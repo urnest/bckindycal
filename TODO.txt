@@ -1,0 +1,63 @@
+- classes for adjusting pages:
+   kc-staff-only-editable
+   ... use python to add readonly="readonly" to all such inputs unless
+   logged in as staff or admin
+   kc-admin-only-editable similar
+   kc-staff-only-visible, remove unless logged in as staff or admin
+   kc-admin-only-visible, remove unless logged in as admin
+   kc-parent-only-visible, remove if logged in as admin or staff
+
+- admin password
+- staff password (editable via super password)
+- parent password (editable via staff password)
+
+- session:
+  - key : uid sent as cookie
+  - level : super=2|staff=1|parent=0
+  - touched : server-time
+
+- view: set<group> - sent as cookie
+
+- term:
+  - number : 1,2,3,4
+  - start date
+  - end date
+  - editable via staff password
+
+- groups
+  eg Matt Monday-Wednesday, Matt Wednesday-Friday
+  - map<term,daysFirstWeek> eg [mon,tue], [wed,thu,fri]
+  - editable via staff password
+
+- events
+  - groups : set<group>
+  - rsvp : False|True|MaxAttendPerDay|map<date,MaxAttend>
+  - dates : set<date>
+  - name : text+font+colour+bg
+  - description : html
+  - attendees : map<date,set<name> >
+
+use event for:
+  - group kindy days
+  - public holidays/kid-free days
+  - maintenance days
+  ... everything except kindy fair stall roster, which would be link
+  to separate area like rss-carnival roster stuff
+
+admin pages:
+  staff-password.html
+
+staff pages:
+  groups.html
+  parent-password.html
+
+parent pages:
+  events.html
+
+  
+-----------------------
+
+  /usr/local/google_appengine/appcfg.py -e xju360@gmail.com update .
+  git status
+  git push ~/kindycal.bare/
+  /usr/local/google_appengine/dev_appserver.py --host 192.168.0.3 --datastore_path=~/kindycal-data --blobstore_path=~/kindycal-blob ~/kindycal/www
