@@ -100,12 +100,16 @@ class login_html(webapp2.RequestHandler):
         if level:
             session.key.delete()
             session.loginLevel=level
-            print 'session %(id)s logged in to level %(loginLevel)s'%{
+            print 'session %(id)s now logged in to level %(loginLevel)s'%{
                 'id':session.sid,
                 'loginLevel':session.loginLevel
                 }
             session.put()
-            result=webapp2.redirect(str(self.request.get('from',level+'.html')))
+            from_=str(self.request.get('from'))
+            if from_=='':
+                from_=level+'.html'
+                pass
+            result=webapp2.redirect(from_)
             result.set_cookie('kc-session',session.sid)
             return result
         page=pq.loadFile('login.html')
