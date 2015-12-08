@@ -18,9 +18,16 @@ handlers:
 - url: /js
   static_dir: js
 
+- url: /login.html$
+  script: kindycal.application
+
+- url: /index.html$
+  script: kindycal.application
+
 - url: /(..*\.html)$
   static_files: \1
   upload: ..*\.html
+  application_readable: true
 
 - url: /(..*\.css)$
   static_files: \1

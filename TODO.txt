@@ -1,3 +1,8 @@
+- login.html
+
+- index.html
+  - if not logged in, redirect to login.html?from=index.html
+
 - classes for adjusting pages:
    kc-staff-only-editable
    ... use python to add readonly="readonly" to all such inputs unless
