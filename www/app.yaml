@@ -24,6 +24,15 @@ handlers:
 - url: /index.html$
   script: kindycal.application
 
+- url: /staff.html$
+  script: kindycal.application
+
+- url: /admin.html$
+  script: kindycal.application
+
+- url: /edit_terms.html$
+  script: kindycal.application
+
 - url: /(..*\.html)$
   static_files: \1
   upload: ..*\.html

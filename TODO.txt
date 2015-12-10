@@ -1,7 +1,7 @@
-- login.html
+x login.html
 
 - index.html
-  - if not logged in, redirect to login.html?from=index.html
+  x if not logged in, redirect to login.html?from=index.html
 
 - classes for adjusting pages:
    kc-staff-only-editable
@@ -23,11 +23,10 @@
 
 - view: set<group> - sent as cookie
 
-- term:
-  - number : 1,2,3,4
-  - start date
-  - end date
-  - editable via staff password
+- terms:
+  - number of terms
+  - dates : [ (start date,end date) ]
+  - editable via staff password edit-terms.html
 
 - groups
   eg Matt Monday-Wednesday, Matt Wednesday-Friday
