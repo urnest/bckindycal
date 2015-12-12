@@ -1,0 +1,5 @@
+%all==%all-tests.tree:leaves
+
+%all-tests.tree==<<
+()+cmd=(/usr/bin/env) 'python' (jsonschema.py):stdout
+()+cmd=(/usr/bin/env) 'python' (pq.py):stdout

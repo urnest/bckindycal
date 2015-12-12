@@ -18,24 +18,35 @@ x login.html
 
 - session:
   - key : uid sent as cookie
-  - level : super=2|staff=1|parent=0
+  - level : admin||staff||parent
   - touched : server-time
 
 - view: set<group> - sent as cookie
 
-- terms:
-  - number of terms
-  - dates : [ (start date,end date) ]
-  - editable via staff password edit-terms.html
+x terms:
+  x number of terms
+  x dates : [ (start date,end date) ]
+  x editable via admin password edit-terms.html
 
 - groups
-  eg Matt Monday-Wednesday, Matt Wednesday-Friday
-  - map<term,daysFirstWeek> eg [mon,tue], [wed,thu,fri]
-  - editable via staff password
+  x editable via staff password
+  x edit_terms.html
+  - edit_terms.js
+    x get
+    - post
+
+- schema:
+  - BoolType
+  - allow literals (matches that literal)
+  - OneOf(list) - match exactly one of the items
+    (so OneOf(['a','b','c']) is an enum)
+  - set(x) - set of x
+  - IntType as dict key
+  - StringType as dict key
 
 - events
-  - groups : set<group>
-  - rsvp : False|True|MaxAttendPerDay|map<date,MaxAttend>
+  - groups : set<group-number>
+  - rsvp : False|True|MaxAttendPerDay
   - dates : set<date>
   - name : text+font+colour+bg
   - description : html

@@ -17,55 +17,7 @@ import sys
 import traceback
 import types
 import string
-
-class PqE(Exception):
-    """Exception allowing capture of cause and context.
-    """
-    def __init__(self, cause):
-        self.cause = cause
-        self.context = []
-        pass
-
-    def addContext(self, context):
-        self.context.append(context)
-        pass
-    
-    def __str__(self):
-        result = ''
-        if len(self.context):
-            x = self.context[:]
-            x.reverse()
-            result = 'Failed to ' + \
-                     string.join(x,
-                                 ' because\nfailed to ') + \
-                                 ' because\n'
-        else:
-            result = 'Failed because\n'
-            pass
-        result = result + self.cause + '.'
-        return result
-
-def makeException(exceptionInfo, context):
-    e = PqE(' '.join(traceback.format_exception(
-        exceptionInfo[0],
-        exceptionInfo[1],
-        exceptionInfo[2])))
-    e.addContext(context)
-    return e
-
-
-def inContext(context, exceptionInfo=None):
-    """Make a PqE that includes exception info and context.
-    If exceptionInfo[1] is already a PqE just add context,
-    otherwise use exceptionInfo as cause for a new PqE.
-
-    exceptionInfo is as returned by sys.exc_info()
-    """
-    if exceptionInfo is None: exceptionInfo=sys.exc_info()
-    if (isinstance(exceptionInfo[1], PqE)):
-        exceptionInfo[1].addContext(context)
-        return exceptionInfo[1]
-    return makeException(exceptionInfo, context)
+from xn import Xn,inContext
 
 class Pos:
     def __init__(self, file, line, col):
@@ -77,11 +29,11 @@ class Pos:
         return '%(file)s:%(line)s:%(col)s' % self.__dict__
     pass
 
-class ParseFailed(PqE):
+class ParseFailed(Xn):
     def __init__(self, cause, pos):
         self.cause=cause
         self.pos=pos
-        PqE.__init__(self.__str__)
+        Xn.__init__(self.__str__)
         return
     def __str__(self):
         return 'failed to parse html at %(pos)s because\n%(cause)s'%self.__dict__

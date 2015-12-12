@@ -1,0 +1,30 @@
+<html>
+<head>
+  <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="kc.js"></script>
+  <script type="text/javascript" src="edit_groups.js"></script>
+</head>
+<body>
+  <form method="POST" action="edit_groups.html">
+    <div class="groups">
+      <table class="group">
+	<tr>
+	  <td>Group Name</td><td><input class="name" type="text" name="name" value=""></td>
+	</tr>
+	<tr class="term">
+	  <td>Term <span class="term-number">1</span> First Week</td>
+	  <td>
+	    <select class="days" name="days">
+	      <option name="Mon-Tue">Mon-Tue</option>
+	      <option name="Mon-Tue-Wed">Mon-Tue-Wed</option>
+	      <option name="Wed-Thu-Fri">Wed-Thu-Fri</option>
+	      <option name="Thu-Fri">Thu-Fri</option>
+	    </select>
+	  </td>
+	</tr>
+      </table>
+    </div>
+    <input id="save-button" name="save" type="submit" value="Save">
+  </form>
+</body>
+</html>

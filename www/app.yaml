@@ -15,10 +15,13 @@ handlers:
 - url: /images
   static_dir: images
 
-- url: /js
-  static_dir: js
-
 - url: /login.html$
+  script: kindycal.application
+
+- url: /admin_login.html$
+  script: kindycal.application
+
+- url: /staff_login.html$
   script: kindycal.application
 
 - url: /index.html$
@@ -33,6 +36,9 @@ handlers:
 - url: /edit_terms.html$
   script: kindycal.application
 
+- url: /edit_groups.html$
+  script: kindycal.application
+
 - url: /(..*\.html)$
   static_files: \1
   upload: ..*\.html
@@ -41,6 +47,13 @@ handlers:
 - url: /(..*\.css)$
   static_files: \1
   upload: ..*\.css
+
+- url: /(..*\.js)$
+  static_files: \1
+  upload: ..*\.js
+
+- url: /..*
+  script: kindycal.application
 
 - url: /script/.*
   script: kindycal.application
