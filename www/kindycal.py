@@ -80,7 +80,7 @@ def getSession(id):
     result[0].put()
     return result[0]
 
-class index(webapp2.RequestHandler):
+class index_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel:
@@ -91,7 +91,7 @@ class index(webapp2.RequestHandler):
         pass
     pass
 
-class admin(webapp2.RequestHandler):
+class admin_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if session.loginLevel!='admin':
@@ -102,7 +102,7 @@ class admin(webapp2.RequestHandler):
         pass
     pass
 
-class staff(webapp2.RequestHandler):
+class staff_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
@@ -113,7 +113,7 @@ class staff(webapp2.RequestHandler):
         pass
     pass
 
-class login(webapp2.RequestHandler):
+class login_page(webapp2.RequestHandler):
     def get(self):
         page=pq.loadFile('login.html')
         page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
@@ -145,7 +145,7 @@ class login(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
         pass
 
-class admin_login(webapp2.RequestHandler):
+class admin_login_page(webapp2.RequestHandler):
     def get(self):
         page=pq.loadFile('admin_login.html')
         page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
@@ -172,6 +172,38 @@ class admin_login(webapp2.RequestHandler):
             result.set_cookie('kc-session',session.sid)
             return result
         page=pq.loadFile('admin_login.html')
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
+        page.find(pq.hasClass('login_failed')).text('Incorrect Password')
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+
+class staff_login_page(webapp2.RequestHandler):
+    def get(self):
+        page=pq.loadFile('staff_login.html')
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+    def post(self):
+        level=None
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if self.request.get('password','')==getPassword('staff'):
+            level='staff'
+            pass
+        if level:
+            session.loginLevel=level
+            print 'session %(id)s now logged in to level %(loginLevel)s'%{
+                'id':session.sid,
+                'loginLevel':session.loginLevel
+                }
+            session.put()
+            from_=str(self.request.get('from'))
+            if from_=='':
+                from_=level+'.html'
+                pass
+            result=webapp2.redirect(from_)
+            result.set_cookie('kc-session',session.sid)
+            return result
+        page=pq.loadFile('staff_login.html')
         page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
         page.find(pq.hasClass('login_failed')).text('Incorrect Password')
         self.response.write(unicode(page).encode('utf-8'))
@@ -225,7 +257,7 @@ class terms(webapp2.RequestHandler):
         return self.response.write(toJson(result).encode('utf-8'))
     pass
 
-class edit_terms(webapp2.RequestHandler):
+class edit_terms_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
@@ -234,14 +266,14 @@ class edit_terms(webapp2.RequestHandler):
         return self.response.write(file('edit_terms.html').read())
     pass
 
-groups_schema=[
+groups_schema=jsonschema.Schema([
     {
         'name': StringType, # eg 'Matt Mon-Wed'
         'terms' : [ {
                 'daysOfFirstWeek' : [StringType], #eg ['Mon','Tue',"Wed']
                 } ]
         }
-    ]
+    ])
 
 class Groups(ndb.Model):
     # data is json encoded groups_schema-conformant
@@ -264,8 +296,8 @@ class groups(webapp2.RequestHandler):
     def post(self):
         try:
             session=getSession(self.request.cookies.get('kc-session',''))
-            if session.loginLevel not in ['admin']:
-                result={'need_login':'admin_login.html'}
+            if session.loginLevel not in ['admin','staff']:
+                result={'error':'Not authorized'}
             else:
                 data=fromJson(self.request.get('params'))
                 assert not data is None
@@ -282,7 +314,7 @@ class groups(webapp2.RequestHandler):
         return self.response.write(toJson(result).encode('utf-8'))
     pass
 
-class edit_groups(webapp2.RequestHandler):
+class edit_groups_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff']:
@@ -292,16 +324,57 @@ class edit_groups(webapp2.RequestHandler):
     pass
 
 
+class events_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff','parent']:
+            print 'not logged in'
+            return webapp2.redirect('login.html?from=events.html')
+        return self.response.write(file('events.html').read())
+    pass
+
+
+class groups_to_show(webapp2.RequestHandler):
+    def get(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                raise xn.Exception('You are not logged in')
+            try:
+                result=fromJson(request.cookies.get('kc-groups-to-show','[]'))
+            except:
+                raise inContext('get groups to show from kc-groups-to-show cookie')
+            return self.response.write(toJson({'result':result}))
+        except:
+            self.response.write(toJson({'error':str(inContext('get groups_to_show'))}))
+            pass
+        pass
+    def post(self):
+        try:
+            groups_to_show=fromJson(self.request.get('params','[]'))
+            jsonschema.Schema([IntType]).validate(groups_to_show)
+            self.response.set_cookie('kc-groups-to-show',toJson(groups_to_show))
+            result={}
+        except:
+            result={'error':str(inContext('save groups'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+        
 application = webapp2.WSGIApplication([
-        ('/', index),
-        ('/admin.html',admin),
-        ('/admin_login.html',admin_login),
-        ('/edit_terms.html',edit_terms),
-        ('/edit_groups.html',edit_groups),
+        ('/', index_page),
+        ('/admin.html',admin_page),
+        ('/admin_login.html',admin_login_page),
+        ('/edit_terms.html',edit_terms_page),
+        ('/edit_groups.html',edit_groups_page),
+        ('/events.html',events_page),
+        ('/index.html', index_page),
+        ('/login.html',login_page),
+        ('/staff.html',staff_page),
+        ('/staff_login.html',staff_login_page),
+
+        # following are not real pages, they are called by javascript files
+        # to get and save data
         ('/groups',groups),
-        ('/index.html', index),
-        ('/login.html',login),
-        ('/staff.html',staff),
-        ('/staff_login.html',staff),
         ('/terms',terms),
 ], debug=True)

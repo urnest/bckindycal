@@ -39,6 +39,9 @@ handlers:
 - url: /edit_groups.html$
   script: kindycal.application
 
+- url: /events.html$
+  script: kindycal.application
+
 - url: /(..*\.html)$
   static_files: \1
   upload: ..*\.html

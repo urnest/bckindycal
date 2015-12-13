@@ -58,12 +58,12 @@ $(document).ready(function(){
       });
     });
     saving=true;
-    $('#save-button').addClass('busy');
+    $('#save-button').addClass('kc-busy-cursor');
     kc.postToServer('terms',{params:kc.json.encode(params)})
       .then(function(){
       })
       .always(function(){
-	$('#save-button').removeClass('busy');
+	$('#save-button').removeClass('kc-busy-cursor');
 	saving=false;
       });
     return false;

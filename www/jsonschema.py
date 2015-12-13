@@ -1,4 +1,4 @@
-from types import IntType,StringType,FloatType,DictType,ListType,TupleType,ObjectType
+from types import IntType,StringType,UnicodeType,FloatType,DictType,ListType,TupleType,ObjectType
 import xn
 from xn import Xn,inContext,firstLineOf
 
@@ -62,7 +62,7 @@ def validate(schema,x):
             raise Xn('%(x)r is not an Int'%vars())
         if schema is FloatType and not type(x) in [IntType,FloatType]:
             raise Xn('%(x)r is not a Float'%vars())
-        if schema is StringType and not type(x) is StringType:
+        if schema is StringType and not type(x) in [StringType,UnicodeType]:
             raise Xn('%(x)r is not a String'%vars())
         if type(schema) is DictType:
             if not type(x) is DictType:
@@ -110,6 +110,7 @@ def test():
     Schema(FloatType).validate(4)
     Schema(FloatType).validate(7.6)
     Schema(StringType).validate('fred')
+    Schema(StringType).validate(u'fred')
     Schema([IntType]).validate([])
     Schema([IntType]).validate([5,6])
     Schema({'a':IntType,'b':StringType}).validate({'a':8,'b':'fred'})

@@ -1,5 +1,6 @@
 $(document).ready(function(){
   var saving=false;
+  var $group_t=$('.group').remove().first();
   kc.getFromServer('groups')
     .then(function(groups){
       groups=groups||[];
@@ -21,11 +22,10 @@ $(document).ready(function(){
 	    }
 	  ]
 	});
-      }
-      var $group_t=$('.group').remove().first();
+      };
       kc.each(groups,function(i,group){
 	var $group=$group_t.clone();
-	$group.find('.name').attr('value',group.name);
+	$group.find('input[name="name"]').prop('value',group.name);
 	var $term_t=$group.find('.term').remove().first();
 	kc.each(group.terms,function(i,term){
 	  var $term=$term_t.clone();
@@ -37,41 +37,32 @@ $(document).ready(function(){
       });
     });
   $('#save-button').click(function(){
-    //REVISIT
-    var $groups=$('.group');
-    var params={
-      numberOfGroups:0,
-      groups:[]
-    };
+    var groups=[];
     if (saving){
       return;
     }
-    saving=true;
-    $groups.each(function(){
-      var $t=$(this);
-      var start=$t.find('.start').prop('value').split('/');
-      var end=$t.find('.end').prop('value').split('/');
-      ++params.numberOfGroups;
-      params.groups.push({
-	start:{
-	  day: parseInt(start[0]),
-	  month: parseInt(start[1]),
-	  year: parseInt(start[2])
-	},
-	end:{
-	  day: parseInt(end[0]),
-	  month: parseInt(end[1]),
-	  year: parseInt(end[2])
-	}
+    $('.group').each(function(){
+      var $group=$(this);
+      var group={
+	name:$group.find('input[name="name"]').prop('value'),
+	terms:[]
+      };
+      $group.find('.term').each(function(){
+	var $term=$(this);
+	var term={
+	  daysOfFirstWeek:$term.find('select[name="days"]').prop('value').split('-')
+	};
+	group.terms.push(term);
       });
+      groups.push(group);
     });
     saving=true;
-    $('#save-button').addClass('busy');
-    kc.postToServer('groups',{params:kc.json.encode(params)})
+    $('#save-button').addClass('kc-busy-cursor');
+    kc.postToServer('groups',{params:kc.json.encode(groups)})
       .then(function(){
       })
       .always(function(){
-	$('#save-button').removeClass('busy');
+	$('#save-button').removeClass('kc-busy-cursor');
 	saving=false;
       });
     return false;
