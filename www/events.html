@@ -4,13 +4,283 @@
   <script type="text/javascript" src="kc.js"></script>
   <script type="text/javascript" src="events.js"></script>
   <style type="text/css" src="kc.css"></style>
+
+<style type="text/css">
+TD {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #333333;
+	background: #FFFFFF;
+	border: 1px solid #FFFFFF;
+	text-align:left;
+}
+TD.nobg {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #333333;
+	padding: 5px;
+	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+}
+TD.bwhd {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	background: #333333;
+	padding: 10px;
+}
+TD.calhd {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #FFFFFF;
+	background: #295882;
+	vertical-align: middle;
+	height: 15px;
+	width: 120px;
+	padding: 4px;
+}
+TD.calhdc {
+	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	font-weight: bold;
+	color: #ffffff;
+	background: #81c344;
+	vertical-align: middle;
+	text-align: center;
+	height: 15px;
+	width: 150px;
+}
+TD.calteal {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	color: #333333;
+	background: #1CCDDF;
+	vertical-align: middle;
+	text-align: center;
+	height: 15px;
+	width: 120px;
+}
+TD.callime {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	color: #333333;
+	background: #B9CC23;
+	vertical-align: middle;
+	text-align: center;
+	height: 15px;
+	width: 120px;
+}
+TD.calbl {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #FFFFFF;
+	background: ##66CCFF;
+	vertical-align: middle;
+	text-align: center;
+	height: 15px;
+	width: 120px;
+	padding: 4px;
+}
+TD.cal {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #333333;
+	background: #FFFFFF;
+	vertical-align: top;
+	height: 50px;
+	padding: 4px;
+}
+TD.calon {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #2b5caa;
+	background-color: #fee1ba;
+	border: 1px solid #FFFFFF;
+	vertical-align: top;
+	height: 100px;
+	padding: 4px;
+}
+TD.calout {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #333333;
+	background-color: #cccccc;
+	vertical-align: top;
+	height: 50px;
+	padding: 4px;
+}
+TD.calopt {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #333333;
+	vertical-align: middle;
+	height: 50px;
+	padding: 4px;
+}
+</style>
 </head>
 <body>
   <div class="toolbar">
     <select class="groups-to-show" name="groups-to-show">
+      <option>Matt Mon-Wed</option>
     </select>
     <a href="add_event.html" class="add-event">New Event</a>
   </div>
-  <div class="month-of-events">
-  </div>
+
+  <table border="0" bordercolor="#ffffff" cellspacing="0" cellpadding="0" align="center" class="month-of-events">
+    <tr>
+      <td class="calopt" colspan=8>&nbsp;&nbsp;<a href="/mthprev" class="prevmonth"><img src="images/but_left.png" alt="Prev" border="0"/></a><a href="/mthnext" class="nextmonth"><img src="images/but_right.png" alt="Next"  border="0"/></a>&nbsp;&nbsp; <span class="hdmth"><span class="month">January</span> <span class="year">2014</span></span></td>
+    </tr>
+    <tr class="head1">
+      <td class="mon cal">&nbsp;&nbsp;&nbsp;</td>
+      <td colspan="1" class="sun calhdc">SUNDAY</td>
+      <td class="cal">&nbsp</td>
+      <td colspan="1" class="mon calhdc">MONDAY</td>
+      <td class="cal">&nbsp</td>
+      <td colspan="1" class="calhdc">TUESDAY</td>
+      <td class="cal">&nbsp</td>
+      <td colspan="1" class="calhdc">WEDNESDAY</td>
+      <td class="cal">&nbsp</td>
+      <td colspan="1" class="calhdc">THURSDAY</td>
+      <td class="cal">&nbsp</td>
+      <td colspan="1" class="calhdc">FRIDAY</td>
+      <td class="cal">&nbsp</td>
+      <td colspan="1" class="calhdc">SATURDAY</td>
+      <td class="cal">&nbsp;&nbsp;&nbsp;</td>
+    </tr>
+    <tr class="week">
+      <td class="sun cal">&nbsp;</td>
+      <td class="sun calout">&nbsp;</td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">2</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">3</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">4</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">5</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">6</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">7</span><br />
+      </td>
+    </tr>
+    <tr class="week">
+      <td class="sun cal">&nbsp;</td>
+      <td class="sun calout">&nbsp;</td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">9</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">10</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">11</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">12</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">13</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">14</span><br />
+      </td>
+    </tr>
+    <tr class="week">
+      <td class="sun cal">&nbsp;</td>
+      <td class="sun calout">&nbsp;</td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">16</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">17</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">18</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">19</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">20</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">21</span><br />
+      </td>
+    </tr>
+    <tr class="week">
+      <td class="sun cal">&nbsp;</td>
+      <td class="sun calout">&nbsp;</td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">23</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">24</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">25</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">26</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">27</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day">28</span><br />
+      </td>
+    </tr>
+    <tr class="week">
+      <td class="sun cal">&nbsp;</td>
+      <td class="sun calout">&nbsp;</td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">30</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calon"><span class="day">31</span><br />
+        <br />
+        <span class="helper">Nicole Taylor</span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day"></span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day"></span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day"></span><br />
+      </td>
+      <td class="cal">&nbsp;</td>
+      <td class="calout"><span class="day"></span><br />
+      </td>
+    </tr>
+  </table>
+</div>
 </body>

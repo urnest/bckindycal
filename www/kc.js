@@ -120,13 +120,13 @@
 	  responseData=kc.json.decode(responseData_);
 	}
 	catch(e){
-	  result.error_(''+e);
+	  result.error_(kc.inContext(''+e, 'get url '+url));
 	  result.always_();
 	  return;
 	}
         if (typeof(responseData.error) != 'undefined' && 
 	    responseData.error != '') {
-	  result.error_(''+responseData.error);
+	  result.error_(kc.inContext(''+responseData.error, 'get url '+url));
         }
         else {
           if (window.console&&console.log&&responseData.msg) {
@@ -137,7 +137,7 @@
 	result.always_();
       },
       error: function(jqXHR, status, e){
-	result.error_(kc.inContext(''+e, 'post data to '+url));
+	result.error_(kc.inContext(''+e, 'get url '+url));
 	result.always_();
       }
     });

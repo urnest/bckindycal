@@ -341,7 +341,7 @@ class groups_to_show(webapp2.RequestHandler):
             if not session.loginLevel:
                 raise xn.Exception('You are not logged in')
             try:
-                result=fromJson(request.cookies.get('kc-groups-to-show','[]'))
+                result=fromJson(self.request.cookies.get('kc-groups-to-show','[]'))
             except:
                 raise inContext('get groups to show from kc-groups-to-show cookie')
             return self.response.write(toJson({'result':result}))
@@ -376,5 +376,6 @@ application = webapp2.WSGIApplication([
         # following are not real pages, they are called by javascript files
         # to get and save data
         ('/groups',groups),
+        ('/groups_to_show',groups_to_show),
         ('/terms',terms),
 ], debug=True)
