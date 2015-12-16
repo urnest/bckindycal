@@ -63,15 +63,34 @@ $(document).ready(function(){
       $('select.groups-to-show').html($options);
       $('select.groups-to-show').prop('value','['+kc.join(',',groupsToShow)+']');
       $('select.groups-to-show').change(function(){
-	groupsToShow=kc.json.decode($('select.groups-to-show').prop('value'));
-	kc.postToServer('groups_to_show',groupsToShow);
-	refresh();
+	setTimeout(function(){
+	  groupsToShow=kc.json.decode($('select.groups-to-show').prop('value'));
+	  kc.postToServer('groups_to_show',{
+	    params:kc.json.encode(groupsToShow)
+	  });
+	  refresh();
+	},0);
       });
       refresh();
     }
   };
   var refresh=function(){
-    kc.getFromServer('getcal',monthToShow,function(result){
-    });
+    var cal;
+    var termWeeks;
+    kc.getFromServer('month_calendar',{params:kc.json.encode(monthToShow)})
+      .then(function(result){
+	cal=result;
+	proceed();
+      });
+    kc.getFromServer('term_weeks',{params:kc.json.encode(monthToShow)})
+      .then(function(result){
+	termWeeks=result;
+	proceed();
+      });
+    var proceed=function(){
+      if (kc.defined(cal) &&
+	  kc.defined(termWeeks)){
+      }
+    };
   };
 });

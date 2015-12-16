@@ -1,0 +1,27 @@
+<html>
+<head>
+  <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+  <script type="text/javascript" src="kc.js"></script>
+  <script type="text/javascript" src="edit_event.js"></script>
+  <style type="text/css" src="kc.css"></style>
+</head>
+<body>
+  <form method="POST" action="event">
+    <table>
+      <tr>
+	<td>Name</td><td><input type="text"></td>
+      </tr>
+      <tr>
+	<td>Groups</td><td><select class="groups"><option>Matt Mon-Wed + Jane Mon-Wed</option></select></td>
+      </tr>
+      <tr>
+	<td>Dates</td><td><input class="dates" type="text" value="2/5/2016"></td>
+      </tr>
+    </table>
+    <div class="event-description">
+      <p>Today we will walk down to the <a href="https://www.google.com.au/maps/place/Bowman+Park,+Bardon+QLD+4065,+Australia/@-27.4584688,152.9772335,15z/data=!4m2!3m1!1s0x6b9150d23865f899:0xf02a35bd721b320">park</a> to see the crocodiles that live there.</p>
+      <p>Wear appropriate shoes (no crocs!).</p>
+    </div>
+    <input type="submit" value="Save">
+  </form>
+</body>
