@@ -96,7 +96,7 @@ class admin_page(webapp2.RequestHandler):
         session=getSession(self.request.cookies.get('kc-session',''))
         if session.loginLevel!='admin':
             print 'not logged in as admin'
-            return webapp2.redirect('admin_login.html?from=index.html')
+            return webapp2.redirect('admin_login.html?from=admin.html')
         self.response.write(file('admin.html').read())
         self.response.set_cookie('kc-session',session.sid)
         pass
@@ -457,13 +457,13 @@ def nextEventId():
 event_schema=jsonschema.Schema({
         'id': IntType, #0 for new event
         'groups': [ IntType ],
-        'dates' : [ {year:IntType,month:IntType,Day:IntType} ],
+        'dates' : [ {'year':IntType,'month':IntType,'day':IntType} ],
         'name' : {
             'text':StringType,
             'colour':StringType
             },
         'description' : {
-            html : StringType
+            'html' : StringType
             }
         })
 
@@ -502,7 +502,7 @@ class event(webapp2.RequestHandler):
                             dates=[datetime.date(_['y'],_['m'],_['d']) \
                                        for _ in data['dates']],
                             data=data)
-                for x in Event.query(Event.id==event.id),ancestor=root_key).fetch(1): x.key.delete()
+                for x in Event.query(Event.id==event.id,ancestor=root_key).fetch(1): x.key.delete()
                 event.put()
                 result=event.data
                 event_schema.validate(result)
