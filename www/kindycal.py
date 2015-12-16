@@ -500,7 +500,7 @@ class event(webapp2.RequestHandler):
                 if data['id']==0: data['id']=nextEventId()
                 event=Event(id=data['id'],
                             dates=[datetime.date(_['y'],_['m'],_['d']) \
-                                       for _ in data['dates']),
+                                       for _ in data['dates']],
                             data=data)
                 for x in Event.query(Event.id==event.id),ancestor=root_key).fetch(1): x.key.delete()
                 event.put()
