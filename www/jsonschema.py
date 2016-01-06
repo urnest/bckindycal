@@ -24,8 +24,12 @@ def validateSchemaElement(x):
         if x is None: return
         if x in [IntType,StringType,FloatType]: return
         if type(x) is DictType:
+            if len(x) == 1 and x.keys()[0] in (IntType,StringType):
+                validateSchemaElement(x.values()[0])
+                return
             for name,y in x.items():
                 try:
+                    assert type(name) is StringType, type(name)
                     validateSchemaElement(y)
                 except:
                     raise inContext('validate dict schema item %(name)r'%vars())
@@ -67,6 +71,17 @@ def validate(schema,x):
         if type(schema) is DictType:
             if not type(x) is DictType:
                 raise Xn('%(x)r is not a Dictionary'%vars())
+            if len(schema)==1 and schema.keys()[0] in (IntType,StringType):
+                for key,y in x.items():
+                    try:
+                        if not type(key) is schema.keys()[0]:
+                            n=schema.keys()[0].__name__
+                            raise Xn('%(key)r is not a %(n)r'%vars())
+                        validate(schema.values()[0],y)
+                    except:
+                        raise inContext('validate dictionary item %(key)r'%vars())
+                    pass
+                return
             for name, y in x.items():
                 try:
                     if not name in schema:
@@ -116,6 +131,8 @@ def test():
     Schema({'a':IntType,'b':StringType}).validate({'a':8,'b':'fred'})
     Schema([{'a':IntType,'b':StringType}]).validate([{'a':8,'b':'fred'},{'a':7,'b':'jock'}])
     Schema((IntType,StringType)).validate([8,'fred'])
+    Schema({IntType:StringType}).validate({1:'fred',2:'jock'})
+    Schema({StringType:IntType}).validate({'fred':1,'jock':2})
     try:
         Schema(IntType).validate('fred')
         assert None
@@ -147,6 +164,12 @@ def test():
     except Exception,e:
         assert str(e)=="Failed to verify {'a': 8, 'b': 6} conforms to json schema {'a': <type 'int'>, 'b': <type 'str'>} because\nfailed to validate dictionary item 'b' because\nfailed to verify 6 conforms to json schema <type 'str'> because\n6 is not a String.",repr(str(e))
         pass
-    
+    try:
+        Schema({IntType:StringType}).validate({'sal':'fred',2:'jock'})
+    except Exception,e:
+        assert str(e)=="Failed to verify {2: 'jock', 'sal': 'fred'} conforms to json schema {<type 'int'>: <type 'str'>} because\nfailed to validate dictionary item 'sal' because\n'sal' is not a 'int'.",repr(str(e))
+        pass
+    pass
+        
 if __name__=='__main__':
     test()

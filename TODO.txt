@@ -39,11 +39,11 @@ x terms:
 - schema:
   - BoolType
   - allow literals (matches that literal)
-  - OneOf(list) - match exactly one of the items
-    (so OneOf(['a','b','c']) is an enum)
+  - OneOf(a,b,c) - match exactly one of the items
+    (so OneOf('a','b','c') is an enum)
   - set(x) - set of x
-  - IntType as dict key
-  - StringType as dict key
+  x IntType as dict key
+  x StringType as dict key
   - embed Schema
 
 - events.html
@@ -54,8 +54,11 @@ x terms:
     x update cookie on change
   - new event link (staff only)
   - calendar month
-    - get current month
+    - get current month via month_calendar and display
     - highlight days of groups-to-show
+      - adjust month_calendar to return {'term':IntType,'week':IntType}||None as 'term_week' instead of 'name'
+      - that way we know if it even or odd week for that term and
+        can figure out which days group is on that week
       - need to know whole term so can figure out what week we're in
         (do it on server side? get_month_term_week_numbers?y=2016&m=3)
     - fetch events for this month

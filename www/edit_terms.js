@@ -10,12 +10,12 @@ $(document).ready(function(){
 	terms.push({
 	  start:{
 	    year: today.getYear()+1900,
-	    month: today.getMonth(),
+	    month: today.getMonth()+1,
 	    day: today.getDay()
 	  },
 	  end:{
 	    year: today.getYear()+1900,
-	    month: today.getMonth(),
+	    month: today.getMonth()+1,
 	    day: today.getDay()
 	  }
 	});

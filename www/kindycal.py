@@ -6,6 +6,7 @@ import webapp2
 import pq
 import datetime
 import uuid
+import stuff
 
 from google.appengine.ext import ndb
 
@@ -222,18 +223,24 @@ class Terms(ndb.Model):
     # data is json encoded terms_schema-conformant
     data=ndb.StringProperty(indexed=False,repeated=False)
 
+def fetchTerms():
+    '''fetch terms from db'''
+    terms=Terms.query(ancestor=root_key).fetch(1)
+    if len(terms)==0:
+        result=None
+    else:
+        result=fromJson(terms[0].data)
+        pass
+    return result
+    pass
+
 class terms(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel:
             result={'error':'You are not logged in.'}
         else:
-            terms=Terms.query(ancestor=root_key).fetch(1)
-            if len(terms)==0:
-                result=None
-            else:
-                result=fromJson(terms[0].data)
-                pass
+            result=fetchTerms()
             pass
         return self.response.write(toJson({'result':result}))
     def post(self):
@@ -245,6 +252,7 @@ class terms(webapp2.RequestHandler):
                 data=fromJson(self.request.get('params'))
                 assert not data is None
                 terms_schema.validate(data)
+                print 'save terms: '+toJson(data)
                 for x in Terms.query(ancestor=root_key).fetch(100000): x.key.delete()
                 Terms(parent=root_key,
                       data=toJson(data)).put()
@@ -378,28 +386,6 @@ class groups_to_show(webapp2.RequestHandler):
         return self.response.write(toJson(result).encode('utf-8'))
     pass
 
-month_calendar_schema=jsonschema.Schema({
-        'y':IntType,
-        'm':IntType,
-        'c':[ [ IntType ] ] # [week][dayOfWeek]=dayOfMonth||0
-})
-
-class month_calendar(webapp2.RequestHandler):
-    def get(self):
-        'get month calendar - see calendar.Calendar.monthdayscalendar'
-        try:
-            monthToShow=fromJson(self.request.get('params'))
-            m=monthToShow['m']
-            y=monthToShow['y']
-            c=calendar.Calendar(6).monthdayscalendar(y,m)
-            result={'y':y,'m':m,'c':c}
-            month_calendar_schema.validate(result)
-            self.response.write(toJson(result))
-        except:
-            self.response.write(toJson({'error':str(inContext('get month calendar'))}))
-            pass
-        pass
-
 term_weeks_schema=jsonschema.Schema({
     'month': { 'y': IntType, 'm': IntType },
     'weeks' : [ # week number, 0..4 or 0..5 or 0..6
@@ -514,6 +500,63 @@ class event(webapp2.RequestHandler):
             pass
         return self.response.write(toJson(result).encode('utf-8'))
     pass
+
+month_calendar_schema=jsonschema.Schema({
+        'y':IntType,
+        'm':IntType,
+        'weeks':[
+            {
+                'name':StringType, #egs None, 'Term 1\nweek 1', 'week 2'
+                'days':[StringType], #egs '', '31'
+            }
+        ]
+})
+
+def dayName(n):
+    if n:
+        return str(n)
+    return ''
+
+class month_calendar(webapp2.RequestHandler):
+    def get(self):
+        'get month calendar'
+        try:
+            monthToShow=fromJson(self.request.get('params'))
+            m=monthToShow['m']
+            y=monthToShow['y']
+            c=calendar.Calendar(6).monthdayscalendar(y,m)
+            week_names=['' for _ in c]
+            for ti,term in enumerate((fetchTerms() or {
+                    'numberOfTerms':0,
+                    'terms':[]})['terms']):
+                week_names=[_[0] or _[1] for _ in
+                            zip(week_names,
+                                stuff.weekNames(
+                                    (y,m),
+                                    ti+1,
+                                    datetime.date(
+                                        term['start']['year'],
+                                        term['start']['month'],
+                                        term['start']['day']),
+                                    datetime.date(
+                                        term['end']['year'],
+                                        term['end']['month'],
+                                        term['end']['day'])))]
+                
+
+            result={'y':y,'m':m,
+                    'weeks':[
+                        {'name':_[0],
+                         'days':[dayName(d) for d in _[1]]
+                        }
+                        for _ in zip(week_names,c)]
+                    }
+            month_calendar_schema.validate(result)
+            self.response.write(toJson({'result':result}))
+        except:
+            self.response.write(toJson({'error':str(inContext('get month calendar'))}))
+            pass
+        pass
 
 application = webapp2.WSGIApplication([
         ('/', index_page),

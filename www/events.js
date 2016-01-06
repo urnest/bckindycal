@@ -1,6 +1,13 @@
 var monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
 var dayNames=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
 
+var $calendar;
+var $week_t;
+var $sunday_t;
+var $weekday_t;
+var $saturday_t;
+var $event_t;
+
 $(document).ready(function(){
   var groups;
   var terms;
@@ -11,6 +18,10 @@ $(document).ready(function(){
     y: new Date().getFullYear(),
     m: new Date().getMonth()+1
   };
+  $calendar=$('table.month-of-events');
+  $event_t=$calendar.find('span.event').remove().first();
+  $week_t=$calendar.find('tr.week').remove().first();
+  
   $('body').addClass('kc-busy-cursor');
   kc.getFromServer('groups')
     .then(function(result){
@@ -76,20 +87,24 @@ $(document).ready(function(){
   };
   var refresh=function(){
     var cal;
-    var termWeeks;
     kc.getFromServer('month_calendar',{params:kc.json.encode(monthToShow)})
       .then(function(result){
 	cal=result;
 	proceed();
       });
-    kc.getFromServer('term_weeks',{params:kc.json.encode(monthToShow)})
-      .then(function(result){
-	termWeeks=result;
-	proceed();
-      });
     var proceed=function(){
-      if (kc.defined(cal) &&
-	  kc.defined(termWeeks)){
+      if (kc.defined(cal)){
+	$calendar.find('tr.week').remove();
+	kc.each(cal.weeks,function(i,week){
+	  var $week=$week_t.clone();
+	  var $days=$week.find('td.day');
+	  $week.find('.week-label').text(week.name);
+	  kc.each(week.days,function(i,day){
+	    var $day=$($days.get(i));
+	    $day.find('span.day').text(day||'');
+	  });
+	  $calendar.append($week);
+	});
       }
     };
   };
