@@ -18,6 +18,16 @@ class Schema:
         return
     pass
 
+class OneOf:
+    def __init__(self,*choices):
+        self.choices=choices
+        pass
+    def __str__(self):
+        return 'one of %(choices)s'%self.__dict__
+    def __repr__(self):
+        return 'one of %(choices)r'%self.__dict__
+    pass
+
 def validateSchemaElement(x):
     'verify that %(x)r is a valid json schema element'
     try:
@@ -48,6 +58,13 @@ def validateSchemaElement(x):
                 except:
                     raise inContext('validate tuple schema item %(i)r'%vars())
                 pass
+            return
+        if isinstance(x,OneOf):
+            for c in x.choices:
+                validateSchemaElement(c)
+                pass
+            return
+        if isinstance(x,Schema):
             return
         t=type(x)
         if t is ObjectType: t=x.__class__
@@ -114,6 +131,21 @@ def validate(schema,x):
                     raise inContext('validate tuple schema element %(i)s'%vars())
                 pass
             pass
+        if isinstance(schema,OneOf):
+            choices=schema.choices[:]
+            failures=[]
+            while len(choices):
+                try:
+                    validate(choices[0],x)
+                    return
+                except Exception,e:
+                    failures.append(e)
+                    pass
+                choices=choices[1:]
+                pass
+            raise Xn(' and '.join([str(_) for _ in failures]))
+        if isinstance(schema,Schema):
+            schema.validate(x)
         pass
     except:
         raise inContext(l1(validate.__doc__)%vars())
@@ -133,6 +165,9 @@ def test():
     Schema((IntType,StringType)).validate([8,'fred'])
     Schema({IntType:StringType}).validate({1:'fred',2:'jock'})
     Schema({StringType:IntType}).validate({'fred':1,'jock':2})
+    Schema(OneOf(IntType,StringType)).validate(1)
+    Schema(OneOf(IntType,StringType)).validate('fred')
+    Schema([Schema(IntType)]).validate([1,2,3])
     try:
         Schema(IntType).validate('fred')
         assert None
@@ -169,6 +204,11 @@ def test():
     except Exception,e:
         assert str(e)=="Failed to verify {2: 'jock', 'sal': 'fred'} conforms to json schema {<type 'int'>: <type 'str'>} because\nfailed to validate dictionary item 'sal' because\n'sal' is not a 'int'.",repr(str(e))
         pass
+    try:
+        Schema(OneOf(IntType,StringType)).validate(None)
+    except Exception,e:
+        assert str(e)=="Failed to verify None conforms to json schema one of (<type 'int'>, <type 'str'>) because\nFailed to verify None conforms to json schema <type 'int'> because\nNone is not an Int. and Failed to verify None conforms to json schema <type 'str'> because\nNone is not a String..",repr(str(e))
+        
     pass
         
 if __name__=='__main__':

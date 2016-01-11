@@ -246,7 +246,7 @@ class terms(webapp2.RequestHandler):
     def post(self):
         try:
             session=getSession(self.request.cookies.get('kc-session',''))
-            if session.loginLevel not in ['admin']:
+            if session.loginLevel not in ['admin','staff']:
                 result={'error':'You are not logged in.'}
             else:
                 data=fromJson(self.request.get('params'))
@@ -286,19 +286,24 @@ groups_schema=jsonschema.Schema([
 class Groups(ndb.Model):
     # data is json encoded groups_schema-conformant
     data=ndb.StringProperty(indexed=False,repeated=False)
+    pass
 
+def fetchGroups():
+    groups=Groups.query(ancestor=root_key).fetch(1)
+    if len(groups)==0:
+        result=None
+    else:
+        result=fromJson(groups[0].data)
+        pass
+    return result
+    
 class groups(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel:
             result={'error':'you are not logged in'}
         else:
-            groups=Groups.query(ancestor=root_key).fetch(1)
-            if len(groups)==0:
-                result=None
-            else:
-                result=fromJson(groups[0].data)
-                pass
+            result=fetchGroups()
             pass
         return self.response.write(toJson({'result':result}))
     def post(self):
@@ -351,6 +356,12 @@ class edit_events_page(webapp2.RequestHandler):
         if not session.loginLevel in ['admin','staff']:
             print 'not logged in'
             return webapp2.redirect('staff.html?from=events.html')
+        if fetchTerms() is None:
+            print 'terms not defined'
+            return webapp2.redirect('edit_terms.html')
+        if fetchGroups() is None:
+            print 'groups not defined'
+            return webapp2.redirect('edit_groups.html')
         page=pq.loadFile('events.html')
         if not session.loginLevel in ['admin']:
             page.find(pq.hasClass('admin-only')).remove()
@@ -385,40 +396,6 @@ class groups_to_show(webapp2.RequestHandler):
             pass
         return self.response.write(toJson(result).encode('utf-8'))
     pass
-
-term_weeks_schema=jsonschema.Schema({
-    'month': { 'y': IntType, 'm': IntType },
-    'weeks' : [ # week number, 0..4 or 0..5 or 0..6
-        {
-            'termIndex':IntType, # see terms_schema
-            'weekNumber':IntType # 1.. (or 0 if not in a term)
-        }
-    ]
-})
-class term_weeks(webapp2.RequestHandler):
-    def get(self):
-        'get term weeks for a month'
-        try:
-            monthToShow=fromJson(self.request.get('params'))
-            m=monthToShow['m']
-            y=monthToShow['y']
-            result={
-                'month': monthToShow,
-                'weeks':[
-                    #REVISIT
-                    { 'termIndex':0, 'weekNumber': 2 },
-                    { 'termIndex':0, 'weekNumber': 3 },
-                    { 'termIndex':0, 'weekNumber': 4 },
-                    { 'termIndex':0, 'weekNumber': 5 },
-                    { 'termIndex':0, 'weekNumber': 6 },
-                    ]
-                }
-            term_weeks_schema.validate(result)
-            self.response.write(toJson(result))
-        except:
-            self.response.write(toJson({'error':str(inContext('get term weeks for a month'))}))
-            pass
-        pass
 
 class EventIdCounter(ndb.Model):
     """Counter to assign ids to events."""
@@ -458,8 +435,8 @@ class Event(ndb.Model):
     data=ndb.StringProperty(indexed=False,repeated=False)
     # id from data['id']
     id=ndb.IntegerProperty(indexed=True,repeated=False)
-    # dates from data['dates']
-    dates=ndb.DateProperty(indexed=True,repeated=True)
+    # months of data['dates'], as yyyymm
+    months=ndb.IntegerProperty(indexed=True,repeated=True)
     pass
 
 class event(webapp2.RequestHandler):
@@ -484,13 +461,14 @@ class event(webapp2.RequestHandler):
                 assert not data is None
                 event_schema.validate(data)
                 if data['id']==0: data['id']=nextEventId()
-                event=Event(id=data['id'],
-                            dates=[datetime.date(_['y'],_['m'],_['d']) \
-                                       for _ in data['dates']],
-                            data=data)
+                event=Event(parent=root_key,
+                            id=data['id'],
+                            months=[_['year']*100+_['month'] \
+                                    for _ in data['dates']],
+                            data=toJson(data))
                 for x in Event.query(Event.id==event.id,ancestor=root_key).fetch(1): x.key.delete()
                 event.put()
-                result=event.data
+                result=fromJson(event.data)
                 event_schema.validate(result)
                 result={'result':result}
                 pass
@@ -506,7 +484,12 @@ month_calendar_schema=jsonschema.Schema({
         'm':IntType,
         'weeks':[
             {
-                'name':StringType, #egs None, 'Term 1\nweek 1', 'week 2'
+                'term_week':jsonschema.OneOf(
+                    {
+                        'term':IntType, #>=1
+                        'week':IntType #>=1
+                    },
+                    None),
                 'days':[StringType], #egs '', '31'
             }
         ]
@@ -546,7 +529,7 @@ class month_calendar(webapp2.RequestHandler):
 
             result={'y':y,'m':m,
                     'weeks':[
-                        {'name':_[0],
+                        {'term_week':_[0],
                          'days':[dayName(d) for d in _[1]]
                         }
                         for _ in zip(week_names,c)]
@@ -557,26 +540,63 @@ class month_calendar(webapp2.RequestHandler):
             self.response.write(toJson({'error':str(inContext('get month calendar'))}))
             pass
         pass
+    pass
+
+month_events_schema=jsonschema.Schema([event_schema])
+
+class month_events(webapp2.RequestHandler):
+    def get(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                y=int(self.request.get('y'))
+                m=int(self.request.get('m'))
+                print y*100+m
+                events=[fromJson(_.data) for _ in
+                        Event.query(ancestor=root_key).fetch(10000)
+                        if y*100+m in _.months]
+                print events
+                month_events_schema.validate(events)
+                self.response.write(toJson({'result':events}))
+        except:
+            self.response.write(toJson({'error':str(inContext('get month events'))}))
+            pass
+        pass
+    pass
+
+class edit_event_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['staff','admin']:
+            print 'not logged in as staff or admin'
+            return webapp2.redirect('staff_login.html?from=edit_terms.html')
+        page=pq.loadFile('edit_event.html')
+        page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
 
 application = webapp2.WSGIApplication([
-        ('/', index_page),
-        ('/admin.html',admin_page),
-        ('/admin_login.html',admin_login_page),
-        ('/edit_terms.html',edit_terms_page),
-        ('/edit_groups.html',edit_groups_page),
-        ('/edit_events.html',edit_events_page),
-        ('/events.html',events_page),
-        ('/index.html', index_page),
-        ('/login.html',login_page),
-        ('/staff.html',staff_page),
-        ('/staff_login.html',staff_login_page),
-
-        # following are not real pages, they are called by javascript files
-        # to get and save data
-        ('/groups',groups),
-        ('/groups_to_show',groups_to_show),
-        ('/terms',terms),
-        ('/month_calendar',month_calendar),
-        ('/term_weeks',term_weeks),
-        ('/event',event),
+    ('/', index_page),
+    ('/admin.html',admin_page),
+    ('/admin_login.html',admin_login_page),
+    ('/edit_terms.html',edit_terms_page),
+    ('/edit_groups.html',edit_groups_page),
+    ('/edit_event.html',edit_event_page),
+    ('/edit_events.html',edit_events_page),
+    ('/events.html',events_page),
+    ('/index.html', index_page),
+    ('/login.html',login_page),
+    ('/staff.html',staff_page),
+    ('/staff_login.html',staff_login_page),
+    
+    # following are not real pages, they are called by javascript files
+    # to get and save data
+    ('/groups',groups),
+    ('/groups_to_show',groups_to_show),
+    ('/terms',terms),
+    ('/month_calendar',month_calendar),
+    ('/month_events',month_events),
+    ('/event',event),
 ], debug=True)

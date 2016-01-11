@@ -46,10 +46,11 @@ def termWeekName(weekNumber, termNumber):
     assert weekNumber is None or weekNumber >= 1, weekNumber
     assert termNumber >= 1, termNumber
     if weekNumber is None:
-        return ''
-    if weekNumber == 1:
-        return 'Term %(termNumber)s\nweek %(weekNumber)s'%vars()
-    return 'week %(weekNumber)s'%vars()
+        return None
+    return {
+        'term':termNumber,
+        'week':weekNumber
+    }
 
     
 def weekNames(month, termNumber, termStart, termEnd):
@@ -93,17 +94,22 @@ def test3():
                  1,
                  datetime.date(2016,1,25),
                  datetime.date(2016,3,25) )
-    assert x==['', '', '', '', 'Term 1\nweek 1', 'week 2'], x
+    assert x==[None, None, None, None, {'term':1,'week':1}, {'term':1,'week':2}], x
     x=weekNames( (2016,2),
                  1,
                  datetime.date(2016,1,25),
                  datetime.date(2016,3,25) )
-    assert x==['week 2', 'week 3', 'week 4', 'week 5', 'week 6'], x
+    assert x==[{'term':1,'week':2}, {'term':1,'week':3},{'term':1,'week':4},{'term':1,'week':5}, {'term':1,'week':6}], x
     x=weekNames( (2016,3),
                  1,
                  datetime.date(2016,1,25),
                  datetime.date(2016,3,25) )
-    assert x==['week 6', 'week 7', 'week 8', 'week 9', ''], x
+    assert x==[{'term':1,'week':6}, {'term':1,'week':7}, {'term':1,'week':8}, {'term':1,'week':9}, None], x
+    x=weekNames( (2016,1),
+                 1,
+                 datetime.date(2016,1,25),
+                 datetime.date(2016,4,25) )
+    assert x==[None,None,None,None,{'week': 1, 'term': 1}, {'week': 2, 'term': 1}], x
     pass
 
 if __name__=='__main__':
