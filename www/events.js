@@ -130,7 +130,7 @@ $(document).ready(function(){
   var refresh=function(){
     var cal;
     var events;
-    $('span.month').text(monthNames[monthToShow.m]);
+    $('span.month').text(monthNames[monthToShow.m-1]);
     $('span.year').text(monthToShow.y);
     kc.getFromServer('month_calendar',{params:kc.json.encode(monthToShow)})
       .then(function(result){

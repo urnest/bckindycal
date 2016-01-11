@@ -387,7 +387,7 @@ class groups_to_show(webapp2.RequestHandler):
         pass
     def post(self):
         try:
-            groups_to_show=fromJson(self.request.get('params','[]'))
+            groups_to_show=fromJson(self.request.get('params','[0,1,2,3]'))
             jsonschema.Schema([IntType]).validate(groups_to_show)
             self.response.set_cookie('kc-groups-to-show',toJson(groups_to_show))
             result={}
@@ -555,8 +555,8 @@ class month_events(webapp2.RequestHandler):
                 m=int(self.request.get('m'))
                 print y*100+m
                 events=[fromJson(_.data) for _ in
-                        Event.query(ancestor=root_key).fetch(10000)
-                        if y*100+m in _.months]
+                        Event.query(Event.months==y*100+m,
+                                    ancestor=root_key).fetch(10000)]
                 print events
                 month_events_schema.validate(events)
                 self.response.write(toJson({'result':events}))
