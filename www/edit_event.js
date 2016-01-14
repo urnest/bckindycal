@@ -46,6 +46,9 @@ $(document).ready(function(){
 	description:{html:description}
       })
     })
+      .then(function(){
+	window.location='edit_events.html';
+      })
       .always(function(){
 	$('body').removeClass('kc-busy-cursor');
       });
@@ -97,7 +100,7 @@ $(document).ready(function(){
   var proceed=function(){
     if (groups && event){
       var $o_t=$groupsOption_t;
-      var $options=$o_t.clone().prop('value','[]').text('All');
+      var $options=$o_t.clone().prop('value','[0,1,2,3]').text('All');
       kc.each(groups,function(i,group){
 	$options=$options.add($o_t.clone().prop('value','['+i+']').text(group.name));
       });
@@ -128,22 +131,33 @@ $(document).ready(function(){
 	  $('tr.date-row').find('.delete-date').show();
 	  $('tr.date-row').find('.delete-date').first().hide();
 	});
+	$dateRow.find('input.date').datepicker({
+	  dateFormat: 'dd/mm/yy'
+	});
       });
+      $('table.date-table').append(
+	$('table.date-table').find('tr.add-date').remove());
       $('tr.date-row').find('.delete-date').show();
       $('tr.date-row').find('.delete-date').first().hide();
-      $('.add-date').click(function(){
+      $('td.add-date').click(function(){
 	var $dateRow=$dateRow_t.clone();
 	var today=new Date();
 	$dateRow.find('input.date').prop(
-	  'value',today.getFullYear()*10000+
-	    (today.getMonth()+1)*100+
-	    today.getDate());
+	  'value',
+	  today.getDate()+'/'+
+	    (today.getMonth()+1)+'/'+
+	    today.getFullYear());
 	$('table.date-table').append($dateRow);
 	$dateRow.find('.delete-date').click(function(){
 	  $dateRow.remove();
 	  $('tr.date-row').find('.delete-date').show();
 	  $('tr.date-row').find('.delete-date').first().hide();
 	});
+	$dateRow.find('input.date').datepicker({
+	  dateFormat: 'd/m/yy'
+	});
+	$('table.date-table').append(
+	  $('table.date-table').find('tr.add-date').remove());
       });
     }
   };

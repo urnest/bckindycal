@@ -8,6 +8,9 @@ handlers:
 - url: /
   script: kindycal.application
 
+- url: /jquery-ui-1.11
+  static_dir: jquery-ui-1.11
+  
 - url: /favicon\.ico$
   static_files: favicon.ico
   upload: favicon.ico
@@ -46,6 +49,9 @@ handlers:
   script: kindycal.application
 
 - url: /events.html$
+  script: kindycal.application
+
+- url: /event.html$
   script: kindycal.application
 
 - url: /edit_event.html$

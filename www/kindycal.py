@@ -84,9 +84,6 @@ def getSession(id):
 class index_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel:
-            print 'not logged in'
-            return webapp2.redirect('login.html?from=index.html')
         self.response.write(file('index.html').read())
         self.response.set_cookie('kc-session',session.sid)
         pass
@@ -370,6 +367,38 @@ class edit_events_page(webapp2.RequestHandler):
     pass
 
 
+def formatDate(d):
+    return '%(day)s/%(month)s/%(year)s'%d
+
+class event_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff','parent']:
+            print 'not logged in'
+            return webapp2.redirect('parent.html?from=events.html')
+        id=int(self.request.get('id'))
+        if session.loginLevel in ['admin','staff']:
+            return webapp2.redirect('edit_event.html?id=%(id)s'%vars())
+        event=Event.query(Event.id==id,
+                          ancestor=root_key).fetch(1)
+        event=fromJson(event[0].data)
+        event_schema.validate(event)
+        page=pq.loadFile('event.html')
+        page.find(pq.hasClass('event-name')).text(event['name']['text'])
+        groups=fetchGroups()
+        print groups
+        print event['groups']
+        g=' + '.join([groups[_]['name'] for _ in event['groups']])
+        page.find(pq.hasClass('groups')).text(g)
+        d=', '.join([formatDate(_) for _ in event['dates']])
+        page.find(pq.hasClass('dates')).text(d)
+        page.find(pq.hasClass('event-description')).html(
+            pq.parse(event['description']['html']))
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+
+
 class groups_to_show(webapp2.RequestHandler):
     def get(self):
         try:
@@ -377,7 +406,7 @@ class groups_to_show(webapp2.RequestHandler):
             if not session.loginLevel:
                 raise xn.Exception('You are not logged in')
             try:
-                result=fromJson(self.request.cookies.get('kc-groups-to-show','[]'))
+                result=fromJson(self.request.cookies.get('kc-groups-to-show','[0,1,2,3]'))
             except:
                 raise inContext('get groups to show from kc-groups-to-show cookie')
             return self.response.write(toJson({'result':result}))
@@ -445,7 +474,7 @@ class event(webapp2.RequestHandler):
         if not session.loginLevel:
             result={'error':'You are not logged in.'}
         else:
-            event=Event.query(Event.id==self.request.get('id'),
+            event=Event.query(Event.id==int(self.request.get('id')),
                               ancestor=root_key).fetch(1)
             result=fromJson(event[0].data)
             event_schema.validate(result)
@@ -585,6 +614,7 @@ application = webapp2.WSGIApplication([
     ('/edit_groups.html',edit_groups_page),
     ('/edit_event.html',edit_event_page),
     ('/edit_events.html',edit_events_page),
+    ('/event.html',event_page),
     ('/events.html',events_page),
     ('/index.html', index_page),
     ('/login.html',login_page),

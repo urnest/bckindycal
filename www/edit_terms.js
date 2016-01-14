@@ -27,6 +27,12 @@ $(document).ready(function(){
 	$t.find('.start').attr('value',kc.formatDate(term.start));
 	$t.find('.end').attr('value',kc.formatDate(term.end));
 	$('.terms').append($t);
+	$t.find('input.start').datepicker({
+	  dateFormat: 'd/m/yy'
+	});
+	$t.find('input.end').datepicker({
+	  dateFormat: 'd/m/yy'
+	});
       });
     });
   $('#save-button').click(function(){

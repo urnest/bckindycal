@@ -139,21 +139,17 @@ $(document).ready(function(){
       });
     kc.getFromServer('month_events',monthToShow)
       .then(function(result){
-	events={};
-	kc.each(result,function(i,event){
-	  kc.each(event.dates,function(i,ymd){
-	    if (ymd.year==monthToShow.y&&
-		ymd.month==monthToShow.m){
-	      events[ymd.day]=events[ymd.day]||[];
-	      events[ymd.day].push(event);
-	    }
-	  });
-	});
+	events=result;
 	proceed();
       });
     var proceed=function(){
+      var groupSet={};
+      kc.each(groupsToShow,function(i,g){
+	groupSet[g]=true;
+      });
       if (kc.defined(cal)&&kc.defined(events)){
 	$calendar.find('tr.week').remove();
+	var dateDays={};
 	kc.each(cal.weeks,function(i,week){
 	  var $week=$week_t.clone();
 	  var $days=$week.find('td.day');
@@ -188,6 +184,9 @@ $(document).ready(function(){
 	  kc.each(week.days,function(i,day){
 	    var $day=$($days.get(i));
 	    $day.find('span.day').text(day||'');
+	    if (day){
+	      dateDays[day]=$day;
+	    }
 	    if (groupDay[i]){
 	      $day.removeClass('calout').addClass('calon');
 	    }
@@ -196,6 +195,29 @@ $(document).ready(function(){
 	    }
 	  });
 	  $calendar.append($week);
+	});
+	kc.each(events,function(i,event){
+	  var show=false;
+	  kc.each(event.groups,function(i,g){
+	    if (groupSet[g]){
+	      show=true;
+	    }
+	  });
+	  if (!show){
+	    return;
+	  }
+	  kc.each(event.dates,function(i,date){
+	    if (date.year==monthToShow.y&&
+		date.month==monthToShow.m&&
+		dateDays[date.day]){
+	      var $event=$event_t.clone();
+	      $event.find('.event-link').attr('href','event.html?id='+event.id);
+	      $event.find('.event-link').text(event.name.text);
+	      $event.find('.event-link').css('color',event.name.colour);
+	      
+	      dateDays[date.day].append($event);
+	    }
+	  });
 	});
       }
     };

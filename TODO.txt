@@ -53,8 +53,8 @@ x terms:
     x select option based on cookie
     x update cookie on change
   - new event link (staff only)
-    - display form
-    - save form
+    x display form
+    x save form
     - mce for description
   - calendar month
     x get current month via month_calendar and display
@@ -63,11 +63,19 @@ x terms:
       x that way we know if it even or odd week for that term and
         can figure out which days group is on that week
 )
-    - fetch events for this month
-      - query via months but how?
+    x fetch events for this month
+      x query via months but how?
+    x filter events by groups-to-show
     - allow date(s) select
+  x use jquery date picker (edit_terms.js)
+  - find colour picker (edit_event.html)
+  - use mce (edit_event.html)
+    
   x prev/next month links
   - delete event
+  x go back to events on save event (and refresh)
+  x test add dates to event, remove dates from event
+  - edit_terms.js: on save return to previous page
   
 - event.html
   - schema: {
@@ -93,6 +101,13 @@ x terms:
     - name colour
     - save (return to calendar for monthToShow)
     - image upload (later)
+
+- terms start with monday/tue or monday/tue/wed, not per group
+  - grey out of term
+- public holidays separate
+
+- View All Groups
+- upload document/image
 
 use event for:
   - group kindy days

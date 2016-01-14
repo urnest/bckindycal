@@ -33,7 +33,7 @@ class ParseFailed(Xn):
     def __init__(self, cause, pos):
         self.cause=cause
         self.pos=pos
-        Xn.__init__(self.__str__)
+        Xn.__init__(self,self.__str__())
         return
     def __str__(self):
         return 'failed to parse html at %(pos)s because\n%(cause)s'%self.__dict__
