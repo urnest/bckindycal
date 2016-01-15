@@ -14,30 +14,6 @@ TD {
 	border: 1px solid #FFFFFF;
 	text-align:left;
 }
-TD.nobg {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
-	color: #333333;
-	padding: 5px;
-	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
-}
-TD.bwhd {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 12px;
-	color: #FFFFFF;
-	background: #333333;
-	padding: 10px;
-}
-TD.calhd {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
-	color: #FFFFFF;
-	background: #295882;
-	vertical-align: middle;
-	height: 15px;
-	width: 120px;
-	padding: 4px;
-}
 TD.calhdc {
 	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
 	font-size: 20px;
@@ -69,27 +45,25 @@ TD.callime {
 	height: 15px;
 	width: 120px;
 }
-TD.calbl {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
-	color: #FFFFFF;
-	background: ##66CCFF;
-	vertical-align: middle;
-	text-align: center;
-	height: 15px;
-	width: 120px;
-	padding: 4px;
-}
 TD.cal {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10px;
 	color: #333333;
 	background: #FFFFFF;
 	vertical-align: top;
-	height: 50px;
+	height: 100px;
 	padding: 4px;
 }
-TD.calon {
+TD.day {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #333333;
+	background-color: #cccccc;
+	vertical-align: top;
+	height: 100px;
+	padding: 4px;
+}
+TD.day.mon-wed {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10px;
 	color: #2b5caa;
@@ -99,37 +73,20 @@ TD.calon {
 	height: 100px;
 	padding: 4px;
 }
-TD.calout {
+TD.day.wed-fri {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 10px;
 	color: #333333;
 	background-color: #B9CC23;
 	vertical-align: top;
-	height: 50px;
-	padding: 4px;
-}
-TD.weekend.calout {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
-	color: #333333;
-	background-color: #cccccc;
-	vertical-align: top;
-	height: 50px;
-	padding: 4px;
-}
-TD.calopt {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 12px;
-	color: #333333;
-	vertical-align: middle;
-	height: 50px;
+	height: 100px;
 	padding: 4px;
 }
 </style>
 </head>
 <body>
   <div class="toolbar">
-    <select class="groups-to-show" name="groups-to-show">
+    Show events for Groups: <select class="groups-to-show" name="groups-to-show">
       <option>Matt Mon-Wed</option>
     </select>
     <a href="edit_event.html" class="staff-only add-event">New Event</a>
@@ -158,24 +115,24 @@ TD.calopt {
     </tr>
     <tr class="week">
       <td class="cal">&nbsp;</td>
-      <td class="day weekend calout"><span class="week-label">Week 2</span></td>
+      <td class="day"><span class="week-label">Week 2</span></td>
       <td class="cal">&nbsp;</td>
-      <td class="day calon"><span class="day">2</span>
+      <td class="day mon-wed"><span class="day">2</span>
       </td>
       <td class="cal">&nbsp;</td>
-      <td class="day calon"><span class="day">3</span>
+      <td class="day mon-wed"><span class="day">3</span>
       </td>
       <td class="cal">&nbsp;</td>
-      <td class="day calout"><span class="day">4</span><br>
+      <td class="day mon-wed"><span class="day">4</span><br>
       </td>
       <td class="cal">&nbsp;</td>
-      <td class="day calout"><span class="day">5</span><br>
+      <td class="day wed-fri"><span class="day">5</span><br>
       </td>
       <td class="cal">&nbsp;</td>
-      <td class="day calout"><span class="day">6</span><br>
+      <td class="day wed-fri"><span class="day">6</span><br>
       </td>
       <td class="cal">&nbsp;</td>
-      <td class="day weekend calout"><span class="day">7</span><br>
+      <td class="day"><span class="day">7</span><br>
       </td>
     </tr>
     <tr class="week">

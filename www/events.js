@@ -154,24 +154,18 @@ $(document).ready(function(){
 	  var $week=$week_t.clone();
 	  var $days=$week.find('td.day');
 	  var weekName='';
-	  var groupDay=[false,false,false,false,false,false,false]
+	  var dayClass=['','','','','','','']
+	  var dayClasses=['','','','','','',''];
 	  if (week.term_week){
 	    var oddWeek=(week.term_week.week%2)!=0;
-	    kc.each(groupsToShow,function(i,group){
-	      kc.each(groups[group].terms[week.term_week.term-1].daysOfFirstWeek,function(i,shortDayName){
-		if (shortDayName=='Wed'){
-		  if (oddWeek){
-		    groupDay[dayIndices[shortDayName]]=true;
-		  }
-		}
-		else{
-		  groupDay[dayIndices[shortDayName]]=true;
-		}
-	      });
-	      if (groups[group].terms[week.term_week.term-1].daysOfFirstWeek.length==2 && !oddWeek){
-		groupDay[3]=true;
-	      }
-	    });
+	    var termStartsWith=terms.terms[week.term_week.term-1].starts_with;
+	    if ((oddWeek && termStartsWith=='mon-wed')||
+		(!oddWeek && termStartsWith=='mon-tue')){
+	      dayClasses=['','mon-wed','mon-wed','mon-wed','wed-fri','wed-fri',''];
+	    }
+	    else {
+	      dayClasses=['','mon-wed','mon-wed','wed-fri','wed-fri','wed-fri',''];
+	    }
 	    if (week.term_week.week==1){
 	      weekName='Term '+week.term_week.term+
 		'<br>week '+week.term_week.week;
@@ -187,11 +181,9 @@ $(document).ready(function(){
 	    if (day){
 	      dateDays[day]=$day;
 	    }
-	    if (groupDay[i]){
-	      $day.removeClass('calout').addClass('calon');
-	    }
-	    else{
-	      $day.removeClass('calon').addClass('calout');
+	    $day.removeClass('mon-wed').removeClass('wed-fri');
+	    if (dayClasses[i]){
+	      $day.addClass(dayClasses[i]);
 	    }
 	  });
 	  $calendar.append($week);

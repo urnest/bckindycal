@@ -24,8 +24,10 @@ $(document).ready(function(){
       kc.each(terms,function(i,term){
 	var $t=$term_t.clone();
 	$t.find('.term-number').text(i+1);
-	$t.find('.start').attr('value',kc.formatDate(term.start));
-	$t.find('.end').attr('value',kc.formatDate(term.end));
+	$t.find('.start').prop('value',kc.formatDate(term.start));
+	$t.find('.end').prop('value',kc.formatDate(term.end));
+	$t.find('.starts_with').prop('value',
+				     term.starts_with||'mon-tue');
 	$('.terms').append($t);
 	$t.find('input.start').datepicker({
 	  dateFormat: 'd/m/yy'
@@ -60,13 +62,18 @@ $(document).ready(function(){
 	  day: parseInt(end[0]),
 	  month: parseInt(end[1]),
 	  year: parseInt(end[2])
-	}
+	},
+	starts_with: $t.find('.starts_with').prop('value')
       });
     });
     saving=true;
     $('#save-button').addClass('kc-busy-cursor');
     kc.postToServer('terms',{params:kc.json.encode(params)})
       .then(function(){
+	var referer=$('input#referer').prop('value');
+	if (referer){
+	  window.location=referer;
+	};
       })
       .always(function(){
 	$('#save-button').removeClass('kc-busy-cursor');

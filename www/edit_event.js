@@ -54,6 +54,30 @@ $(document).ready(function(){
       });
     return false;
   });
+  $('input#delete-button').click(function(){
+    if (busyCount){
+      return false;
+    }
+    if ($('input#id').prop('value')=='0'){
+      return false;
+    }
+    if (!window.confirm('Delete event?')){
+      return false;
+    }
+    kc.postToServer('delete_event',{
+      params:kc.json.encode({
+	id:parseInt($('input#id').prop('value'))
+      })
+    })
+      .then(function(){
+	window.location='edit_events.html';
+      })
+      .always(function(){
+	$('body').removeClass('kc-busy-cursor');
+      });
+    return false;
+  });
+
   ++busyCount&&kc.getFromServer('groups')
     .then(function(result){
       groups=result;

@@ -44,7 +44,7 @@ x terms:
   - set(x) - set of x
   x IntType as dict key
   x StringType as dict key
-  - embed Schema
+  x embed Schema
 
 - events.html
   - show group(s) selector
@@ -72,13 +72,13 @@ x terms:
   - use mce (edit_event.html)
     
   x prev/next month links
-  - delete event
+  x delete event
   x go back to events on save event (and refresh)
   x test add dates to event, remove dates from event
-  - edit_terms.js: on save return to previous page
+  x edit_terms.js: on save return to previous page
   
-- event.html
-  - schema: {
+x event.html
+  x schema: {
       id: IntType,
       groups: [ IntType ],
       dates : [ {year:IntType,month:IntType,Day:IntType} ],
@@ -89,43 +89,34 @@ x terms:
       description : {
         html : StringType
       }
-  - calc weeks
-  - calc events
+  x calc weeks
+  x calc events
 
 - edit_event.html
-  - pass in eventid + date + monthToShow + bg colour
   - edit_event.js
-    - fetch event (for non-zero id passed in)
+    x fetch event (for non-zero id passed in)
     - mce
-    - name bg colour
     - name colour
-    - save (return to calendar for monthToShow)
-    - image upload (later)
+    x save (return to calendar for monthToShow)
+    - image/document upload (later)
 
-- terms start with monday/tue or monday/tue/wed, not per group
-  - grey out of term
-- public holidays separate
+x terms start with monday/tue or monday/tue/wed, not per group
+  x grey out of term
+  x edit_terms
+  x edit_groups
+  x events
+  
+- public holidays separate - different background colour
+- maintenance days separate and allow add names (you can
+  see all names)
+- menu bar
+- start on events page
 
-- View All Groups
+x View Events for: All Groups
 - upload document/image
 
-use event for:
-  - group kindy days
-  - public holidays/kid-free days
-  - maintenance days
-  ... everything except kindy fair stall roster, which would be link
-  to separate area like rss-carnival roster stuff, and time-with-your-child
-  which will be separate
-
-admin pages:
-  staff-password.html
-
-staff pages:
-  groups.html
-  parent-password.html
-
-parent pages:
-  events.html
+- roster jobs
+- fair rosters
 
   
 -----------------------

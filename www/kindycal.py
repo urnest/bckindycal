@@ -210,11 +210,12 @@ class staff_login_page(webapp2.RequestHandler):
 def today(): return datetime.date.today()
 
 terms_schema=jsonschema.Schema({
-        'numberOfTerms':IntType,
-        'terms':[{
-                'start':{'year':IntType,'month':IntType,'day':IntType},
-                'end':{'year':IntType,'month':IntType,'day':IntType},
-                }]})
+    'numberOfTerms':IntType,
+    'terms':[{
+        'start':{'year':IntType,'month':IntType,'day':IntType},
+        'end':{'year':IntType,'month':IntType,'day':IntType},
+        'starts_with':StringType # 'mon-tue' or 'mon-wed'
+    }]})
 
 class Terms(ndb.Model):
     # data is json encoded terms_schema-conformant
@@ -268,17 +269,16 @@ class edit_terms_page(webapp2.RequestHandler):
         if not session.loginLevel in ['staff','admin']:
             print 'not logged in as staff or admin'
             return webapp2.redirect('staff_login.html?from=edit_terms.html')
-        return self.response.write(file('edit_terms.html').read())
+        print self.request.headers
+        page=pq.loadFile('edit_terms.html')
+        page.find(pq.tagName('input')).filter(pq.attrEquals('id','referer')).attr('value',self.request.headers['Referer'])
+        self.response.write(unicode(page).encode('utf-8'))
     pass
 
 groups_schema=jsonschema.Schema([
     {
-        'name': StringType, # eg 'Matt Mon-Wed'
-        'terms' : [ {
-                'daysOfFirstWeek' : [StringType], #eg ['Mon','Tue',"Wed']
-                } ]
-        }
-    ])
+        'name': StringType # eg 'Matt Mon-Wed'
+    }])
 
 class Groups(ndb.Model):
     # data is json encoded groups_schema-conformant
@@ -330,7 +330,10 @@ class edit_groups_page(webapp2.RequestHandler):
         if not session.loginLevel in ['admin','staff']:
             print 'not logged in as staff'
             return webapp2.redirect('staff_login.html?from=edit_groups.html')
-        return self.response.write(file('edit_groups.html').read())
+        page=pq.loadFile('edit_groups.html')
+
+        page.find(pq.tagName('input')).filter(pq.attrEquals('id','referer')).attr('value',self.request.headers['Referer'])
+        self.response.write(unicode(page).encode('utf-8'))
     pass
 
 
@@ -468,6 +471,25 @@ class Event(ndb.Model):
     months=ndb.IntegerProperty(indexed=True,repeated=True)
     pass
 
+class delete_event(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                data=fromJson(self.request.get('params'))
+                assert not data is None
+                event_schema.validate(data)
+                for x in Event.query(Event.id==data['id'],ancestor=root_key).fetch(1): x.key.delete()
+                self.response.write(toJson({'result':'OK'}))
+                return
+        except:
+            result={'error':str(inContext('delete event'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
 class event(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
@@ -503,7 +525,7 @@ class event(webapp2.RequestHandler):
                 pass
             pass
         except:
-            result={'error':str(inContext('save terms'))}
+            result={'error':str(inContext('save event'))}
             pass
         return self.response.write(toJson(result).encode('utf-8'))
     pass
@@ -629,4 +651,5 @@ application = webapp2.WSGIApplication([
     ('/month_calendar',month_calendar),
     ('/month_events',month_events),
     ('/event',event),
+    ('/delete_event',delete_event),
 ], debug=True)
