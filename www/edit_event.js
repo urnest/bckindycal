@@ -141,7 +141,18 @@ $(document).ready(function(){
       $('select.groups').prop('value','['+kc.join(',',event.groups)+']');
       $('input#name').prop('value',event.name.text);
       $('input#name-colour').prop('value',event.name.colour);
-      $('div#description').html(event.description.html);
+      $('img.name-color-picker').css('background-color',event.name.colour);
+      $('div.event-description').html(event.description.html);
+      tinymce.init({
+	selector: 'div.event-description',
+	inline: true,
+	plugins: [
+	  'advlist autolink lists link image charmap print preview anchor',
+	  'searchreplace visualblocks code fullscreen',
+	  'insertdatetime media table contextmenu paste code'
+	],
+	toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
+      });
       var $dateRow_t=$('tr.date-row').remove().first();
       kc.each(event.dates,function(i,date){
 	var $dateRow=$dateRow_t.clone();
