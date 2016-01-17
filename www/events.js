@@ -16,6 +16,7 @@ var $sunday_t;
 var $weekday_t;
 var $saturday_t;
 var $event_t;
+var $public_holiday_t;
 function prevMonth(m){
   if (m.m==1){
     return {
@@ -52,6 +53,8 @@ $(document).ready(function(){
   };
   $calendar=$('table.month-of-events');
   $event_t=$calendar.find('span.event').remove().first();
+  $public_holiday_t=$calendar.find('span.public-holiday').remove().first();
+  
   $week_t=$calendar.find('tr.week').remove().first();
   
   $('body').addClass('kc-busy-cursor');
@@ -130,6 +133,7 @@ $(document).ready(function(){
   var refresh=function(){
     var cal;
     var events;
+    var public_holidays;
     $('span.month').text(monthNames[monthToShow.m-1]);
     $('span.year').text(monthToShow.y);
     kc.getFromServer('month_calendar',{params:kc.json.encode(monthToShow)})
@@ -142,12 +146,19 @@ $(document).ready(function(){
 	events=result;
 	proceed();
       });
+    kc.getFromServer('month_public_holidays',monthToShow)
+      .then(function(result){
+	public_holidays=result;
+	proceed();
+      });
     var proceed=function(){
       var groupSet={};
-      kc.each(groupsToShow,function(i,g){
-	groupSet[g]=true;
-      });
-      if (kc.defined(cal)&&kc.defined(events)){
+      if (kc.defined(cal) &&
+	  kc.defined(events) &&
+	  kc.defined(public_holidays)){
+	kc.each(groupsToShow,function(i,g){
+	  groupSet[g]=true;
+	});
 	$calendar.find('tr.week').remove();
 	var dateDays={};
 	kc.each(cal.weeks,function(i,week){
@@ -177,6 +188,7 @@ $(document).ready(function(){
 	  $week.find('.week-label').html(weekName);
 	  kc.each(week.days,function(i,day){
 	    var $day=$($days.get(i));
+	    $day.removeClass('public-holiday');
 	    $day.find('span.day').text(day||'');
 	    if (day){
 	      dateDays[day]=$day;
@@ -208,6 +220,21 @@ $(document).ready(function(){
 	      $event.find('.event-link').css('color',event.name.colour);
 	      
 	      dateDays[date.day].append($event);
+	    }
+	  });
+	});
+	kc.each(public_holidays,function(i,public_holiday){
+	  kc.each(public_holiday.dates,function(i,date){
+	    if (date.year==monthToShow.y&&
+		date.month==monthToShow.m&&
+		dateDays[date.day]){
+	      var $public_holiday=$public_holiday_t.clone();
+	      $public_holiday.find('.public-holiday-name').text(
+		public_holiday.name.text);
+	      $public_holiday.find('.public-holiday-link').attr(
+		'href','edit_public_holiday.html?id='+public_holiday.id);
+	      dateDays[date.day].append($public_holiday);
+	      dateDays[date.day].addClass('public-holiday');
 	    }
 	  });
 	});

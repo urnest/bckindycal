@@ -78,6 +78,8 @@ $(document).ready(function(){
     return false;
   });
 
+  $('.event-description').html('');
+
   ++busyCount&&kc.getFromServer('groups')
     .then(function(result){
       groups=result;

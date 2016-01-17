@@ -82,6 +82,17 @@ TD.day.wed-fri {
 	height: 100px;
 	padding: 4px;
 }
+TD.day.public-holiday, 
+TD.day.mon-wed.public-holiday, 
+TD.day.wed-fri.public-holiday {
+	background-color: black;
+	color:white;
+}
+TD.day.public-holiday a, 
+TD.day.mon-wed.public-holiday a, 
+TD.day.wed-fri.public-holiday a {
+	color:white;
+}
 span.day {
   float: right;
 }
@@ -90,10 +101,15 @@ span.day {
 </head>
 <body>
   <div class="toolbar">
-    Show events for Groups: <select class="groups-to-show" name="groups-to-show">
-      <option>Matt Mon-Wed</option>
-    </select>
-    <a href="edit_event.html" class="staff-only add-event">New Event</a>
+    <span class="toolbar-item">
+      Show events for Groups: <select class="groups-to-show" name="groups-to-show"><option>Matt Mon-Wed</option></select>
+    </span>
+    <span class="toolbar-item">
+      <a href="edit_event.html" class="staff-only add-event">New Event</a>
+    </span>
+    <span class="toolbar-item">
+      <a href="edit_public_holiday.html" class="staff-only add-public-holiday">New Public Holiday</a>
+    </span>
   </div>
 
   <table border="0" bordercolor="#ffffff" cellspacing="0" cellpadding="0" align="center" class="month-of-events">
@@ -124,7 +140,10 @@ span.day {
       <td class="day mon-wed"><span class="day">2</span>
       </td>
       <td class="cal">&nbsp;</td>
-      <td class="day mon-wed"><span class="day">3</span>
+      <td class="day mon-wed public-holiday"><span class="day">3</span>
+	<span class="public-holiday"><br>
+          <span class="pubic-holiday-name parent-only">Queen's Birthday</span><a class="public-holiday-link staff-only" href="edit_public_holiday.html"><span class="public-holiday-name">Maintenance Day</span></a>
+	</span>
       </td>
       <td class="cal">&nbsp;</td>
       <td class="day mon-wed"><span class="day">4</span><br>

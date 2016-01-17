@@ -363,6 +363,7 @@ class edit_events_page(webapp2.RequestHandler):
             print 'groups not defined'
             return webapp2.redirect('edit_groups.html')
         page=pq.loadFile('events.html')
+        page.find(pq.hasClass('parent-only')).remove()
         if not session.loginLevel in ['admin']:
             page.find(pq.hasClass('admin-only')).remove()
             pass
@@ -530,6 +531,104 @@ class event(webapp2.RequestHandler):
         return self.response.write(toJson(result).encode('utf-8'))
     pass
 
+class PublicHolidayIdCounter(ndb.Model):
+    """Counter to assign ids to PublicHolidays."""
+    nextPublicHolidayId = ndb.IntegerProperty()
+
+nextPublicHolidayIdKey=ndb.Key('nextPublicHolidayId','nextPublicHolidayId')
+
+def nextPublicHolidayId():
+    q=PublicHolidayIdCounter.query(ancestor=nextPublicHolidayIdKey)
+    x=q.fetch(1)
+    if len(x)==0:
+        x=PublicHolidayIdCounter(parent=nextPublicHolidayIdKey)
+        x.nextPublicHolidayId=100
+    else:
+        x=x[0]
+    result=x.nextPublicHolidayId
+    x.nextPublicHolidayId=x.nextPublicHolidayId+1
+    x.put()
+    return result
+
+
+public_holiday_schema=jsonschema.Schema({
+        'id': IntType, #0 for new PublicHoliday
+        'dates' : [ {'year':IntType,'month':IntType,'day':IntType} ],
+        'name' : {
+            'text':StringType
+            }
+        })
+
+class PublicHoliday(ndb.Model):
+    # data is json encoded public_holiday_schema-conformant
+    data=ndb.StringProperty(indexed=False,repeated=False)
+    # id from data['id']
+    id=ndb.IntegerProperty(indexed=True,repeated=False)
+    # months of data['dates'], as yyyymm
+    months=ndb.IntegerProperty(indexed=True,repeated=True)
+    pass
+
+class delete_public_holiday(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                data=fromJson(self.request.get('params'))
+                assert not data is None
+                public_holiday_schema.validate(data)
+                for x in PublicHoliday.query(
+                    PublicHoliday.id==data['id'],
+                    ancestor=root_key).fetch(1): x.key.delete()
+                self.response.write(toJson({'result':'OK'}))
+                return
+        except:
+            result={'error':str(inContext('delete public_holiday'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+class public_holiday(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+        else:
+            public_holiday=PublicHoliday.query(
+                PublicHoliday.id==int(self.request.get('id')),
+                ancestor=root_key).fetch(1)
+            result=fromJson(public_holiday[0].data)
+            public_holiday_schema.validate(result)
+            pass
+        return self.response.write(toJson({'result':result}))
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                data=fromJson(self.request.get('params'))
+                assert not data is None
+                public_holiday_schema.validate(data)
+                if data['id']==0: data['id']=nextPublicHolidayId()
+                public_holiday=PublicHoliday(parent=root_key,
+                            id=data['id'],
+                            months=[_['year']*100+_['month'] \
+                                    for _ in data['dates']],
+                            data=toJson(data))
+                for x in PublicHoliday.query(PublicHoliday.id==public_holiday.id,ancestor=root_key).fetch(1): x.key.delete()
+                public_holiday.put()
+                result=fromJson(public_holiday.data)
+                public_holiday_schema.validate(result)
+                result={'result':result}
+                pass
+            pass
+        except:
+            result={'error':str(inContext('post public_holiday'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
 month_calendar_schema=jsonschema.Schema({
         'y':IntType,
         'm':IntType,
@@ -617,13 +716,49 @@ class month_events(webapp2.RequestHandler):
         pass
     pass
 
+month_public_holidays_schema=jsonschema.Schema([public_holiday_schema])
+
+class month_public_holidays(webapp2.RequestHandler):
+    def get(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                y=int(self.request.get('y'))
+                m=int(self.request.get('m'))
+                print y*100+m
+                public_holidays=[fromJson(_.data) for _ in
+                        PublicHoliday.query(
+                        PublicHoliday.months==y*100+m,
+                        ancestor=root_key).fetch(10000)]
+                print public_holidays
+                month_public_holidays_schema.validate(public_holidays)
+                self.response.write(toJson({'result':public_holidays}))
+        except:
+            self.response.write(toJson({'error':str(inContext('get month public_holidays'))}))
+            pass
+        pass
+    pass
+
 class edit_event_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
             print 'not logged in as staff or admin'
-            return webapp2.redirect('staff_login.html?from=edit_terms.html')
+            return webapp2.redirect('staff_login.html')
         page=pq.loadFile('edit_event.html')
+        page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+class edit_public_holiday_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['staff','admin']:
+            print 'not logged in as staff or admin'
+            return webapp2.redirect('staff_login.html')
+        page=pq.loadFile('edit_public_holiday.html')
         page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
         self.response.write(unicode(page).encode('utf-8'))
     pass
@@ -636,6 +771,7 @@ application = webapp2.WSGIApplication([
     ('/edit_groups.html',edit_groups_page),
     ('/edit_event.html',edit_event_page),
     ('/edit_events.html',edit_events_page),
+    ('/edit_public_holiday.html',edit_public_holiday_page),
     ('/event.html',event_page),
     ('/events.html',events_page),
     ('/index.html', index_page),
@@ -650,6 +786,9 @@ application = webapp2.WSGIApplication([
     ('/terms',terms),
     ('/month_calendar',month_calendar),
     ('/month_events',month_events),
+    ('/month_public_holidays',month_public_holidays),
     ('/event',event),
+    ('/public_holiday',public_holiday),
     ('/delete_event',delete_event),
+    ('/delete_public_holiday',delete_public_holiday),
 ], debug=True)

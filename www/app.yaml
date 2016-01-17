@@ -57,6 +57,9 @@ handlers:
 - url: /edit_event.html$
   script: kindycal.application
   
+- url: /edit_public_holiday.html$
+  script: kindycal.application
+  
 - url: /(..*\.html)$
   static_files: \1
   upload: ..*\.html
