@@ -79,22 +79,32 @@ $(document).ready(function(){
 
   if ($('input#id').prop('value')=='0'){
     //new maintenance_day
-    var today=new Date();
-    maintenance_day={
-      id:0,
-      groups:[],
-      date:{
-	year: today.getFullYear(),
-	month: today.getMonth()+1,
-	day: today.getDate()
-      },
-      description:{
-	html:'(click to edit)'
-      },
-      volunteers:[
-      ]
-    }
-    setTimeout(function(){proceed();},0);
+    ++busyCount&&kc.getFromServer('get_month_to_show')
+      .then(function(result){
+	var today=new Date();
+	var date={
+	  'year':result.y,
+	  'month':result.m,
+	  'day':((result.y==today.getFullYear()&&
+		  result.m==today.getMonth()+1)?today.getDate():1)
+	};
+	maintenance_day={
+	  id:0,
+	  groups:[],
+	  date:date,
+	  description:{
+	    html:'(click to edit)'
+	  },
+	  volunteers:[
+	  ]
+	}
+	proceed();
+      })
+      .always(function(){
+	if (--busyCount==0){
+	  $('body').removeClass('kc-busy-cursor');
+	}
+      });
   }
   else{
     ++busyCount&&kc.getFromServer('maintenance_day',

@@ -92,23 +92,34 @@ $(document).ready(function(){
     });
   if ($('input#id').prop('value')=='0'){
     //new event
-    var today=new Date();
-    event={
-      id:0,
-      groups:[],
-      dates:[{
-	year: today.getFullYear(),
-	month: today.getMonth()+1,
-	day: today.getDate()
-      }],
-      name:{
-	text:'',
-	colour:'#000000'
-      },
-      description:{
-	html:''
-      }
-    }
+    ++busyCount&&kc.getFromServer('get_month_to_show')
+      .then(function(result){
+	var today=new Date();
+	var date={
+	  'year':result.y,
+	  'month':result.m,
+	  'day':((result.y==today.getFullYear()&&
+		  result.m==today.getMonth()+1)?today.getDate():1)
+	};
+	event={
+	  id:0,
+	  groups:[],
+	  dates:[date],
+	  name:{
+	    text:'',
+	    colour:'#000000'
+	  },
+	  description:{
+	    html:''
+	  }
+	}
+	proceed();
+      })
+      .always(function(){
+	if (--busyCount==0){
+	  $('body').removeClass('kc-busy-cursor');
+	}
+      });
   }
   else{
     ++busyCount&&kc.getFromServer('event',

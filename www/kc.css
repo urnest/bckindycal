@@ -1,3 +1,6 @@
 .kc-busy-cursor { 
-  cursor: wait
+    cursor: wait
+}
+.invalid-input {
+    outline: 1px solid red
 }

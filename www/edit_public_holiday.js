@@ -73,19 +73,29 @@ $(document).ready(function(){
 
   if ($('input#id').prop('value')=='0'){
     //new PublicHoliday
-    var today=new Date();
-    public_holiday={
-      id:0,
-      dates:[{
-	year: today.getFullYear(),
-	month: today.getMonth()+1,
-	day: today.getDate()
-      }],
-      name:{
-	text:''
-      }
-    }
-    setTimeout(function(){proceed();},0);
+    ++busyCount&&kc.getFromServer('get_month_to_show')
+      .then(function(result){
+	var today=new Date();
+	var date={
+	  'year':result.y,
+	  'month':result.m,
+	  'day':((result.y==today.getFullYear()&&
+		  result.m==today.getMonth()+1)?today.getDate():1)
+	};
+	public_holiday={
+	  id:0,
+	  dates:[date],
+	  name:{
+	    text:''
+	  }
+	}
+	proceed();
+      })
+      .always(function(){
+	if (--busyCount==0){
+	  $('body').removeClass('kc-busy-cursor');
+	}
+      });
   }
   else{
     ++busyCount&&kc.getFromServer('public_holiday',

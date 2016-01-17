@@ -7,7 +7,7 @@
   <script src="tinymce/js/tinymce/tinymce.js"></script>
   <script type="text/javascript" src="kc.js"></script>
   <script type="text/javascript" src="edit_event.js"></script>
-  <style type="text/css" src="kc.css"></style>
+  <link href="kc.css" rel="stylesheet">
 </head>
 <body>
   <form method="POST" action="event">
@@ -16,7 +16,7 @@
       <tr>
 	<td>Name</td><td><input name="name" id="name" type="text"><input type="hidden" id="name-colour"></td>
       </tr>
-      <tr>
+      <tr style="display:none">
 	<td>Name text colour: <img class="name-color-picker" src="images/spacer.gif" width="20px" height="20px"></td>
       </tr>
       <tr>
