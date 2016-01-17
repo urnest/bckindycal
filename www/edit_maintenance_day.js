@@ -23,7 +23,7 @@ $(document).ready(function(){
       day:parseInt(d[0])
     }
     var volunteers=[];
-    if (!$('volunteer-childs-name').each(function(){
+    if (!$('.volunteer-childs-name').each(function(){
       var $t=$(this);
       if ($t.prop('value')==''){
 	$t.addClass('invalid-input');
