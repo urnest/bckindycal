@@ -4,10 +4,11 @@
   <script type="text/javascript" src="kc.js"></script>
   <script type="text/javascript" src="events.js"></script>
   <style type="text/css" src="kc.css"></style>
+  <link rel='stylesheet' id='google-fonts-css'  href='//fonts.googleapis.com/css?family=Lato%3A300%2C400%2C300italic%2C400italic%7CMontserrat%3A400%2C700&#038;ver=4.4.1' type='text/css' media='all' />
 
 <style type="text/css">
 TD {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-family: "Montserrat",sans-serif;
 	font-size: 12px;
 	color: #333333;
 	background: #FFFFFF;
@@ -15,18 +16,19 @@ TD {
 	text-align:left;
 }
 TD.calhdc {
-	font-family: Tahoma, Verdana, Arial, Helvetica, sans-serif;
-	font-size: 20px;
-	font-weight: bold;
+	font-family: "Montserrat",sans-serif;
+    font-weight: 400;
+	font-size: 14px;
 	color: #ffffff;
-	background: #81c344;
+	background: #264452;
 	vertical-align: middle;
 	text-align: center;
+	padding: 13px 0 12px;
 	height: 15px;
-	width: 150px;
+	width: 14.285%;
 }
 TD.calteal {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-family: "Montserrat",sans-serif;
 	font-size: 14px;
 	color: #333333;
 	background: #1CCDDF;
@@ -36,7 +38,7 @@ TD.calteal {
 	width: 120px;
 }
 TD.callime {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-family: "Montserrat",sans-serif;
 	font-size: 14px;
 	color: #333333;
 	background: #B9CC23;
@@ -46,17 +48,17 @@ TD.callime {
 	width: 120px;
 }
 TD.cal {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-family: "Montserrat",sans-serif;
 	font-size: 10px;
 	color: #333333;
 	background: #FFFFFF;
 	vertical-align: top;
-	height: 100px;
-	padding: 4px;
+	height: 30px;
+	padding: 0px;
 }
 TD.day {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
+	font-family: "Montserrat",sans-serif;
+	font-size: 12px;
 	color: #333333;
 	background-color: #cccccc;
 	vertical-align: top;
@@ -64,8 +66,8 @@ TD.day {
 	padding: 4px;
 }
 TD.day.mon-wed {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
+	font-family: "Montserrat",sans-serif;
+	font-size: 12px;
 	color: #2b5caa;
 	background-color: #fee1ba;
 	border: 1px solid #FFFFFF;
@@ -74,8 +76,8 @@ TD.day.mon-wed {
 	padding: 4px;
 }
 TD.day.wed-fri {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 10px;
+	font-family: "Montserrat",sans-serif;
+	font-size: 12px;
 	color: #333333;
 	background-color: #B9CC23;
 	vertical-align: top;
@@ -87,6 +89,8 @@ TD.day.mon-wed.public-holiday,
 TD.day.wed-fri.public-holiday {
 	background-color: black;
 	color:white;
+	font-size: 14px;
+	text-align:center;
 }
 TD.day.public-holiday a, 
 TD.day.mon-wed.public-holiday a, 
@@ -95,6 +99,10 @@ TD.day.wed-fri.public-holiday a {
 }
 span.day {
   float: right;
+}
+div.event {
+	font-size: 12px;
+	text-align:center;
 }
 
 </style>
@@ -121,32 +129,32 @@ span.day {
     </tr>
     <tr class="head1">
       <td class="mon cal">&nbsp;&nbsp;&nbsp;</td>
-      <td colspan="1" class="sun calhdc">SUNDAY</td>
+      <td colspan="1" class="sun calhdc">SUN</td>
       <td class="cal">&nbsp</td>
-      <td colspan="1" class="weekday calhdc">MONDAY</td>
+      <td colspan="1" class="weekday calhdc">MON</td>
       <td class="cal">&nbsp</td>
-      <td colspan="1" class="weekday calhdc">TUESDAY</td>
+      <td colspan="1" class="weekday calhdc">TUE</td>
       <td class="cal">&nbsp</td>
-      <td colspan="1" class="weekday calhdc">WEDNESDAY</td>
+      <td colspan="1" class="weekday calhdc">WED</td>
       <td class="cal">&nbsp</td>
-      <td colspan="1" class="weekday calhdc">THURSDAY</td>
+      <td colspan="1" class="weekday calhdc">THU</td>
       <td class="cal">&nbsp</td>
-      <td colspan="1" class="weekday calhdc">FRIDAY</td>
+      <td colspan="1" class="weekday calhdc">FRI</td>
       <td class="cal">&nbsp</td>
-      <td colspan="1" class="sat calhdc">SATURDAY</td>
+      <td colspan="1" class="sat calhdc">SAT</td>
       <td class="cal">&nbsp;&nbsp;&nbsp;</td>
     </tr>
     <tr class="week">
       <td class="cal">&nbsp;</td>
-      <td class="day"><span class="day">1</span><span class="week-label">Week 2</span></td>
+      <td class="day"><span class="day">1</span><span class="week-label">Week 2</span><br></td>
       <td class="cal">&nbsp;</td>
-      <td class="day mon-wed"><span class="day">2</span>
+      <td class="day mon-wed"><span class="day">2</span><br>
       </td>
       <td class="cal">&nbsp;</td>
-      <td class="day mon-wed public-holiday"><span class="day">3</span>
-	<span class="public-holiday"><br>
+      <td class="day mon-wed public-holiday"><span class="day">3</span><br>
+	<div class="public-holiday">
           <span class="pubic-holiday-name parent-only">Queen's Birthday</span><a class="public-holiday-link staff-only" href="edit_public_holiday.html"><span class="public-holiday-name">Queen's Birthday</span></a>
-	</span>
+	</div>
       </td>
       <td class="cal">&nbsp;</td>
       <td class="day mon-wed"><span class="day">4</span><br>
@@ -164,9 +172,9 @@ span.day {
     <tr class="week">
       <td class="sun cal">&nbsp;</td>
       <td class="sun calout"><span class="week-label">Week 3</span><br>
-	<span class="event"><br>
+	<div class="event">
           <a class="event-link" href="event.html">Maintenance Day</a>
-	</span>
+	</div>
       </td>
       <td class="cal">&nbsp;</td>
       <td class="calon"><span class="day">9</span>

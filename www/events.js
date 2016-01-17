@@ -49,8 +49,8 @@ $(document).ready(function(){
   var $groupsToShowOption_t=$('select.groups-to-show option').remove().first();
   var monthToShow;
   $calendar=$('table.month-of-events');
-  $event_t=$calendar.find('span.event').remove().first();
-  $public_holiday_t=$calendar.find('span.public-holiday').remove().first();
+  $event_t=$calendar.find('div.event').remove().first();
+  $public_holiday_t=$calendar.find('div.public-holiday').remove().first();
   
   $week_t=$calendar.find('tr.week').remove().first();
   
