@@ -47,10 +47,7 @@ $(document).ready(function(){
   var groupsToShow;
   var busyCount=0;
   var $groupsToShowOption_t=$('select.groups-to-show option').remove().first();
-  var monthToShow={
-    y: new Date().getFullYear(),
-    m: new Date().getMonth()+1
-  };
+  var monthToShow;
   $calendar=$('table.month-of-events');
   $event_t=$calendar.find('span.event').remove().first();
   $public_holiday_t=$calendar.find('span.public-holiday').remove().first();
@@ -88,10 +85,21 @@ $(document).ready(function(){
 	$('body').removeClass('kc-busy-cursor');
       }
     });
+  ++busyCount&&kc.getFromServer('get_month_to_show')
+    .then(function(result){
+      monthToShow=result;
+      proceed();
+    })
+    .always(function(){
+      if (--busyCount){
+	$('body').removeClass('kc-busy-cursor');
+      }
+    });
   var proceed=function(){
     if (kc.defined(groups)&&
 	kc.defined(terms)&&
-	kc.defined(groupsToShow)){
+	kc.defined(groupsToShow)&&
+	kc.defined(monthToShow)){
       var $o_t=$groupsToShowOption_t;
       var $options=$o_t.clone().prop('value','[0,1,2,3]').text('All');
       kc.each(groups,function(i,group){
@@ -119,11 +127,13 @@ $(document).ready(function(){
       });
       $('a.prevmonth').click(function(){
 	monthToShow=prevMonth(monthToShow);
+	kc.postToServer('remember_month',monthToShow);
 	refresh();
 	return false;
       });
       $('a.nextmonth').click(function(){
 	monthToShow=nextMonth(monthToShow);
+	kc.postToServer('remember_month',monthToShow);
 	refresh();
 	return false;
       });
@@ -134,6 +144,7 @@ $(document).ready(function(){
     var cal;
     var events;
     var public_holidays;
+    var maintenance_days;
     $('span.month').text(monthNames[monthToShow.m-1]);
     $('span.year').text(monthToShow.y);
     kc.getFromServer('month_calendar',{params:kc.json.encode(monthToShow)})
@@ -151,11 +162,17 @@ $(document).ready(function(){
 	public_holidays=result;
 	proceed();
       });
+    kc.getFromServer('month_maintenance_days',monthToShow)
+      .then(function(result){
+	maintenance_days=result;
+	proceed();
+      });
     var proceed=function(){
       var groupSet={};
       if (kc.defined(cal) &&
 	  kc.defined(events) &&
-	  kc.defined(public_holidays)){
+	  kc.defined(public_holidays) &&
+	  kc.defined(maintenance_days)){
 	kc.each(groupsToShow,function(i,g){
 	  groupSet[g]=true;
 	});
@@ -237,6 +254,17 @@ $(document).ready(function(){
 	      dateDays[date.day].addClass('public-holiday');
 	    }
 	  });
+	});
+	kc.each(maintenance_days,function(i,event){
+	  var date=event.date;
+	  if (date.year==monthToShow.y&&
+	      date.month==monthToShow.m&&
+	      dateDays[date.day]){
+	    var $event=$event_t.clone();
+	    $event.find('.event-link').attr('href','maintenance_day.html?id='+event.id);
+	    $event.find('.event-link').text('Maintenance Day');
+	    dateDays[date.day].append($event);
+	  }
 	});
       }
     };

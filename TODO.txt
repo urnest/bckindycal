@@ -106,11 +106,16 @@ x terms start with monday/tue or monday/tue/wed, not per group
   x edit_groups
   x events
   
-- public holidays separate - different background colour
+x public holidays separate - different background colour
 - maintenance days separate and allow add names (you can
   see all names)
-- menu bar
+  - only one date per maintenance day
+  - view allows add volunteer only
+- nav bar (make it mobile style always)
 - start on events page
+- login pages use referer to go to requested page after login
+- return to previous month after edit/view event etc (via cookie?)
+- new event etc init date from month cookie
 
 x View Events for: All Groups
 - upload document/image

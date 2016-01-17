@@ -629,6 +629,111 @@ class public_holiday(webapp2.RequestHandler):
             pass
         return self.response.write(toJson(result).encode('utf-8'))
     pass
+
+
+class MaintenanceDayIdCounter(ndb.Model):
+    """Counter to assign ids to MaintenanceDays."""
+    nextMaintenanceDayId = ndb.IntegerProperty()
+
+nextMaintenanceDayIdKey=ndb.Key('nextMaintenanceDayId','nextMaintenanceDayId')
+
+def nextMaintenanceDayId():
+    q=MaintenanceDayIdCounter.query(ancestor=nextMaintenanceDayIdKey)
+    x=q.fetch(1)
+    if len(x)==0:
+        x=MaintenanceDayIdCounter(parent=nextMaintenanceDayIdKey)
+        x.nextMaintenanceDayId=100
+    else:
+        x=x[0]
+    result=x.nextMaintenanceDayId
+    x.nextMaintenanceDayId=x.nextMaintenanceDayId+1
+    x.put()
+    return result
+
+
+maintenance_day_schema=jsonschema.Schema({
+        'id': IntType, #0 for new MaintenanceDay
+        'date' : {'year':IntType,'month':IntType,'day':IntType},
+        'groups': [ IntType ],
+        'description' : {
+            'html' : StringType
+            },
+        'volunteers':[{
+                'childs_name':StringType
+                }]
+        })
+
+class MaintenanceDay(ndb.Model):
+    # data is json encoded maintenance_day_schema-conformant
+    data=ndb.StringProperty(indexed=False,repeated=False)
+    # id from data['id']
+    id=ndb.IntegerProperty(indexed=True,repeated=False)
+    # month of data['date'], as yyyymm
+    months=ndb.IntegerProperty(indexed=True,repeated=True)
+    pass
+
+class delete_maintenance_day(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                data=fromJson(self.request.get('params'))
+                assert not data is None
+                for x in MaintenanceDay.query(
+                    MaintenanceDay.id==data['id'],
+                    ancestor=root_key).fetch(1): x.key.delete()
+                self.response.write(toJson({'result':'OK'}))
+                return
+        except:
+            result={'error':str(inContext('delete maintenance_day'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+class maintenance_day(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+        else:
+            maintenance_day=MaintenanceDay.query(
+                MaintenanceDay.id==int(self.request.get('id')),
+                ancestor=root_key).fetch(1)
+            result=fromJson(maintenance_day[0].data)
+            maintenance_day_schema.validate(result)
+            pass
+        return self.response.write(toJson({'result':result}))
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                data=fromJson(self.request.get('params'))
+                assert not data is None
+                maintenance_day_schema.validate(data)
+                if data['id']==0: data['id']=nextMaintenanceDayId()
+                maintenance_day=MaintenanceDay(parent=root_key,
+                            id=data['id'],
+                            months=[_['year']*100+_['month'] \
+                                    for _ in [data['date']]],
+                            data=toJson(data))
+                for x in MaintenanceDay.query(MaintenanceDay.id==maintenance_day.id,ancestor=root_key).fetch(1): x.key.delete()
+                maintenance_day.put()
+                result=fromJson(maintenance_day.data)
+                maintenance_day_schema.validate(result)
+                result={'result':result}
+                pass
+            pass
+        except:
+            result={'error':str(inContext('post maintenance_day'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+
 month_calendar_schema=jsonschema.Schema({
         'y':IntType,
         'm':IntType,
@@ -741,6 +846,31 @@ class month_public_holidays(webapp2.RequestHandler):
         pass
     pass
 
+month_maintenance_days_schema=jsonschema.Schema([maintenance_day_schema])
+
+class month_maintenance_days(webapp2.RequestHandler):
+    def get(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                y=int(self.request.get('y'))
+                m=int(self.request.get('m'))
+                print y*100+m
+                maintenance_days=[fromJson(_.data) for _ in
+                        MaintenanceDay.query(
+                        MaintenanceDay.months==y*100+m,
+                        ancestor=root_key).fetch(10000)]
+                print maintenance_days
+                month_maintenance_days_schema.validate(maintenance_days)
+                self.response.write(toJson({'result':maintenance_days}))
+        except:
+            self.response.write(toJson({'error':str(inContext('get month maintenance_days'))}))
+            pass
+        pass
+    pass
+
 class edit_event_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
@@ -763,6 +893,99 @@ class edit_public_holiday_page(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
+class maintenance_day_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff','parent']:
+            print 'not logged in'
+            return webapp2.redirect('parent.html')
+        id=int(self.request.get('id'))
+        if session.loginLevel in ['admin','staff']:
+            return webapp2.redirect('edit_maintenance_day.html?id=%(id)s'%vars())
+        maintenance_day=MaintenanceDay.query(MaintenanceDay.id==id,
+                          ancestor=root_key).fetch(1)
+        maintenance_day=fromJson(maintenance_day[0].data)
+        maintenance_day_schema.validate(maintenance_day)
+        page=pq.loadFile('maintenance_day.html')
+        d=formatDate(maintenance_day['date'])
+        page.find(pq.attrEquals('id','id')).attr('value',str(id))
+        page.find(pq.hasClass('date')).text(d)
+        page.find(pq.hasClass('maintenance-day-description')).html(
+            pq.parse(maintenance_day['description']['html']))
+        vrt=page.find(pq.hasClass('volunteer-row')).remove().first()
+        for v in maintenance_day['volunteers']:
+            vr=vrt.clone()
+            vr.find(pq.hasClass('volunteer-child-name')).text(
+                v['childs_name'])
+            vr.appendTo(page.find(pq.hasClass('volunteers-table')))
+            pass
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+
+class edit_maintenance_day_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['staff','admin']:
+            print 'not logged in as staff or admin'
+            return webapp2.redirect('staff_login.html')
+        page=pq.loadFile('edit_maintenance_day.html')
+        page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+class add_maintenance_day_volunteer(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                assert self.request.get('id','')
+                assert self.request.get('childs_name','')
+                id=int(self.request.get('id'))
+                childs_name=self.request.get('childs_name')
+                maintenance_day=MaintenanceDay.query(
+                    MaintenanceDay.id==id,
+                    ancestor=root_key).fetch(1)[0]
+                data=fromJson(maintenance_day.data)
+                data['volunteers'].append({
+                    'childs_name':childs_name
+                    })
+                maintenance_day_schema.validate(data)
+                maintenance_day.data=toJson(data)
+                maintenance_day.put()
+                self.response.write(toJson({'result':toJson(data)}))
+        except:
+            self.response.write(toJson({'error':str(inContext('add maintenance day volunteer'))}))
+            pass
+        pass
+    pass
+
+class remember_month(webapp2.RequestHandler):
+    def post(self):
+        try:
+            y=int(self.request.get('y'))
+            m=int(self.request.get('m'))
+            self.response.set_cookie('month-to-show',toJson({'y':y,'m':m}))
+            self.response.write(toJson({'result':'OK'}))
+        except:
+            self.response.write(toJson({'error':str(inContext('remember month'))}))
+            pass
+        pass
+    pass
+
+class get_month_to_show(webapp2.RequestHandler):
+    def get(self):
+        t=today()
+        result={'y':t.year,'m':t.month}
+        if self.request.cookies.get('month-to-show',None):
+            result=fromJson(self.request.cookies.get('month-to-show'))
+            pass
+        self.response.write(toJson({'result':result}))
+        pass
+    pass
+
 application = webapp2.WSGIApplication([
     ('/', index_page),
     ('/admin.html',admin_page),
@@ -771,24 +994,32 @@ application = webapp2.WSGIApplication([
     ('/edit_groups.html',edit_groups_page),
     ('/edit_event.html',edit_event_page),
     ('/edit_events.html',edit_events_page),
+    ('/edit_maintenance_day.html',edit_maintenance_day_page),
     ('/edit_public_holiday.html',edit_public_holiday_page),
     ('/event.html',event_page),
     ('/events.html',events_page),
     ('/index.html', index_page),
     ('/login.html',login_page),
+    ('/maintenance_day.html',maintenance_day_page),
     ('/staff.html',staff_page),
     ('/staff_login.html',staff_login_page),
     
     # following are not real pages, they are called by javascript files
     # to get and save data
+    ('/add_maintenance_day_volunteer',add_maintenance_day_volunteer),
+    ('/get_month_to_show',get_month_to_show),
     ('/groups',groups),
     ('/groups_to_show',groups_to_show),
     ('/terms',terms),
     ('/month_calendar',month_calendar),
     ('/month_events',month_events),
+    ('/month_maintenance_days',month_maintenance_days),
     ('/month_public_holidays',month_public_holidays),
     ('/event',event),
+    ('/maintenance_day',maintenance_day),
     ('/public_holiday',public_holiday),
     ('/delete_event',delete_event),
+    ('/delete_maintenance_day',delete_maintenance_day),
     ('/delete_public_holiday',delete_public_holiday),
+    ('/remember_month',remember_month),
 ], debug=True)

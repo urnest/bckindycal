@@ -1,0 +1,39 @@
+<html>
+<head>
+  <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+  <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
+  <script src="jquery-ui-1.11/jquery-ui.js"></script>
+  <script src="ajaxfileupload/ajaxfileupload.js"></script>
+  <script src="tinymce/js/tinymce/tinymce.js"></script>
+  <script type="text/javascript" src="kc.js"></script>
+  <script type="text/javascript" src="edit_maintenance_day.js"></script>
+  <style type="text/css" src="kc.css"></style>
+</head>
+<body>
+  <h1>Maintenance Day</h1>
+  <form method="POST" action="maintenance_day">
+    <input type="hidden" id="id" name="id" value="0">
+    <table>
+      <tr>
+	<td>Date</td>
+	<td><input class="date" type="text" value="2/5/2016"></td>
+      </tr>
+    </table>
+    <p>Description (click to edit):</p>
+    <div class="maintenance-day-description">
+      <p>Odd jobs etc.</p>
+    </div>
+    <p>Volunteers (child's names):</p>
+    <table class="volunteer-table">
+      <tr class="volunteer-row">
+	<td><span class="delete-volunteer">-</span></td>
+	<td><input class="volunteer-childs-name" type="text" value="Sandy Kay"></td>
+      </tr>
+      <tr class="add-volunteer">
+	<td class="add-volunteer">+</td>
+      </tr>
+    </table>
+    <input type="submit" value="Save" id="save-button">
+    <input type="submit" value="Delete" id="delete-button">
+  </form>
+</body>
