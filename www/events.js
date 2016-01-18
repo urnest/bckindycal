@@ -210,6 +210,9 @@ $(document).ready(function(){
 	    if (day){
 	      dateDays[day]=$day;
 	    }
+	    else{
+	      $day.addClass('other-month');
+	    }
 	    $day.removeClass('mon-wed').removeClass('wed-fri');
 	    if (dayClasses[i]){
 	      $day.addClass(dayClasses[i]);

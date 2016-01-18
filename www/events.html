@@ -99,6 +99,9 @@ TD.calopt {
 	padding: 0px;
 	vertical-align: middle;
 }
+TD.note {
+	height: 10px !important;
+}
 TD.day {
 	font-family: "Montserrat",sans-serif;
 	font-size: 14px;
@@ -117,9 +120,6 @@ TD.day.mon-wed {
 	vertical-align: top;
 	height: 100px;
 	padding: 4px;
-}
-TD.note {
-	height: 10px !important;
 }
 TD.day.wed-fri {
 	font-family: "Montserrat",sans-serif;
@@ -142,6 +142,11 @@ TD.day.public-holiday a,
 TD.day.mon-wed.public-holiday a, 
 TD.day.wed-fri.public-holiday a {
 	color:white;
+}
+TD.day.mon-wed.other-month,
+TD.day.wed-fri.other-month,
+TD.day.other-month {
+	background-color: #FFFFFF;
 }
 span.day {
   float: right;
@@ -267,7 +272,7 @@ a:hover.add-staff {
       </td> <td class="cal"> </td>
       <td class="day mon-wed public-holiday"><span class="day">3</span><br>
 	<div class="public-holiday">
-          <span class="pubic-holiday-name parent-only">Queen's Birthday</span><a class="public-holiday-link staff-only" href="edit_public_holiday.html"><span class="public-holiday-name">Queen's Birthday</span></a>
+          <span class="public-holiday-name parent-only">Queen's Birthday</span><a class="public-holiday-link staff-only" href="edit_public_holiday.html"><span class="public-holiday-name">Queen's Birthday</span></a>
 	</div>
       </td> <td class="cal"> </td>
       <td class="day mon-wed"><span class="day">4</span><br>
