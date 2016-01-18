@@ -173,7 +173,7 @@ $(document).ready(function(){
 					 date.day+'/'+
 					 date.month+'/'+
 					 date.year);
-	$('table.date-table').append($dateRow);
+	$('table.date-table').find('tr.add-date').before($dateRow);
 	$dateRow.find('.delete-date').click(function(){
 	  $dateRow.remove();
 	  $('tr.date-row').find('.delete-date').show();
@@ -183,8 +183,6 @@ $(document).ready(function(){
 	  dateFormat: 'dd/mm/yy'
 	});
       });
-      $('table.date-table').append(
-	$('table.date-table').find('tr.add-date').remove());
       $('tr.date-row').find('.delete-date').show();
       $('tr.date-row').find('.delete-date').first().hide();
       $('td.add-date').click(function(){
@@ -195,7 +193,7 @@ $(document).ready(function(){
 	  today.getDate()+'/'+
 	    (today.getMonth()+1)+'/'+
 	    today.getFullYear());
-	$('table.date-table').append($dateRow);
+	$('table.date-table').find('tr.add-date').before($dateRow);
 	$dateRow.find('.delete-date').click(function(){
 	  $dateRow.remove();
 	  $('tr.date-row').find('.delete-date').show();
@@ -204,8 +202,6 @@ $(document).ready(function(){
 	$dateRow.find('input.date').datepicker({
 	  dateFormat: 'd/m/yy'
 	});
-	$('table.date-table').append(
-	  $('table.date-table').find('tr.add-date').remove());
       });
     }
   };
