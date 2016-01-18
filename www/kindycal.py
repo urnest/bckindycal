@@ -869,6 +869,9 @@ class month_maintenance_days(webapp2.RequestHandler):
                         MaintenanceDay.query(
                         MaintenanceDay.months==y*100+m,
                         ancestor=root_key).fetch(10000)]
+                for data in maintenance_days:
+                    if not 'name' in data: data['name']='Maintenance Day 8am'
+                    pass
                 print maintenance_days
                 month_maintenance_days_schema.validate(maintenance_days)
                 self.response.write(toJson({'result':maintenance_days}))
