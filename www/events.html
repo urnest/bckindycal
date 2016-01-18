@@ -7,6 +7,42 @@
   <link rel='stylesheet' id='google-fonts-css'  href='//fonts.googleapis.com/css?family=Lato%3A300%2C400%2C300italic%2C400italic%7CMontserrat%3A400%2C700&#038;ver=4.4.1' type='text/css' media='all' />
 
 <style type="text/css">
+body, input, textarea {
+	font-family: "Montserrat",sans-serif;
+	font-size: 12px;
+	color: #333333;
+	text-align:left;
+}
+#content {
+    margin-bottom: 100px;
+}
+.shell {
+    margin: 0 auto;
+    position: relative;
+    width: 940px;
+}
+select {
+	font-family: "Montserrat",sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	text-align:left;
+	background: #264452;
+    box-sizing: border-box;
+    cursor: default;
+    display: inline-block;
+    line-height: normal !important;
+    margin: 0;
+    overflow: -moz-hidden-unscrollable;
+    page-break-inside: avoid;
+    text-align: start;
+    text-indent: 0;
+    text-shadow: none;
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+}
+:-moz-any-link {
+    cursor: pointer;
+}
 TD {
 	font-family: "Montserrat",sans-serif;
 	font-size: 12px;
@@ -56,30 +92,40 @@ TD.cal {
 	height: 30px;
 	padding: 0px;
 }
+TD.calopt {
+	color: #FFFFFF;
+	background: #365566;
+	height: 60px;
+	padding: 0px;
+	vertical-align: middle;
+}
 TD.day {
 	font-family: "Montserrat",sans-serif;
-	font-size: 12px;
+	font-size: 14px;
 	color: #333333;
-	background-color: #cccccc;
+	background-color: #DDDDDD;
 	vertical-align: top;
 	height: 100px;
 	padding: 4px;
 }
 TD.day.mon-wed {
 	font-family: "Montserrat",sans-serif;
-	font-size: 12px;
-	color: #2b5caa;
+	font-size: 14px;
+	color: #333333;
 	background-color: #fee1ba;
 	border: 1px solid #FFFFFF;
 	vertical-align: top;
 	height: 100px;
 	padding: 4px;
 }
+TD.note {
+	height: 10px !important;
+}
 TD.day.wed-fri {
 	font-family: "Montserrat",sans-serif;
-	font-size: 12px;
+	font-size: 14px;
 	color: #333333;
-	background-color: #B9CC23;
+	background-color: #a2c523;
 	vertical-align: top;
 	height: 100px;
 	padding: 4px;
@@ -103,69 +149,133 @@ span.day {
 div.event {
 	font-size: 12px;
 	text-align:center;
+	color: #2b5caa;
 }
-
+a {
+	color: #2b5caa;
+	text-decoration: none;
+}
+a:hover {
+	color: #f45b4d;
+	text-decoration: none;
+}
+a.event-link {
+	color: #2b5caa;
+	text-decoration: none;
+}
+a:hover.event-link {
+	color: #f45b4d;
+	text-decoration: none;
+}
+a.staff-only {
+    color: #ffffff;
+}
+a:hover.staff-only {
+    color: #eeeeee;
+}
+a.add-staff {
+	background: #388fe0 none repeat scroll 0 0;
+    border: 1px solid #388fe0;
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 20px;
+    display: inline-block;
+    float: right;
+    line-height: 35px;
+    margin: 0 10px 0 0;
+    padding: 0 15px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+}
+a:hover.add-staff {
+	background: #000000 none repeat scroll 0 0;
+    border: 1px solid #000000;
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 20px;
+    display: inline-block;
+    float: right;
+    line-height: 35px;
+    margin: 0 10px 0 0;
+    padding: 0 15px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+}
+.hdmth	{
+	font-size: 20px;
+}
+.week-label	{
+	font-size: 13px;
+	color: #996699;
+}
+.Groupselect {
+	background: #264452 none repeat scroll 0 0;
+    border-radius: 5px 5px 0 0;
+    box-sizing: border-box;
+    display: inline-block;
+    margin: 0 0 0 12px;
+    padding: 8px 10px 9px 12px;
+	font-size: 10px;
+	color: #FFFFFF;
+}
 </style>
 </head>
 <body>
+<div id="content" class="shell">
+<span class="toolbar-item">
+      <a href="edit_event.html" class="staff-only add-event add-staff">New Event</a>
+    </span>
+    <span class="toolbar-item">
+      <a href="edit_public_holiday.html" class="staff-only add-public-holiday add-staff">New Public Holiday</a>
+    </span>
+    <span class="toolbar-item">
+      <a href="edit_maintenance_day.html" class="staff-only add-maintenance-day add-staff">New Maintenance Day</a>
+</span>
+<div class="Groupselect">
   <div class="toolbar">
     <span class="toolbar-item">
-      Show events for Groups: <select class="groups-to-show" name="groups-to-show"><option>Matt Mon-Wed</option></select>
-    </span>
-    <span class="toolbar-item">
-      <a href="edit_event.html" class="staff-only add-event">New Event</a>
-    </span>
-    <span class="toolbar-item">
-      <a href="edit_public_holiday.html" class="staff-only add-public-holiday">New Public Holiday</a>
-    </span>
-    <span class="toolbar-item">
-      <a href="edit_maintenance_day.html" class="staff-only add-maintenance-day">New Maintenance Day</a>
-    </span>
+      Show events for Groups: <br><select class="groups-to-show" name="groups-to-show"><option>Matt Mon-Wed</option></select>
+    </span>    
   </div>
-
+</div>
   <table border="0" bordercolor="#ffffff" cellspacing="0" cellpadding="0" align="center" class="month-of-events">
     <tr>
-      <td class="calopt" colspan=8>&nbsp;&nbsp;<a href="#" class="prevmonth"><img src="images/but_left.png" alt="Prev" border="0"/></a><a href="#" class="nextmonth"><img src="images/but_right.png" alt="Next"  border="0"/></a>&nbsp;&nbsp; <span class="hdmth"><span class="month">January</span> <span class="year">2014</span></span></td>
+      <td></td><td class="calopt" colspan=13>&nbsp;&nbsp;<a href="#" class="prevmonth"><img src="images/but_left.png" alt="Prev" border="0"/></a><a href="#" class="nextmonth"><img src="images/but_right.png" alt="Next"  border="0"/></a>&nbsp;&nbsp; <span class="hdmth"><span class="month">January</span> <span class="year">2014</span></span></td>
     </tr>
     <tr class="head1">
       <td class="mon cal">&nbsp;&nbsp;&nbsp;</td>
       <td colspan="1" class="sun calhdc">SUN</td>
-      <td class="cal">&nbsp</td>
+      <td class="cal"></td>
       <td colspan="1" class="weekday calhdc">MON</td>
-      <td class="cal">&nbsp</td>
+      <td class="cal"> </td>
       <td colspan="1" class="weekday calhdc">TUE</td>
-      <td class="cal">&nbsp</td>
+      <td class="cal"> </td>
       <td colspan="1" class="weekday calhdc">WED</td>
-      <td class="cal">&nbsp</td>
+      <td class="cal"> </td>
       <td colspan="1" class="weekday calhdc">THU</td>
-      <td class="cal">&nbsp</td>
+      <td class="cal"> </td>
       <td colspan="1" class="weekday calhdc">FRI</td>
-      <td class="cal">&nbsp</td>
+      <td class="cal"> </td>
       <td colspan="1" class="sat calhdc">SAT</td>
       <td class="cal">&nbsp;&nbsp;&nbsp;</td>
     </tr>
-    <tr class="week">
-      <td class="cal">&nbsp;</td>
-      <td class="day"><span class="day">1</span><span class="week-label">Week 2</span><br></td>
-      <td class="cal">&nbsp;</td>
+    <tr class="week"> <td class="cal"> </td>
+      <td class="day"><span class="day">1</span><span class="week-label">Week 2</span><br></td> <td class="cal"> </td>
       <td class="day mon-wed"><span class="day">2</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="day mon-wed public-holiday"><span class="day">3</span><br>
 	<div class="public-holiday">
           <span class="pubic-holiday-name parent-only">Queen's Birthday</span><a class="public-holiday-link staff-only" href="edit_public_holiday.html"><span class="public-holiday-name">Queen's Birthday</span></a>
 	</div>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="day mon-wed"><span class="day">4</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="day wed-fri"><span class="day">5</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="day wed-fri"><span class="day">6</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="day"><span class="day">7</span><br>
       </td>
     </tr>
@@ -175,96 +285,77 @@ div.event {
 	<div class="event">
           <a class="event-link" href="event.html">Maintenance Day</a>
 	</div>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calon"><span class="day">9</span>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calon"><span class="day">10</span><br>
         <br>
         <a class="event-link" href="event.html">Park/Creek Visit</a>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calon"><span class="day">11</span>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">12</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">13</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">14</span><br>
       </td>
     </tr>
     <tr class="week">
       <td class="sun cal">&nbsp;</td>
-      <td class="sun calout"><span class="week-label">Week 4</span></td>
-      <td class="cal">&nbsp;</td>
+      <td class="sun calout"><span class="week-label">Week 4</span></td> <td class="cal"> </td>
       <td class="calon"><span class="day">16</span><br>
         <br>
         <a class="event-link" href="event.html"><span style="color:red">Kid Free</span></a>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calon"><span class="day">17</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">18</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">19</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">20</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">21</span><br>
       </td>
     </tr>
     <tr class="week">
       <td class="sun cal">&nbsp;</td>
-      <td class="sun calout"><span class="week-label">Week 5</span></td>
-      <td class="cal">&nbsp;</td>
+      <td class="sun calout"><span class="week-label">Week 5</span></td> <td class="cal"> </td>
       <td class="calon"><span class="day">23</span>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calon"><span class="day">24</span>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calon"><span class="day">25</span>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">26</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">27</span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day">28</span><br>
       </td>
     </tr>
     <tr class="week">
       <td class="sun cal">&nbsp;</td>
-      <td class="sun calout"><span class="week-label">Week 6</span></td>
-      <td class="cal">&nbsp;</td>
+      <td class="sun calout"><span class="week-label">Week 6</span></td> <td class="cal"> </td>
       <td class="calon"><span class="day">30</span>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calon"><span class="day">31</span>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day"></span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day"></span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day"></span><br>
-      </td>
-      <td class="cal">&nbsp;</td>
+      </td> <td class="cal"> </td>
       <td class="calout"><span class="day"></span><br>
       </td>
     </tr>
+  </table><br><br>
+  <table border="0" bordercolor="#ffffff" cellspacing="0" cellpadding="0" align="left">
+    <tr><td>Please note:</td><td class="day mon-wed note">&nbsp;&nbsp;</td><td>&nbsp; Group 1 attendance days</td></tr>
+    <tr><td>&nbsp;</td><td class="day wed-fri note">&nbsp;&nbsp;</td><td>&nbsp; Group 2 attendance days</td></tr>
   </table>
+</div>
 </div>
 </body>
