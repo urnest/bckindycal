@@ -196,10 +196,10 @@ $(document).ready(function(){
 	    }
 	    if (week.term_week.week==1){
 	      weekName='Term '+week.term_week.term+
-		'<br>week '+week.term_week.week;
+		'<br>Week '+week.term_week.week;
 	    }
 	    else{
-	      weekName='week '+week.term_week.week;
+	      weekName='Week '+week.term_week.week;
 	    }
 	  }
 	  $week.find('.week-label').html(weekName);
