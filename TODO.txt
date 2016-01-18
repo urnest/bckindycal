@@ -107,22 +107,36 @@ x terms start with monday/tue or monday/tue/wed, not per group
   x events
   
 x public holidays separate - different background colour
-- maintenance days separate and allow add names (you can
+x maintenance days separate and allow add names (you can
   see all names)
-  - only one date per maintenance day
-  - view allows add volunteer only
+  x only one date per maintenance day
+  x view allows add volunteer only
+- allow edit maintenance day name
 - nav bar (make it mobile style always)
 - start on events page
 - login pages use referer to go to requested page after login
-- return to previous month after edit/view event etc (via cookie?)
-- new event etc init date from month cookie
+x return to previous month after edit/view event etc (via cookie?)
+x new event etc init date from month cookie
 
 x View Events for: All Groups
-- upload document/image
+- grey out next/prev-months days
 
 - roster jobs
 - fair rosters
+- time with your child
 
+- upload document/image
+- hash(data) & 0xffffffff
+- @ndb.transactional
+- ref count File
+  File
+    hash : IntegerProperty
+    id : IntegerProperty
+    mime_type
+    data
+    ref_count
+
+x fix + button after adding new date (use before rather than append)
   
 -----------------------
 

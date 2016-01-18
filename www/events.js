@@ -49,8 +49,8 @@ $(document).ready(function(){
   var $groupsToShowOption_t=$('select.groups-to-show option').remove().first();
   var monthToShow;
   $calendar=$('table.month-of-events');
-  $event_t=$calendar.find('div.event').remove().first();
-  $public_holiday_t=$calendar.find('div.public-holiday').remove().first();
+  $event_t=$calendar.find('span.event').remove().first();
+  $public_holiday_t=$calendar.find('span.public-holiday').remove().first();
   
   $week_t=$calendar.find('tr.week').remove().first();
   
@@ -196,10 +196,10 @@ $(document).ready(function(){
 	    }
 	    if (week.term_week.week==1){
 	      weekName='Term '+week.term_week.term+
-		'<br>week '+week.term_week.week;
+		'<br>Week '+week.term_week.week;
 	    }
 	    else{
-	      weekName='week '+week.term_week.week;
+	      weekName='Week '+week.term_week.week;
 	    }
 	  }
 	  $week.find('.week-label').html(weekName);

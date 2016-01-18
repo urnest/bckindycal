@@ -30,6 +30,7 @@ class Session(ndb.Model):
     touched=ndb.DateTimeProperty(indexed=True,repeated=False,auto_now_add=True)
     # login levels are 'parent','staff','admin', or '' if not logged in
     loginLevel=ndb.StringProperty(indexed=False,repeated=False,default='')
+    nextFileId=ndb.IntegerProperty(indexed=False,default=1)
     pass
 
 class Password(ndb.Model):
@@ -56,6 +57,11 @@ def expireOldSessions():
         ancestor=root_key)
     for x in q.fetch(10000):
         print 'expire session %(x)s'%vars()
+        for i in SessionFile.query(
+            SessionFile.sid==x.sid,
+            ancestor=root_key).fetch(100000):
+            i.key.delete()
+            pass
         x.key.delete()
     pass
 
@@ -481,7 +487,6 @@ class delete_event(webapp2.RequestHandler):
             else:
                 data=fromJson(self.request.get('params'))
                 assert not data is None
-                event_schema.validate(data)
                 for x in Event.query(Event.id==data['id'],ancestor=root_key).fetch(1): x.key.delete()
                 self.response.write(toJson({'result':'OK'}))
                 return
@@ -577,7 +582,6 @@ class delete_public_holiday(webapp2.RequestHandler):
             else:
                 data=fromJson(self.request.get('params'))
                 assert not data is None
-                public_holiday_schema.validate(data)
                 for x in PublicHoliday.query(
                     PublicHoliday.id==data['id'],
                     ancestor=root_key).fetch(1): x.key.delete()
@@ -986,6 +990,59 @@ class get_month_to_show(webapp2.RequestHandler):
         pass
     pass
 
+class SessionFile(ndb.Model):
+    sid=ndb.StringProperty(indexed=True)
+    id=ndb.IntegerProperty(indexed=True)
+    mime_type=ndb.StringProperty(indexed=False,repeated=False,default='') #eg image/jpeg
+    data=ndb.BlobProperty(indexed=False,repeated=False)#file data
+    pass
+
+class session_file(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+            self.response.write(toJson(result))
+        else:
+            assert self.request.get('id')
+            id=int(self.request.get('id'))
+            f=SessionFile.query(
+                SessionFile.sid==session.sid and SessionFile.id==id,
+                ancestor=root_key).fetch(1)[0]
+            self.response.headers['Content-Type'] = \
+                f.mime_type.encode('ascii','ignore')
+            self.response.write(f.data)
+            pass
+        pass
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                print self.request.POST.keys()
+                data=self.request.get('filename')
+                mime_type=self.request.POST['filename'].type
+                id=session.nextFileId
+                session.nextFileId=session.nextFileId+1
+                session.put()
+                f=SessionFile(parent=root_key,
+                              sid=session.sid,
+                              id=id,
+                              mime_type=mime_type,
+                              data=data)
+                f.put()
+                result={'result':{'id':id}}
+                pass
+            pass
+        except:
+            result={'error':str(inContext('post maintenance_day'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+
+
 application = webapp2.WSGIApplication([
     ('/', index_page),
     ('/admin.html',admin_page),
@@ -1022,4 +1079,5 @@ application = webapp2.WSGIApplication([
     ('/delete_maintenance_day',delete_maintenance_day),
     ('/delete_public_holiday',delete_public_holiday),
     ('/remember_month',remember_month),
+    ('/session_file',session_file)
 ], debug=True)
