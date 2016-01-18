@@ -657,6 +657,7 @@ def nextMaintenanceDayId():
 
 maintenance_day_schema=jsonschema.Schema({
         'id': IntType, #0 for new MaintenanceDay
+        'name': StringType,
         'date' : {'year':IntType,'month':IntType,'day':IntType},
         'groups': [ IntType ],
         'description' : {
@@ -706,6 +707,7 @@ class maintenance_day(webapp2.RequestHandler):
                 MaintenanceDay.id==int(self.request.get('id')),
                 ancestor=root_key).fetch(1)
             result=fromJson(maintenance_day[0].data)
+            if not 'name' in result: result['name']='Maintenance Day 8am'
             maintenance_day_schema.validate(result)
             pass
         return self.response.write(toJson({'result':result}))
@@ -717,6 +719,7 @@ class maintenance_day(webapp2.RequestHandler):
             else:
                 data=fromJson(self.request.get('params'))
                 assert not data is None
+                if not 'name' in data: data['name']='Maintenance Day 8am'
                 maintenance_day_schema.validate(data)
                 if data['id']==0: data['id']=nextMaintenanceDayId()
                 maintenance_day=MaintenanceDay(parent=root_key,
@@ -909,10 +912,12 @@ class maintenance_day_page(webapp2.RequestHandler):
         maintenance_day=MaintenanceDay.query(MaintenanceDay.id==id,
                           ancestor=root_key).fetch(1)
         maintenance_day=fromJson(maintenance_day[0].data)
+        if not 'name' in maintenance_day: maintenance_day['name']='Maintenance Day 8am'
         maintenance_day_schema.validate(maintenance_day)
         page=pq.loadFile('maintenance_day.html')
-        d=formatDate(maintenance_day['date'])
         page.find(pq.attrEquals('id','id')).attr('value',str(id))
+        page.find(pq.hasClass('maintenance-day-name')).text(maintenance_day['name'])
+        d=formatDate(maintenance_day['date'])
         page.find(pq.hasClass('date')).text(d)
         page.find(pq.hasClass('maintenance-day-description')).html(
             pq.parse(maintenance_day['description']['html']))

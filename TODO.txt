@@ -111,7 +111,14 @@ x maintenance days separate and allow add names (you can
   see all names)
   x only one date per maintenance day
   x view allows add volunteer only
+
 - allow edit maintenance day name
+  x kindycal.py schema
+  x kindycal.py maintenance_day_page
+  x edit_maintenance_day.html
+  x events.js
+  x edit_maintenance_day.js
+
 - nav bar (make it mobile style always)
 - start on events page
 - login pages use referer to go to requested page after login

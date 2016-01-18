@@ -265,7 +265,7 @@ $(document).ready(function(){
 	      dateDays[date.day]){
 	    var $event=$event_t.clone();
 	    $event.find('.event-link').attr('href','maintenance_day.html?id='+event.id);
-	    $event.find('.event-link').text('Maintenance Day');
+	    $event.find('.event-link').text(event.name);
 	    dateDays[date.day].append($event);
 	  }
 	});

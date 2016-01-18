@@ -2,13 +2,14 @@ $(document).ready(function(){
   var maintenance_day;
   var busyCount=0;
   $('input.date').prop('value','');
+  $('input.name').prop('value','');
   $('input#save-button').click(function(){
     if (busyCount){
       return false;
     }
     $('input').removeClass('invalid-input');
-    if ($('input.date').first().prop('value')==''){
-      $('input#date').first().addClass('invalid-input');
+    if ($('input.name').first().prop('value')==''){
+      $('input.name').first().addClass('invalid-input');
       return false;
     }
     var date;
@@ -90,6 +91,7 @@ $(document).ready(function(){
 	};
 	maintenance_day={
 	  id:0,
+	  name:'Maintenance Day 8am',
 	  groups:[],
 	  date:date,
 	  description:{
@@ -132,6 +134,7 @@ $(document).ready(function(){
 	],
 	toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
       });
+      $('input.name').prop('value',maintenance_day.name);
       $('input.date').prop('value',kc.formatDate(maintenance_day.date));
       $('input.date').datepicker({
 	dateFormat: 'dd/mm/yy'
