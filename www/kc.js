@@ -614,4 +614,63 @@
   kc.showError=function(e){
     alert(''+e);
   };
+  kc.uploadFile=function(jquery_){
+    var result={
+      then_: function(url){},
+      error_:function(e){
+	alert(e);
+      },
+      always_:function(){
+      }
+    };
+    result.then=function(then){
+      result.then_=then;
+      return result;
+    };
+    result.or=function(error){
+      result.error_=error;
+      return result;
+    };
+    result.always=function(always){
+      result.always_=always;
+      return result;
+    }
+    var $=jquery_||$;
+    var $dialog=$('<form action="" method="POST" enctype="multipart/form-data"><p>File: <input id="filename" type="file" name="filename"></p></form>');
+    $dialog.dialog({
+      modal: true,
+      buttons:{
+	'OK': function(){
+          $.ajaxFileUpload({
+            url:'session_file',
+            secureuri:false,
+            fileElementId:'filename',
+            dataType: 'text',
+            success: function (d, status)
+            {
+	      var data=kc.json.decode(d);
+              if(data.error) {
+                result.error_(data.error);
+              }
+	      else {
+                result.then_('session_file?id='+data.result.id);
+                $dialog.dialog('close');
+              }
+            },
+            error: function (data, status, e)
+            {
+              result.error_(e);
+            }
+          });
+	},
+	'Cancel':function(){
+	  $dialog.dialog('close');
+	  result.then_();
+	}
+      }
+    });
+    $dialog.dialog('open');
+    result.$dialog=$dialog;
+    return result;
+  };
 }( window.kc = window.kc || {} ));

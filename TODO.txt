@@ -114,15 +114,28 @@ x public holidays separate - different background colour
 - nav bar (make it mobile style always)
 - start on events page
 - login pages use referer to go to requested page after login
-- return to previous month after edit/view event etc (via cookie?)
-- new event etc init date from month cookie
+x return to previous month after edit/view event etc (via cookie?)
+x new event etc init date from month cookie
 
 x View Events for: All Groups
 - upload document/image
+- grey out next/prev-months days
 
 - roster jobs
 - fair rosters
+- time with your child
 
+- hash('') & 0xffffffff
+- @ndb.transactional
+- ref count File
+  File
+    hash : IntegerProperty
+    id : IntegerProperty
+    mime_type
+    data
+    ref_count
+
+- fix + button after adding new date (use before rather than append)
   
 -----------------------
 

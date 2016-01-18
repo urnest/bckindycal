@@ -263,6 +263,7 @@ tinymce.PluginManager.add('image', function(editor) {
 		}
 
 		// General settings shared between simple and advanced dialogs
+		var jquery_=$;
 		var generalFormItems = [{
 			type: 'container',
 			label: 'Source',
@@ -287,10 +288,12 @@ tinymce.PluginManager.add('image', function(editor) {
 					type: 'button', 
 					text: 'Upload...',
 					onclick: function(){
-						kc.uploadFile()
+						kc.uploadFile(jquery_)
 							.then(function(url){
 								win.find('#src').value(url);
-							});
+							})
+							.$dialog.closest('.ui-dialog').css('z-index',65539)
+							.closest('.ui-widget-overlay').css('z-index',65538);
 					}
 				}
 			]
