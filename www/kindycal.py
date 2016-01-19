@@ -12,6 +12,8 @@ from google.appengine.ext import ndb
 
 from xn import Xn,inContext,firstLineOf
 
+l1=firstLineOf
+
 from types import IntType,StringType,FloatType,DictType,ListType,TupleType,ObjectType
 import jsonschema
 
@@ -378,6 +380,9 @@ class edit_events_page(webapp2.RequestHandler):
             return webapp2.redirect('edit_groups.html')
         page=pq.loadFile('events.html')
         page.find(pq.hasClass('parent-only')).remove()
+        if not session.loginLevel in ['staff','admin']:
+            page.find(pq.hasClass('staff-only')).remove()
+            pass
         if not session.loginLevel in ['admin']:
             page.find(pq.hasClass('admin-only')).remove()
             pass
@@ -1059,6 +1064,172 @@ class session_file(webapp2.RequestHandler):
 
 
 
+twyc_schema=jsonschema.Schema({
+        'date' : {'year':IntType,'month':IntType,'day':IntType},
+        'group': IntType,
+        'parents':[StringType]
+        })
+
+def make_twyc_id(date,group):
+    return date['year']*1000000+date['month']*10000+date['day']*100+group
+
+class TWYC(ndb.Model):
+    # yyyymmddgg ... where gg is data['group'], rest from data['date']
+    id=ndb.IntegerProperty(indexed=True,repeated=False)
+    # data is json encoded twyc_schema-conformant
+    data=ndb.StringProperty(indexed=False,repeated=False)
+    # month of data['date'], as yyyymm
+    months=ndb.IntegerProperty(indexed=True,repeated=True)
+    pass
+
+add_delete_twyc_schema=jsonschema.Schema({
+        'date' : {'year':IntType,'month':IntType,'day':IntType},
+        'group': IntType,
+        'parent': StringType
+        })
+
+@ndb.transactional
+def delete_twyc_(data):
+    'delete twyc %(data)r'
+    try:
+        add_delete_twyc_schema.validate(data)
+        date=data['date']
+        group=data['group']
+        parent=data['parent']
+        for twyc in TWYC.query(TWYC.id==make_twyc_id(date,group),
+                               ancestor=root_key).fetch(1):
+            twyc.parents=[_ for _ in twyc.parents if not _ == data['parent'] ]
+            twyc.put()
+            pass
+        pass
+    except:
+        raise inContext(l1(delete_twyc_.__doc__)%vars())
+    pass
+
+class delete_twyc(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                delete_twyc_(self.request.get('params'))
+                result={'result':'OK'}
+        except:
+            result={'error':str(inContext('post delete_twyc'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+@ndb.transactional
+def add_twyc_(data):
+    'add twyc %(data)r'
+    try:
+        add_delete_twyc_schema.validate(data)
+        date=data['date']
+        group=data['group']
+        parent=data['parent']
+        twycs=TWYC.query(
+            TWYC.id==make_twyc_id(date,group),ancestor=root_key).fetch(1)
+        if not len(twycs):
+            twycs.append(TWYC(
+                    parent=root_key,
+                    id=make_twyc_id(date,group),
+                    data={
+                        'date':date,
+                        'group':group,
+                        'parents':[]
+                        },
+                    months=[ date['year']*100+date['month']]))
+            pass
+        twyc=twycs[0]
+        if not parent in twyc['parents']:
+            if len(twyc['parents']==1):
+                return 'TOO_LATE'
+            twyc['parents'].append(parent)
+            pass
+        twyc_schema.validate(twyc.data)
+        twyc.put()
+        return 'OK'
+    except:
+        raise inContext(l1(add_twyc_.__doc__)%vars())
+    pass
+
+class add_twyc(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                result={'result':add_twyc_(self.request.get('params'))}
+        except:
+            result={'error':str(inContext('post add_twyc'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+month_twycs_schema=jsonschema.Schema([twyc_schema])
+
+class month_twycs(webapp2.RequestHandler):
+    def get(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                y=int(self.request.get('y'))
+                m=int(self.request.get('m'))
+                print y*100+m
+                twycs=[fromJson(_.data) for _ in
+                        TWYC.query(TWYC.months==y*100+m,
+                                   ancestor=root_key).fetch(10000)]
+                print twycs
+                month_twycs_schema.validate(twycs)
+                self.response.write(toJson({'result':twycs}))
+        except:
+            self.response.write(toJson({'error':str(inContext('get month twycs'))}))
+            pass
+        pass
+    pass
+
+class twyc_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff','parent']:
+            print 'not logged in'
+            return webapp2.redirect('login.html?from=events.html')
+        page=pq.loadFile('twyc.html')
+        page.find(pq.hasClass('staff-only')).remove()
+        page.find(pq.hasClass('admin-only')).remove()
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+
+class edit_twyc_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff']:
+            print 'not logged in'
+            return webapp2.redirect('staff.html?from=events.html')
+        if fetchTerms() is None:
+            print 'terms not defined'
+            return webapp2.redirect('edit_terms.html')
+        if fetchGroups() is None:
+            print 'groups not defined'
+            return webapp2.redirect('edit_groups.html')
+        page=pq.loadFile('twyc.html')
+        page.find(pq.hasClass('parent-only')).remove()
+        if not session.loginLevel in ['staff','admin']:
+            page.find(pq.hasClass('staff-only')).remove()
+            pass
+        if not session.loginLevel in ['admin']:
+            page.find(pq.hasClass('admin-only')).remove()
+            pass
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+
 application = webapp2.WSGIApplication([
     ('/', index_page),
     ('/admin.html',admin_page),
@@ -1076,6 +1247,7 @@ application = webapp2.WSGIApplication([
     ('/maintenance_day.html',maintenance_day_page),
     ('/staff.html',staff_page),
     ('/staff_login.html',staff_login_page),
+    ('/twyc.html',twyc_page),
     ('/index-rc.html',indexrc_page),
     
     # following are not real pages, they are called by javascript files
@@ -1085,10 +1257,13 @@ application = webapp2.WSGIApplication([
     ('/groups',groups),
     ('/groups_to_show',groups_to_show),
     ('/terms',terms),
+    ('/add_twyc',add_twyc),
+    ('/delete_twyc',delete_twyc),
     ('/month_calendar',month_calendar),
     ('/month_events',month_events),
     ('/month_maintenance_days',month_maintenance_days),
     ('/month_public_holidays',month_public_holidays),
+    ('/month_twycs',month_twycs),
     ('/event',event),
     ('/maintenance_day',maintenance_day),
     ('/public_holiday',public_holiday),
