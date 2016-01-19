@@ -95,6 +95,14 @@ class index_page(webapp2.RequestHandler):
         pass
     pass
 
+class indexrc_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        self.response.write(file('index-rc.html').read())
+        self.response.set_cookie('kc-session',session.sid)
+        pass
+    pass
+
 class admin_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
@@ -1068,6 +1076,7 @@ application = webapp2.WSGIApplication([
     ('/maintenance_day.html',maintenance_day_page),
     ('/staff.html',staff_page),
     ('/staff_login.html',staff_login_page),
+    ('/index-rc.html',indexrc_page),
     
     # following are not real pages, they are called by javascript files
     # to get and save data
