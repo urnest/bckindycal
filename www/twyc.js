@@ -52,7 +52,8 @@ var promptForName=function(){
   result.then=function(f){
     result.then_=f;
   };
-  $dialog.dialog({
+    $dialog.dialog({
+	'title':'TWYC',
     'buttons':{
       'OK':function(){ result.then_($dialog.find('input').prop('value')); 
 		       $dialog.dialog('close'); },
@@ -283,7 +284,7 @@ $(document).ready(function(){
 		$day.hasClass('public-holiday')){
 	      return;
 	    }
-	    s=groupsToShow.length>1?groupPrefixes[group]:'';
+	    s=groupPrefixes[group];
 	    $twyc_add=$twyc_add_t.clone();
 	    $twyc=$twyc_t.clone();
 	    $day.append($twyc.hide());
