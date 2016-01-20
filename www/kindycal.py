@@ -130,25 +130,22 @@ class staff_page(webapp2.RequestHandler):
 class login_page(webapp2.RequestHandler):
     def get(self):
         page=pq.loadFile('login.html')
-        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer','events.html'))
         self.response.write(unicode(page).encode('utf-8'))
         pass
     def post(self):
         level=None
         session=getSession(self.request.cookies.get('kc-session',''))
         if self.request.get('password','')==getPassword('parent'):
-            level='parent'
-            pass
-        if level:
-            session.loginLevel=level
+            session.loginLevel='parent'
             print 'session %(id)s now logged in to level %(loginLevel)s'%{
                 'id':session.sid,
                 'loginLevel':session.loginLevel
                 }
             session.put()
             from_=str(self.request.get('from'))
-            if from_=='':
-                from_=level+'.html'
+            if from_=='' or from_=='login.html':
+                from_='events.html'
                 pass
             result=webapp2.redirect(from_)
             result.set_cookie('kc-session',session.sid)
@@ -162,25 +159,21 @@ class login_page(webapp2.RequestHandler):
 class admin_login_page(webapp2.RequestHandler):
     def get(self):
         page=pq.loadFile('admin_login.html')
-        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer','events.html'))
         self.response.write(unicode(page).encode('utf-8'))
         pass
     def post(self):
-        level=None
         session=getSession(self.request.cookies.get('kc-session',''))
         if self.request.get('password','')==getPassword('admin'):
-            level='admin'
-            pass
-        if level:
-            session.loginLevel=level
+            session.loginLevel='admin'
             print 'session %(id)s now logged in to level %(loginLevel)s'%{
                 'id':session.sid,
                 'loginLevel':session.loginLevel
                 }
             session.put()
             from_=str(self.request.get('from'))
-            if from_=='':
-                from_=level+'.html'
+            if from_=='' or from_=='admin.html':
+                from_='events.html'
                 pass
             result=webapp2.redirect(from_)
             result.set_cookie('kc-session',session.sid)
@@ -198,21 +191,17 @@ class staff_login_page(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
         pass
     def post(self):
-        level=None
         session=getSession(self.request.cookies.get('kc-session',''))
         if self.request.get('password','')==getPassword('staff'):
-            level='staff'
-            pass
-        if level:
-            session.loginLevel=level
+            session.loginLevel='staff'
             print 'session %(id)s now logged in to level %(loginLevel)s'%{
                 'id':session.sid,
                 'loginLevel':session.loginLevel
                 }
             session.put()
             from_=str(self.request.get('from'))
-            if from_=='':
-                from_=level+'.html'
+            if from_=='' or from_=='staff_login.html':
+                from_='events.html'
                 pass
             result=webapp2.redirect(from_)
             result.set_cookie('kc-session',session.sid)
@@ -287,7 +276,7 @@ class edit_terms_page(webapp2.RequestHandler):
             return webapp2.redirect('staff_login.html?from=edit_terms.html')
         print self.request.headers
         page=pq.loadFile('edit_terms.html')
-        page.find(pq.tagName('input')).filter(pq.attrEquals('id','referer')).attr('value',self.request.headers['Referer'])
+        page.find(pq.tagName('input')).filter(pq.attrEquals('id','referer')).attr('value',self.request.headers.get('Referer','staff.html'))
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -348,7 +337,7 @@ class edit_groups_page(webapp2.RequestHandler):
             return webapp2.redirect('staff_login.html?from=edit_groups.html')
         page=pq.loadFile('edit_groups.html')
 
-        page.find(pq.tagName('input')).filter(pq.attrEquals('id','referer')).attr('value',self.request.headers['Referer'])
+        page.find(pq.tagName('input')).filter(pq.attrEquals('id','referer')).attr('value',self.request.headers.get('Referer','staff.html'))
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -358,7 +347,7 @@ class events_page(webapp2.RequestHandler):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff','parent']:
             print 'not logged in'
-            return webapp2.redirect('login.html?from=events.html')
+            return webapp2.redirect('login.html')
         page=pq.loadFile('events.html')
         page.find(pq.hasClass('staff-only')).remove()
         page.find(pq.hasClass('admin-only')).remove()
@@ -1251,9 +1240,15 @@ class edit_twyc_page(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
+class redirect_to_events_page(webapp2.RequestHandler):
+    def get(self):
+        return webapp2.redirect('events.html')
+    def post(self):
+        return webapp2.redirect('events.html')
+    pass
 
 application = webapp2.WSGIApplication([
-    ('/', index_page),
+    ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
     ('/admin_login.html',admin_login_page),
     ('/edit_terms.html',edit_terms_page),
