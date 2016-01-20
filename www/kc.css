@@ -220,7 +220,8 @@ a:hover.event-link {
 	color: #f45b4d;
 	text-decoration: none;
 }
-a.twyc-link {
+a.twyc-link,
+a.staff-only.twyc-delete {
 	color: #ef4a5a;
 	text-decoration: none;
 }

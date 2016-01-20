@@ -51,6 +51,12 @@ handlers:
 - url: /events.html$
   script: kindycal.application
 
+- url: /twyc.html$
+  script: kindycal.application
+
+- url: /edit_twyc.html$
+  script: kindycal.application
+
 - url: /event.html$
   script: kindycal.application
 

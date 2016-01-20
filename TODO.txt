@@ -128,9 +128,9 @@ x new event etc init date from month cookie
 x View Events for: All Groups
 x grey out next/prev-months days
 
+- time with your child
 - roster jobs
 - fair rosters
-- time with your child
 
 - upload document/image
 - hash(data) & 0xffffffff
