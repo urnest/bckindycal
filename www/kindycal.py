@@ -393,7 +393,7 @@ class event_page(webapp2.RequestHandler):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff','parent']:
             print 'not logged in'
-            return webapp2.redirect('parent.html?from=events.html')
+            return webapp2.redirect('events.html?from=events.html')
         id=int(self.request.get('id'))
         if session.loginLevel in ['admin','staff']:
             return webapp2.redirect('edit_event.html?id=%(id)s'%vars())
@@ -916,7 +916,7 @@ class maintenance_day_page(webapp2.RequestHandler):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff','parent']:
             print 'not logged in'
-            return webapp2.redirect('parent.html')
+            return webapp2.redirect('events.html')
         id=int(self.request.get('id'))
         if session.loginLevel in ['admin','staff']:
             return webapp2.redirect('edit_maintenance_day.html?id=%(id)s'%vars())

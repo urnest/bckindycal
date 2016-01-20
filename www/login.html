@@ -1,9 +1,35 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bardon Community Kindy</title>
+    <link href='http://fonts.googleapis.com/css?family=Montserrat|Open+Sans|Lato' rel='stylesheet' type='text/css' media='all'>
+    <link href="bckfair.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="kc.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="inputs.css" rel="stylesheet" type="text/css" media="all" />
+    
+   
+</head>
 <body>
-<form method="POST" action="login.html">
-<p>Parent/Guardian Password: <input type="password" name="password">
-  <span class="login_failed"></span></p>
-<p><input type="submit" value="OK"></p>
-<input type="hidden" name="from">
+    <div id="page">
+    <main id="main" class="site-main">  
+     <div id="content" class="loginshell" align="center">
+      <div class="login" align="center">
+    	<img class="logo" src="images/bck-logo-circ.png" width="120" alt="Bardon Community Kindy Logo" /><br><br>
+         <div class="loginput">
+        	<form method="POST" action="login.html">        
+            <p>Password:<br> <input type="password" name="password" size="12"><br>
+            <span class="login_failed"></span></p>
+            <p><input class="job" type="submit" value="Login"></p>
+            <input type="hidden" name="from">
+            </form>
+         </div>
+       </div>
+      </div>
+     </main>
+    </div>
 </body>
 </html>

@@ -24,15 +24,18 @@ P {
 }
 a.ulink {
 	font-size: 14px;
-	color: #2b5caa;
+	color: #ef4a5a;
 	text-decoration: none;
 }
 a:hover.ulink, a:focus.ulink {
 	font-size: 14px
-	color: #f45b4d;
+	color: #000000;
 	text-decoration: none;
 }
-
+span.ulhd {
+	font-size: 15px;
+	color: #333333;
+}
 .kc-busy-cursor { 
     cursor: wait
 }
@@ -52,6 +55,11 @@ a:hover.ulink, a:focus.ulink {
     margin: 0 auto;
     position: relative;
     width: 940px;
+}
+.loginshell {
+    margin: 0 auto;
+    position: relative;
+    width: 300px;
 }
 select {
 	font-family: "Montserrat",sans-serif;
@@ -94,6 +102,17 @@ TD.calhdc {
 	padding: 13px 0 12px;
 	height: 15px;
 	width: 14.285%;
+}
+TD.jobhd {
+	font-family: "Montserrat",sans-serif;
+    font-weight: 400;
+	font-size: 12px;
+	color: #ffffff;
+	background: #365566;
+	vertical-align: middle;
+	text-align: center;
+	padding: 8px 10px 7px;
+	height: 13px;
 }
 TD.calteal {
 	font-family: "Montserrat",sans-serif;
@@ -261,4 +280,111 @@ a:hover.add-staff {
     padding: 8px 10px 9px 12px;
 	font-size: 10px;
 	color: #FFFFFF;
+}
+.Jobs {
+	text-align: center;
+	margin: 0 0 0 12px;
+}
+TD.job {
+	font-size: 12px;
+	color: #333333;
+	text-align: left;
+	padding: 8px 10px 7px;
+	margin: 0 0 0 12px;
+	background: #eeeeee none repeat scroll 0 0;
+}
+TD.jobc {
+	font-size: 12px;
+	color: #333333;
+	text-align: center;
+	padding: 8px 10px 7px;
+	margin: 0 0 0 12px;
+	background: #eeeeee none repeat scroll 0 0;
+}
+.mdate {
+	font-size: 17px;
+	color: #333333;
+	text-align: left;
+	padding: 8px 10px 7px 0px;
+}
+.mname {
+	font-size: 14px;
+	color: #666666;
+	text-align: left;
+}
+a.job {
+	background: #41ad48 none repeat scroll 0 0;
+    border: 1px solid #41ad48;
+    color: #fff;
+    border-radius: 5px;
+    display: inline-block;
+    line-height: 22px;
+    margin: 0 5px 0 0;
+    padding: 0 10px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+}
+a:hover.job {
+	background: #000000 none repeat scroll 0 0;
+    border: 1px solid #000000;
+    color: #fff;
+    border-radius: 5px;
+    display: inline-block;
+    line-height: 22px;
+    margin: 0 5px 0 0;
+    padding: 0 10px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+}
+input[type="submit"].job {
+	background: #41ad48 none repeat scroll 0 0;
+    border: 1px solid #41ad48;
+    color: #fff;
+    border-radius: 5px;
+    display: inline-block;
+    line-height: 22px;
+    margin: 0 5px 0 0;
+    padding: 0 10px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+	box-shadow:none;
+}
+input[type="submit"]:hover.job {
+	background: #333333 none repeat scroll 0 0;
+    border: 1px solid #333333;
+    color: #fff;
+    border-radius: 5px;
+    display: inline-block;
+    line-height: 22px;
+    margin: 0 5px 0 0;
+    padding: 0 10px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+	box-shadow: none;
+}		
+.login {
+	background: #FFFFFF none repeat scroll 0 0;
+    border: 1px solid #F6FE1B;
+    color: #333333;
+    border-radius: 20px;
+	text-align: center;
+	width: 220px;
+    margin: 0 10px 0 0;
+    padding: 0 15px 15px;
+    font-size: 100%;
+}
+.loginput {
+    color: #333333;
+	text-align: left;
+	width: 150px;
+	margin: auto;
+}
+.login_failed {
+	font-size: 11px;
+	color: #ff0000;
+	text-align: left;
 }

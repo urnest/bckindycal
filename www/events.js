@@ -107,13 +107,13 @@ $(document).ready(function(){
       });
       // assumes 4 groups
       $options=$options.add($o_t.clone().prop('value','[0,1]')
-			    .text(groups[0].name+'+'+groups[1].name));
+			    .text(groups[0].name+' + '+groups[1].name));
       $options=$options.add($o_t.clone().prop('value','[2,3]')
-			    .text(groups[2].name+'+'+groups[3].name));
+			    .text(groups[2].name+' + '+groups[3].name));
       $options=$options.add($o_t.clone().prop('value','[0,2]')
-			    .text(groups[0].name+'+'+groups[2].name));
+			    .text(groups[0].name+' + '+groups[2].name));
       $options=$options.add($o_t.clone().prop('value','[1,3]')
-			    .text(groups[1].name+'+'+groups[3].name));
+			    .text(groups[1].name+' + '+groups[3].name));
       $('select.groups-to-show').html($options);
       $('select.groups-to-show').prop('value','['+kc.join(',',groupsToShow)+']');
       $('select.groups-to-show').change(function(){
