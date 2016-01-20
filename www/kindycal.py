@@ -386,6 +386,7 @@ class edit_events_page(webapp2.RequestHandler):
         if not session.loginLevel in ['admin']:
             page.find(pq.hasClass('admin-only')).remove()
             pass
+        page.find(pq.tagName('body')).addClass(session.loginLevel)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -430,6 +431,9 @@ class groups_to_show(webapp2.RequestHandler):
                 raise xn.Exception('You are not logged in')
             try:
                 result=fromJson(self.request.cookies.get('kc-groups-to-show','[0,1,2,3]'))
+                if not session.loginLevel in ['staff','admin'] and len(result)>1:
+                    result=[]
+                    pass
             except:
                 raise inContext('get groups to show from kc-groups-to-show cookie')
             return self.response.write(toJson({'result':result}))
@@ -439,12 +443,19 @@ class groups_to_show(webapp2.RequestHandler):
         pass
     def post(self):
         try:
-            groups_to_show=fromJson(self.request.get('params','[0,1,2,3]'))
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                raise xn.Exception('You are not logged in')
+            dflt='[]'
+            if session.loginLevel in ['staff','admin']:
+                dflt='[0,1,2,3]'
+                pass
+            groups_to_show=fromJson(self.request.get('params',dflt))
             jsonschema.Schema([IntType]).validate(groups_to_show)
             self.response.set_cookie('kc-groups-to-show',toJson(groups_to_show))
             result={}
         except:
-            result={'error':str(inContext('save groups'))}
+            result={'error':str(inContext('set groups to show in kc-groups-to-show cookie'))}
             pass
         return self.response.write(toJson(result).encode('utf-8'))
     pass
@@ -1092,13 +1103,19 @@ add_delete_twyc_schema=jsonschema.Schema({
 def delete_twyc_(data):
     'delete twyc %(data)r'
     try:
+        print l1(delete_twyc_.__doc__)%vars()
         add_delete_twyc_schema.validate(data)
         date=data['date']
         group=data['group']
         parent=data['parent']
-        for twyc in TWYC.query(TWYC.id==make_twyc_id(date,group),
-                               ancestor=root_key).fetch(1):
-            twyc.parents=[_ for _ in twyc.parents if not _ == data['parent'] ]
+        twycs=TWYC.query(TWYC.id==make_twyc_id(date,group),
+                         ancestor=root_key).fetch(2)
+        assert len(twycs)<2,twycs
+        for twyc in twycs:
+            d=fromJson(twyc.data)
+            d['parents']=[_ for _ in d['parents'] if not _ == parent ]
+            twyc_schema.validate(d)
+            twyc.data=toJson(d)
             twyc.put()
             pass
         pass
@@ -1113,7 +1130,7 @@ class delete_twyc(webapp2.RequestHandler):
             if session.loginLevel not in ['staff','admin']:
                 result={'error':'You are not logged in.'}
             else:
-                delete_twyc_(self.request.get('params'))
+                delete_twyc_(fromJson(self.request.get('params')))
                 result={'result':'OK'}
         except:
             result={'error':str(inContext('post delete_twyc'))}
@@ -1135,22 +1152,24 @@ def add_twyc_(data):
             twycs.append(TWYC(
                     parent=root_key,
                     id=make_twyc_id(date,group),
-                    data={
+                    data=toJson({
                         'date':date,
                         'group':group,
                         'parents':[]
-                        },
+                        }),
                     months=[ date['year']*100+date['month']]))
             pass
         twyc=twycs[0]
-        if not parent in twyc['parents']:
-            if len(twyc['parents']==1):
-                return 'TOO_LATE'
-            twyc['parents'].append(parent)
+        d=fromJson(twyc.data)
+        if not parent in d['parents']:
+            if len(d['parents'])==1:
+                return d['parents'][0]
+            d['parents'].append(parent)
             pass
-        twyc_schema.validate(twyc.data)
+        twyc_schema.validate(d)
+        twyc.data=toJson(d)
         twyc.put()
-        return 'OK'
+        return parent
     except:
         raise inContext(l1(add_twyc_.__doc__)%vars())
     pass
@@ -1162,7 +1181,7 @@ class add_twyc(webapp2.RequestHandler):
             if not session.loginLevel:
                 result={'error':'You are not logged in.'}
             else:
-                result={'result':add_twyc_(self.request.get('params'))}
+                result={'result':add_twyc_(fromJson(self.request.get('params')))}
         except:
             result={'error':str(inContext('post add_twyc'))}
             pass
@@ -1196,9 +1215,11 @@ class month_twycs(webapp2.RequestHandler):
 class twyc_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel in ['admin','staff','parent']:
+        if not session.loginLevel:
             print 'not logged in'
-            return webapp2.redirect('login.html?from=events.html')
+            return webapp2.redirect('login.html')
+        if session.loginLevel in ['staff','admin']:
+            return webapp2.redirect('edit_twyc.html')
         page=pq.loadFile('twyc.html')
         page.find(pq.hasClass('staff-only')).remove()
         page.find(pq.hasClass('admin-only')).remove()
@@ -1226,6 +1247,7 @@ class edit_twyc_page(webapp2.RequestHandler):
         if not session.loginLevel in ['admin']:
             page.find(pq.hasClass('admin-only')).remove()
             pass
+        page.find(pq.tagName('body')).addClass(session.loginLevel)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -1240,6 +1262,7 @@ application = webapp2.WSGIApplication([
     ('/edit_events.html',edit_events_page),
     ('/edit_maintenance_day.html',edit_maintenance_day_page),
     ('/edit_public_holiday.html',edit_public_holiday_page),
+    ('/edit_twyc.html',edit_twyc_page),
     ('/event.html',event_page),
     ('/events.html',events_page),
     ('/index.html', index_page),

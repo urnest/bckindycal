@@ -101,19 +101,28 @@ $(document).ready(function(){
 	kc.defined(groupsToShow)&&
 	kc.defined(monthToShow)){
       var $o_t=$groupsToShowOption_t;
-      var $options=$o_t.clone().prop('value','[0,1,2,3]').text('All');
+      var $options=$();
+      var staff=$('body').hasClass('staff')||$('body').hasClass('admin');
+      if (staff){
+	$options=$o_t.clone().prop('value','[0,1,2,3]').text('All');
+      }
+      else{
+	$options=$o_t.clone().prop('value','[]').text('** select your group **');
+      }
       kc.each(groups,function(i,group){
 	$options=$options.add($o_t.clone().prop('value','['+i+']').text(group.name));
       });
-      // assumes 4 groups
-      $options=$options.add($o_t.clone().prop('value','[0,1]')
-			    .text(groups[0].name+'+'+groups[1].name));
-      $options=$options.add($o_t.clone().prop('value','[2,3]')
-			    .text(groups[2].name+'+'+groups[3].name));
-      $options=$options.add($o_t.clone().prop('value','[0,2]')
-			    .text(groups[0].name+'+'+groups[2].name));
-      $options=$options.add($o_t.clone().prop('value','[1,3]')
-			    .text(groups[1].name+'+'+groups[3].name));
+      if (staff){
+	// assumes 4 groups
+	$options=$options.add($o_t.clone().prop('value','[0,1]')
+			      .text(groups[0].name+'+'+groups[1].name));
+	$options=$options.add($o_t.clone().prop('value','[2,3]')
+			      .text(groups[2].name+'+'+groups[3].name));
+	$options=$options.add($o_t.clone().prop('value','[0,2]')
+			      .text(groups[0].name+'+'+groups[2].name));
+	$options=$options.add($o_t.clone().prop('value','[1,3]')
+			      .text(groups[1].name+'+'+groups[3].name));
+      }
       $('select.groups-to-show').html($options);
       $('select.groups-to-show').prop('value','['+kc.join(',',groupsToShow)+']');
       $('select.groups-to-show').change(function(){

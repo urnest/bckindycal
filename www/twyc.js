@@ -10,8 +10,8 @@ var dayIndices={
   'Sat':6,
   'Sun':7
 };
-var groupPrefixes=['U1G2','U1G2','U2G1','U2G2'];
-
+var groupPrefixes=['U1G1','U1G2','U2G1','U2G2'];
+var groupClasses=['mon-wed','wed-fri','mon-wed','wed-fri'];
 var $calendar;
 var $week_t;
 var $sunday_t;
@@ -45,6 +45,22 @@ function nextMonth(m){
     'm':m.m+1
   }
 };
+var promptForName=function(){
+  var $dialog=$('<p>Your Name: <input type="text" class="GroupName"></p>');
+  var result={
+  };
+  result.then=function(f){
+    result.then_=f;
+  };
+  $dialog.dialog({
+    'buttons':{
+      'OK':function(){ result.then_($dialog.find('input').prop('value')); 
+		       $dialog.dialog('close'); },
+      'Cancel':function(){ $dialog.dialog('close'); }
+    }
+  }).show();
+  return result;
+};
 $(document).ready(function(){
   var groups;
   var terms;
@@ -55,8 +71,8 @@ $(document).ready(function(){
   $calendar=$('table.month-of-events');
   $calendar.find('div.event').remove().first();
   $public_holiday_t=$calendar.find('div.public-holiday').remove().first();
-  $twyc_t=$calendar.find('div.twyc').remove().first();
-  $twyc_add_t=$calendar.find('div.twyc').remove().first();
+  $twyc_t=$calendar.find('div.twyc-name').remove().first();
+  $twyc_add_t=$calendar.find('div.twyc-add').remove().first();
   
   $week_t=$calendar.find('tr.week').remove().first();
   
@@ -107,19 +123,28 @@ $(document).ready(function(){
 	kc.defined(groupsToShow)&&
 	kc.defined(monthToShow)){
       var $o_t=$groupsToShowOption_t;
-      var $options=$o_t.clone().prop('value','[0,1,2,3]').text('All');
+      var $options=$();
+      var staff=$('body').hasClass('staff')||$('body').hasClass('admin');
+      if (staff){
+	$options=$o_t.clone().prop('value','[0,1,2,3]').text('All');
+      }
+      else{
+	$options=$o_t.clone().prop('value','[]').text('** select your group **');
+      }
       kc.each(groups,function(i,group){
 	$options=$options.add($o_t.clone().prop('value','['+i+']').text(group.name));
       });
-      // assumes 4 groups
-      $options=$options.add($o_t.clone().prop('value','[0,1]')
-			    .text(groups[0].name+'+'+groups[1].name));
-      $options=$options.add($o_t.clone().prop('value','[2,3]')
-			    .text(groups[2].name+'+'+groups[3].name));
-      $options=$options.add($o_t.clone().prop('value','[0,2]')
-			    .text(groups[0].name+'+'+groups[2].name));
-      $options=$options.add($o_t.clone().prop('value','[1,3]')
-			    .text(groups[1].name+'+'+groups[3].name));
+      if (staff){
+	// assumes 4 groups
+	$options=$options.add($o_t.clone().prop('value','[0,1]')
+			      .text(groups[0].name+'+'+groups[1].name));
+	$options=$options.add($o_t.clone().prop('value','[2,3]')
+			      .text(groups[2].name+'+'+groups[3].name));
+	$options=$options.add($o_t.clone().prop('value','[0,2]')
+			      .text(groups[0].name+'+'+groups[2].name));
+	$options=$options.add($o_t.clone().prop('value','[1,3]')
+			      .text(groups[1].name+'+'+groups[3].name));
+      }
       $('select.groups-to-show').html($options);
       $('select.groups-to-show').prop('value','['+kc.join(',',groupsToShow)+']');
       $('select.groups-to-show').change(function(){
@@ -157,9 +182,9 @@ $(document).ready(function(){
 	cal=result;
 	proceed();
       });
-    kc.getFromServer('month_events',monthToShow)
+    kc.getFromServer('month_twycs',monthToShow)
       .then(function(result){
-	events=result;
+	twycs=result;
 	proceed();
       });
     kc.getFromServer('month_public_holidays',monthToShow)
@@ -175,7 +200,7 @@ $(document).ready(function(){
     var proceed=function(){
       var groupSet={};
       if (kc.defined(cal) &&
-	  kc.defined(events) &&
+	  kc.defined(twycs) &&
 	  kc.defined(public_holidays) &&
 	  kc.defined(maintenance_days)){
 	kc.each(groupsToShow,function(i,g){
@@ -235,50 +260,6 @@ $(document).ready(function(){
 	      twycs_by_day[twyc.date.day][twyc.group].push(parent);
 	    });
 	  };
-	};
-	kc.each(dateDays,function(day,$day){
-	  kc.each(groupsToShow,function(i,group){
-	    var s=groupsToShow.length>1?groupPrefixes[group]+' ':'';
-	    var $twyc;
-	    if (twycs_by_day[day]&&
-		twycs_by_day[day][group].parents.length){
-	      var parent=twycs_by_day[day][group].parents[0];
-	      $twyc=$twyc_t.clone().text(s+parent);
-	      $twyc.find('.twyc-delete').click(function(){
-	      });
-	    }
-	    else{
-	      // allow add me
-	      $twyc=$twyc_add_t.clone();
-	      $twyc.find('.twyc-link').text(s+'ADD ME')
-		.click(function(){
-		});
-	    }
-	    $day.append($twyc);
-	  });
-	});
-	kc.each(events,function(i,event){
-	  var show=false;
-	  kc.each(event.groups,function(i,g){
-	    if (groupSet[g]){
-	      show=true;
-	    }
-	  });
-	  if (!show){
-	    return;
-	  }
-	  kc.each(event.dates,function(i,date){
-	    if (date.year==monthToShow.y&&
-		date.month==monthToShow.m&&
-		dateDays[date.day]){
-	      var $event=$event_t.clone();
-	      $event.find('.event-link').attr('href','event.html?id='+event.id);
-	      $event.find('.event-link').text(event.name.text);
-	      $event.find('.event-link').css('color',event.name.colour);
-	      
-	      dateDays[date.day].append($event);
-	    }
-	  });
 	});
 	kc.each(public_holidays,function(i,public_holiday){
 	  kc.each(public_holiday.dates,function(i,date){
@@ -292,6 +273,75 @@ $(document).ready(function(){
 		'href','edit_public_holiday.html?id='+public_holiday.id);
 	      dateDays[date.day].append($public_holiday);
 	      dateDays[date.day].addClass('public-holiday');
+	    }
+	  });
+	});
+	kc.each(dateDays,function(day,$day){
+	  kc.each(groupsToShow,function(i,group){
+	    var s,$twyc_add,$twyc;
+	    if (!$day.hasClass(groupClasses[group]) ||
+		$day.hasClass('public-holiday')){
+	      return;
+	    }
+	    s=groupsToShow.length>1?groupPrefixes[group]:'';
+	    $twyc_add=$twyc_add_t.clone();
+	    $twyc=$twyc_t.clone();
+	    $day.append($twyc.hide());
+	    $day.append($twyc_add.show());
+	    $twyc.find('.twyc-delete').click(function(){
+	      kc.postToServer('delete_twyc',{
+		params:kc.json.encode({
+		  date:{
+		    year:monthToShow.y,
+		    month:monthToShow.m,
+		    day:parseInt(day)
+		  },
+		  group:group,
+		  parent:$twyc.find('.parent-name').text()
+		})
+	      })
+		.then(function(){
+		  $twyc.hide();
+		  $twyc_add.show();
+		});
+	      return false;
+	    });
+	    $twyc_add.find('.twyc-label').text(s);
+	    $twyc_add.find('.twyc-link').text('ADD ME');
+	    $twyc_add.click(function(){
+	      var x=1;
+	      promptForName()
+		.then(function(name){
+		  kc.postToServer('add_twyc',{
+		    params:kc.json.encode({
+		      date:{
+			year:monthToShow.y,
+			month:monthToShow.m,
+			day:parseInt(day)
+		      },
+		      group:group,
+		      parent:name
+		    })
+		  })
+		    .then(function(result){
+		      if (result!=name){
+			alert('Someone snuck in ahead of you.');
+		      }
+		      $twyc_add.hide();
+		      $twyc.find('.twyc-label').text(s);
+		      $twyc.find('.parent-name').text(result);
+		      $twyc.show();
+		    });
+		});
+	      return false;
+	    });
+	    if (twycs_by_day[day]&&
+		twycs_by_day[day][group].length){
+	      var parent=twycs_by_day[day][group][0];
+	      $twyc.find('.twyc-label').text(s);
+	      $twyc.find('.parent-name').text(parent);
+	      $twyc.show();
+	      $twyc_add.hide();
 	    }
 	  });
 	});
