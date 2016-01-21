@@ -455,6 +455,7 @@ class EventIdCounter(ndb.Model):
 
 nextEventIdKey=ndb.Key('nextEventId','nextEventId')
 
+@ndb.transactional
 def nextEventId():
     q=EventIdCounter.query(ancestor=nextEventIdKey)
     x=q.fetch(1)
@@ -555,6 +556,7 @@ class PublicHolidayIdCounter(ndb.Model):
 
 nextPublicHolidayIdKey=ndb.Key('nextPublicHolidayId','nextPublicHolidayId')
 
+@ndb.transactional
 def nextPublicHolidayId():
     q=PublicHolidayIdCounter.query(ancestor=nextPublicHolidayIdKey)
     x=q.fetch(1)
@@ -654,6 +656,7 @@ class MaintenanceDayIdCounter(ndb.Model):
 
 nextMaintenanceDayIdKey=ndb.Key('nextMaintenanceDayId','nextMaintenanceDayId')
 
+@ndb.transactional
 def nextMaintenanceDayId():
     q=MaintenanceDayIdCounter.query(ancestor=nextMaintenanceDayIdKey)
     x=q.fetch(1)
@@ -1247,6 +1250,51 @@ class redirect_to_events_page(webapp2.RequestHandler):
         return webapp2.redirect('events.html')
     pass
 
+class export_data(webapp2.RequestHandler):
+    def get(self):
+        terms=[fromJson(_.data) for _ in Terms.query(ancestor=root_key).fetch(100)]
+        groups=[fromJson(_.data) for _ in Groups.query(ancestor=root_key).fetch(100)]
+        nextEventId=(EventIdCounter.query(ancestor=root_key).fetch(1)+
+                     [EventIdCounter(parent=root_key,
+                                     nextEventId=1)])[0].nextEventId
+        events=[{'data':fromJson(_.data),
+                 'id':_.id,
+                 'months':_.months} for _ in
+                Event.query(ancestor=root_key).fetch(100000)]
+        nextPublicHolidayId=(PublicHolidayIdCounter.query(ancestor=root_key).fetch(1)+
+                             [PublicHolidayIdCounter(parent=root_key,
+                                                     nextPublicHolidayId=1)])[0].nextPublicHolidayId
+        publicHolidays=[{'data':fromJson(_.data),
+                         'id':_.id,
+                         'months':_.months} for _ in
+                        PublicHoliday.query(ancestor=root_key).fetch(100000)]
+        nextMaintenanceDayId=(MaintenanceDayIdCounter.query(ancestor=root_key).fetch(1)+
+                              [MaintenanceDayIdCounter(parent=root_key,
+                                                       nextMaintenanceDayId=1)])[0].nextMaintenanceDayId
+        maintenanceDays=[{'data':fromJson(_.data),
+                          'id':_.id,
+                          'months':_.months} for _ in
+                         MaintenanceDay.query(ancestor=root_key).fetch(100000)]
+
+        twycs=[{'data':fromJson(_.data),
+                 'id':_.id,
+                 'months':_.months} for _ in
+                TWYC.query(ancestor=root_key).fetch(100000)]
+        self.response.headers['Content-Type'] = 'text/json'
+        self.response.write(toJson({
+                'terms':terms,
+                'groups':groups,
+                'nextEventId':nextEventId,
+                'events':events,
+                'nextPublicHolidayId':nextPublicHolidayId,
+                'publicHolidays':publicHolidays,
+                'nextMaintenanceDayId':nextMaintenanceDayId,
+                'maintenanceDays':maintenanceDays,
+                'twycs':twycs,
+                }))
+        pass
+    pass
+
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
@@ -1267,6 +1315,7 @@ application = webapp2.WSGIApplication([
     ('/staff_login.html',staff_login_page),
     ('/twyc.html',twyc_page),
     ('/index-rc.html',indexrc_page),
+    ('/export_data.txt',export_data),
     
     # following are not real pages, they are called by javascript files
     # to get and save data
