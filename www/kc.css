@@ -220,8 +220,7 @@ a:hover.event-link {
 	color: #f45b4d;
 	text-decoration: none;
 }
-a.twyc-link,
-a.staff-only.twyc-delete {
+a.twyc-link {
 	color: #ef4a5a;
 	text-decoration: none;
 }
@@ -304,7 +303,7 @@ TD.jobc {
 }
 .mdate {
 	font-size: 17px;
-	color: #333333;
+	color: #365566;
 	text-align: left;
 	padding: 8px 10px 7px 0px;
 }
@@ -312,6 +311,17 @@ TD.jobc {
 	font-size: 14px;
 	color: #666666;
 	text-align: left;
+}
+.event-description {
+	font-size: 15px;
+	color: #666666;
+	text-align: left;
+}
+h1.event-name {
+	font-size: 20px;
+	color: #333333;
+	text-align: left;
+	padding: 8px 10px 7px 0px;
 }
 a.job {
 	background: #41ad48 none repeat scroll 0 0;
@@ -367,6 +377,34 @@ input[type="submit"]:hover.job {
     font-size: 100%;
 	box-shadow: none;
 }		
+input[type="submit"].del {
+	background: #333333 none repeat scroll 0 0;
+    border: 1px solid #333333;
+    color: #fff;
+    border-radius: 5px;
+    display: inline-block;
+    line-height: 22px;
+    margin: 0 5px 0 0;
+    padding: 0 10px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+	box-shadow:none;
+}
+input[type="submit"]:hover.del {
+	background: #000000 none repeat scroll 0 0;
+    border: 1px solid #000000;
+    color: #fff;
+    border-radius: 5px;
+    display: inline-block;
+    line-height: 22px;
+    margin: 0 5px 0 0;
+    padding: 0 10px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+	box-shadow: none;
+}		
 .login {
 	background: #FFFFFF none repeat scroll 0 0;
     border: 1px solid #F6FE1B;
@@ -388,4 +426,33 @@ input[type="submit"]:hover.job {
 	font-size: 11px;
 	color: #ff0000;
 	text-align: left;
+}
+.groups {
+	font-size: 11px;
+	color: #666666;
+	text-align: left;
+}
+.grouplst {
+	font-size: 11px;
+	color: #FFFFFF;
+	text-align: left;
+}
+.adm {
+	font-size: 14px;
+	color: #666666;
+	text-align: left;
+}
+a.adm {
+	font-size: 14px;
+	color: #ef4a5a;
+	text-decoration: none;
+}
+a:hover.adm, a:focus.adm {
+	font-size: 14px;
+	color: #000000;
+	text-decoration: none;
+}
+.admgrn {
+	font-size: 12px;
+	color: #41ad48;
 }
