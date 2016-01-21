@@ -2,7 +2,7 @@ $(document).ready(function(){
   var groups;
   var event;
   var busyCount=0;
-  var $groupsOption_t=$('select.groups option').remove().first();
+  var $groupsOption_t=$('select.grouplst option').remove().first();
   $('input#save-button').click(function(){
     if (busyCount){
       return false;
@@ -31,7 +31,7 @@ $(document).ready(function(){
 	day:parseInt(d[0])
       });
     });
-    var groups=kc.json.decode($('select.groups').prop('value'));
+    var groups=kc.json.decode($('select.grouplst').prop('value'));
     var description=$('.event-description').html();
     $('body').addClass('kc-busy-cursor');
     kc.postToServer('event',{
@@ -150,8 +150,8 @@ $(document).ready(function(){
 			    .text(groups[0].name+'+'+groups[2].name));
       $options=$options.add($o_t.clone().prop('value','[1,3]')
 			    .text(groups[1].name+'+'+groups[3].name));
-      $('select.groups').html($options);
-      $('select.groups').prop('value','['+kc.join(',',event.groups)+']');
+      $('select.grouplst').html($options);
+      $('select.grouplst').prop('value','['+kc.join(',',event.groups)+']');
       $('input#name').prop('value',event.name.text);
       $('input#name-colour').prop('value',event.name.colour);
       $('img.name-color-picker').css('background-color',event.name.colour);

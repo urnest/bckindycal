@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bardon Community Kindy</title>
     <link href='//fonts.googleapis.com/css?family=Montserrat|Open+Sans|Lato' rel='stylesheet' type='text/css' media='all'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link href="bckfair.css" rel="stylesheet" type="text/css" media="all" />
     <link href="kc.css" rel="stylesheet" type="text/css" media="all" />
     <link href="inputs.css" rel="stylesheet" type="text/css" media="all" />
@@ -78,24 +79,26 @@
       <div>
           <form method="POST" action="maintenance_day">
             <input type="hidden" id="id" name="id" value="0">
-            <span class=admgrn>Name:</span><br>
+            <span class=admgrn>Name (appears on calendar):</span><br>
             <input class="GroupName name" type="text" value="Maintenance Day 8am"><br>
 			<span class=admgrn>Date:</span><br>
             <input class="date" type="text" value="2/5/2016">
 			<br>
             <span class=admgrn>Description (click to edit):</span>
-            <div class="maintenance-day-description">
-              <p>Odd jobs etc.</p>
-            </div>
+            <div class="maintenance-day-descbox">
+                <div class="maintenance-day-description">
+                  <p>Odd jobs etc.</p>
+                </div>
+            </div>    
             <br>
             <span class=admgrn>Volunteers:</span>
             <table class="volunteer-table">
               <tr class="volunteer-row">
-            <td><span class="delete-volunteer">-</span></td>
+            <td><span class="delete-volunteer"><a href="#"><i class="fa fa-minus-square fa-fw"></i> DEL</a></span></td>
             <td><input class="volunteer-childs-name" type="text" value="Sandy Kay"></td>
               </tr>
               <tr class="add-volunteer">
-            <td class="add-volunteer">+ ADD NAME</td>
+            <td class="add-volunteer"><a href="#"><i class="fa fa-plus-square fa-fw"></i> ADD NAME</a></td>
               </tr>
             </table><br><br>
             <input type="submit" value="Save" id="save-button" class="job">&nbsp;&nbsp;

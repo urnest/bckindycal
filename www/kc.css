@@ -456,3 +456,12 @@ a:hover.adm, a:focus.adm {
 	font-size: 12px;
 	color: #41ad48;
 }
+div.maintenance-day-descbox	{
+	display:block;
+	border:1px solid #eaeaea !important;
+	color:#444444;
+	font-size:13px;
+	line-height:16px;
+	padding:10px 15px;
+	border:none;
+}
