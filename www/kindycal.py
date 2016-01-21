@@ -110,7 +110,7 @@ class admin_page(webapp2.RequestHandler):
         session=getSession(self.request.cookies.get('kc-session',''))
         if session.loginLevel!='admin':
             print 'not logged in as admin'
-            return webapp2.redirect('admin_login.html?from=admin.html')
+            return webapp2.redirect('admin_login.html')
         self.response.write(file('admin.html').read())
         self.response.set_cookie('kc-session',session.sid)
         pass
@@ -159,7 +159,7 @@ class login_page(webapp2.RequestHandler):
 class admin_login_page(webapp2.RequestHandler):
     def get(self):
         page=pq.loadFile('admin_login.html')
-        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer','events.html'))
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer','admin.html'))
         self.response.write(unicode(page).encode('utf-8'))
         pass
     def post(self):
@@ -172,8 +172,8 @@ class admin_login_page(webapp2.RequestHandler):
                 }
             session.put()
             from_=str(self.request.get('from'))
-            if from_=='' or from_=='admin.html':
-                from_='events.html'
+            if from_=='' or from_=='admin_login.html':
+                from_='admin.html'
                 pass
             result=webapp2.redirect(from_)
             result.set_cookie('kc-session',session.sid)
@@ -1423,6 +1423,7 @@ class import_data(webapp2.RequestHandler):
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
+	('/guru',admin_page),
     ('/admin_login.html',admin_login_page),
     ('/edit_terms.html',edit_terms_page),
     ('/edit_groups.html',edit_groups_page),
@@ -1435,8 +1436,10 @@ application = webapp2.WSGIApplication([
     ('/events.html',events_page),
     ('/index.html', index_page),
     ('/login.html',login_page),
+	('/parent',login_page),
     ('/maintenance_day.html',maintenance_day_page),
     ('/staff.html',staff_page),
+	('/staff',staff_page),
     ('/staff_login.html',staff_login_page),
     ('/twyc.html',twyc_page),
     ('/index-rc.html',indexrc_page),

@@ -1,7 +1,7 @@
 $(document).ready(function(){
   $('.add-volunteer').click(function(){
     var id=$('input#id').prop('value');
-    var $dialog=$('<p>Your Child\'s Name: <input type="text"></p>');
+    var $dialog=$('<p>Your Name: <input type="text"></p>');
     var add=function(childs_name){
       if (childs_name==''){
 	$dialog.find('input').addClass('invalid-input');
@@ -17,6 +17,7 @@ $(document).ready(function(){
 	});
     };
     $dialog.dialog({
+	  'title':'Maintenance Day',
       'buttons':{
 	'OK':function(){ add($dialog.find('input').prop('value')); },
 	'Cancel':function(){ $dialog.dialog('close'); }

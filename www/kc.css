@@ -229,10 +229,12 @@ a:hover.twyc-link {
 	text-decoration: none;
 }
 a.staff-only {
-    color: #ffffff;
+    color: #DD017F;
+	font-size: 16px;
 }
 a:hover.staff-only {
-    color: #eeeeee;
+    color: #000000;
+	font-size: 16px;
 }
 a.add-staff {
 	background: #388fe0 none repeat scroll 0 0;
@@ -446,15 +448,29 @@ a.adm {
 	font-size: 14px;
 	color: #ef4a5a;
 	text-decoration: none;
+	line-height: 22px;
 }
 a:hover.adm, a:focus.adm {
 	font-size: 14px;
 	color: #000000;
 	text-decoration: none;
+	line-height: 22px;
 }
 .admgrn {
 	font-size: 12px;
 	color: #41ad48;
+}
+.admblu {
+	font-size: 12px;
+	color: #388FE0;
+}
+.admpnk {
+	font-size: 12px;
+	color: #DD017F;
+}
+.admpnk1 {
+	font-size: 14px;
+	color: #DD017F;
 }
 div.maintenance-day-descbox	{
 	display:block;
@@ -464,4 +480,28 @@ div.maintenance-day-descbox	{
 	line-height:16px;
 	padding:10px 15px;
 	border:none;
+}
+div.filebox	{
+	display:block;
+	border:1px solid #eaeaea !important;
+	color:#444444;
+	font-size:13px;
+	line-height:16px;
+	padding:10px 15px;
+	border:none;
+}
+.volunteer-child-name {
+	font-size: 14px;
+	color: #666666;
+	text-align: left;
+}
+P.maintenance-day-description {
+	font-size: 14px;
+	color: #666666;
+	text-align: left;
+}
+p.event-description {
+	font-size: 16px;
+	color: #666666;
+	text-align: left;
 }

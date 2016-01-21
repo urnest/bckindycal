@@ -1,3 +1,7 @@
+- edit_event/maintenance_day/public_holiday go back to edit_events
+- add admin menu item to navbar when admin (-> admin.html)
+- add admin menu item to navbar when staff (-> staff.html)
+
 x login.html
 
 - index.html

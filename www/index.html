@@ -1,11 +1,79 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <style type="text/css" src="kc.css"></style>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bardon Community Kindy</title>
+    <link href='//fonts.googleapis.com/css?family=Montserrat|Open+Sans|Lato' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link href="bckfair.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="kc.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="inputs.css" rel="stylesheet" type="text/css" media="all" />
+    <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery.form.js"></script>
+    <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
+    <script type="text/javascript" src="kc.js"></script>
+    
+    <!-- SMOOTH SCROLL -->
+    <script>
+    $(function() {
+      $('a[href*=#]:not([href=#])').click(function() {
+        if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+          var target = $(this.hash);
+          target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+          if (target.length) {
+            $('html,body').animate({
+              scrollTop: target.offset().top
+            }, 1000);
+            return false;
+          }
+        }
+      });
+  // Sticky Navbar Affix
+  $('#navbar').affix({
+    offset: {
+      top: $('#topbar').outerHeight(),
+    }
+  });
+    });
+    </script>
+	<!-- End of SMOOTH SCROLL -->
 </head>
 <body>
-  <ul>
-    <li><a href="events.html">Events</a>
-    <li><a href="staff.html">Staff</a>
-    <li><a href="admin.html">Admin</a>
-  </ul>
+    <div id="page">
+	<header id="header" class="site-header">
+        <nav id="navbar" class="site-navbar navbar navbar-static-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <i class="fa fa-bars"></i>
+              </button>
+              <h1 class="navbar-tagline"><a href="index.html"><img class="logo" src="images/bck-logo.png" width="100" alt="Bardon Community Kindy Logo" /></a></h1>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-collapse-1">
+              <ul id="navigation" class="nav navbar-nav navbar-right">
+                <li><a href="events.html">CALENDAR</a></li>
+                <li><a href="roster.html">ROSTER JOBS</a></li>
+                <li><a href="twyc.html">TWYC</a></li>
+                <li><a href="fair.html">FAIR</a></li>
+                <li><a href="links.html">LINKS</a></li>                            
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+<main id="main" class="site-main">
+
+<div id="content" class="shell">
+<h2>Menu</h2>
+  <div>
+	<a class="adm" href="events.html"><i class="fa fa-user fa-fw"></i> Parents View</a><br> 
+    <a class="adm" href="staff.html"><i class="fa fa-user fa-fw"></i> Staff Admin</a><br> 
+    <a class="adm" href="admin.html"><i class="fa fa-user fa-fw"></i> Guru Admin</a><br><br> 
+  </div>
 </body>
