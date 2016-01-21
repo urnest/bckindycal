@@ -1252,24 +1252,28 @@ class redirect_to_events_page(webapp2.RequestHandler):
 
 class export_data(webapp2.RequestHandler):
     def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff']:
+            print 'not logged in'
+            return webapp2.redirect('staff.html?from=events.html')
         terms=[fromJson(_.data) for _ in Terms.query(ancestor=root_key).fetch(100)]
         groups=[fromJson(_.data) for _ in Groups.query(ancestor=root_key).fetch(100)]
-        nextEventId=(EventIdCounter.query(ancestor=root_key).fetch(1)+
-                     [EventIdCounter(parent=root_key,
+        nextEventId=(EventIdCounter.query(ancestor=nextEventIdKey).fetch(1)+
+                     [EventIdCounter(parent=nextEventIdKey,
                                      nextEventId=1)])[0].nextEventId
         events=[{'data':fromJson(_.data),
                  'id':_.id,
                  'months':_.months} for _ in
                 Event.query(ancestor=root_key).fetch(100000)]
-        nextPublicHolidayId=(PublicHolidayIdCounter.query(ancestor=root_key).fetch(1)+
-                             [PublicHolidayIdCounter(parent=root_key,
+        nextPublicHolidayId=(PublicHolidayIdCounter.query(ancestor=nextPublicHolidayIdKey).fetch(1)+
+                             [PublicHolidayIdCounter(parent=nextPublicHolidayIdKey,
                                                      nextPublicHolidayId=1)])[0].nextPublicHolidayId
         publicHolidays=[{'data':fromJson(_.data),
                          'id':_.id,
                          'months':_.months} for _ in
                         PublicHoliday.query(ancestor=root_key).fetch(100000)]
-        nextMaintenanceDayId=(MaintenanceDayIdCounter.query(ancestor=root_key).fetch(1)+
-                              [MaintenanceDayIdCounter(parent=root_key,
+        nextMaintenanceDayId=(MaintenanceDayIdCounter.query(ancestor=nextMaintenanceDayIdKey).fetch(1)+
+                              [MaintenanceDayIdCounter(parent=nextMaintenanceDayIdKey,
                                                        nextMaintenanceDayId=1)])[0].nextMaintenanceDayId
         maintenanceDays=[{'data':fromJson(_.data),
                           'id':_.id,
@@ -1295,6 +1299,127 @@ class export_data(webapp2.RequestHandler):
         pass
     pass
 
+class import_data_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin']:
+            print 'not logged in'
+            return webapp2.redirect('admin.html')
+        page=pq.loadFile('import_data.html')
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+    pass
+
+class import_data(webapp2.RequestHandler):
+    def post(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if session.loginLevel not in ['staff','admin']:
+            result={'error':'You are not logged in.'}
+        else:
+            print self.request.POST.keys()
+            data=fromJson(self.request.get('filename'))
+            assert 'terms' in data, data.keys()
+            assert 'groups' in data, data.keys()
+            assert 'events' in data, data.keys()
+            assert 'nextPublicHolidayId' in data, data.keys()
+            assert 'publicHolidays' in data, data.keys()
+            assert 'nextMaintenanceDayId' in data, data.keys()
+            assert 'maintenanceDays' in data, data.keys()
+            assert 'twycs' in data, data.keys()
+            if len(data['terms']):
+                for _ in Terms.query(ancestor=root_key).fetch(10): _.key.delete()
+                for _ in data['terms']:
+                    terms_schema.validate(_)
+                    t=Terms(parent=root_key,
+                            data=toJson(_))
+                    t.put()
+                    pass
+                self.response.write('%s Terms<br>'%len(data['terms']))
+                pass
+            if len(data['groups']):
+                for _ in Groups.query(ancestor=root_key).fetch(10): _.key.delete()
+                for _ in data['groups']:
+                    groups_schema.validate(_)
+                    t=Groups(parent=root_key,
+                             data=toJson(_))
+                    t.put()
+                    pass
+                self.response.write('%s Groups<br>'%len(data['groups']))
+                pass
+            if 'nextEventId' in data:
+                for _ in EventIdCounter.query(ancestor=nextEventIdKey).fetch(10): _.key.delete()
+                t=EventIdCounter(parent=nextEventIdKey,
+                                 nextEventId=data['nextEventId'])
+                t.put()
+                self.response.write('EventCounter<br>')
+                pass
+            if len(data['events']):
+                for _ in Event.query(ancestor=root_key).fetch(100000): _.key.delete()
+                for _ in data['events']:
+                    event_schema.validate(_['data'])
+                    t=Event(parent=root_key,
+                            data=toJson(_['data']),
+                            id=_['id'],
+                            months=_['months'])
+                    t.put()
+                    pass
+                self.response.write('%s events<br>'%len(data['events']))
+                pass
+            if 'nextPublicHolidayId' in data:
+                for _ in PublicHolidayIdCounter.query(ancestor=nextPublicHolidayIdKey).fetch(10): _.key.delete()
+                t=PublicHolidayIdCounter(parent=nextPublicHolidayIdKey,
+                                         nextPublicHolidayId=data['nextPublicHolidayId'])
+                t.put()
+                self.response.write('PublicHolidayIdCounter<br>')
+                pass
+            if len(data['publicHolidays']):
+                for _ in PublicHoliday.query(ancestor=root_key).fetch(100000): _.key.delete()
+                for _ in data['publicHolidays']:
+                    public_holiday_schema.validate(_['data'])
+                    t=PublicHoliday(parent=root_key,
+                                    data=toJson(_['data']),
+                                    id=_['id'],
+                                    months=_['months'])
+                    t.put()
+                    pass
+                self.response.write('%s PublicHolidayss<br>'%len(data['publicHolidays']))
+                pass
+            if 'nextMaintenanceDayId' in data:
+                for _ in MaintenanceDayIdCounter.query(ancestor=nextMaintenanceDayIdKey).fetch(10): _.key.delete()
+                t=MaintenanceDayIdCounter(parent=nextMaintenanceDayIdKey,
+                                 nextMaintenanceDayId=data['nextMaintenanceDayId'])
+                t.put()
+                self.response.write('MaintenanceDayCounter<br>')
+                pass
+            if len(data['maintenanceDays']):
+                for _ in MaintenanceDay.query(ancestor=root_key).fetch(100000): _.key.delete()
+                for _ in data['maintenanceDays']:
+                    maintenance_day_schema.validate(_['data'])
+                    t=MaintenanceDay(parent=root_key,
+                            data=toJson(_['data']),
+                            id=_['id'],
+                            months=_['months'])
+                    t.put()
+                    pass
+                self.response.write('%s MaintenanceDays<br>'%len(data['maintenanceDays']))
+                pass
+            if len(data['twycs']):
+                for _ in TWYC.query(ancestor=root_key).fetch(100000): _.key.delete()
+                for _ in data['twycs']:
+                    twyc_schema.validate(_['data'])
+                    t=TWYC(parent=root_key,
+                            data=toJson(_['data']),
+                            id=_['id'],
+                            months=_['months'])
+                    t.put()
+                    pass
+                self.response.write('%s twycs<br>'%len(data['twycs']))
+                pass
+            self.response.write('OK')
+            pass
+        pass
+    pass
+
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
@@ -1315,7 +1440,7 @@ application = webapp2.WSGIApplication([
     ('/staff_login.html',staff_login_page),
     ('/twyc.html',twyc_page),
     ('/index-rc.html',indexrc_page),
-    ('/export_data.txt',export_data),
+    ('/import_data.html',import_data_page),
     
     # following are not real pages, they are called by javascript files
     # to get and save data
@@ -1338,5 +1463,7 @@ application = webapp2.WSGIApplication([
     ('/delete_maintenance_day',delete_maintenance_day),
     ('/delete_public_holiday',delete_public_holiday),
     ('/remember_month',remember_month),
-    ('/session_file',session_file)
+    ('/session_file',session_file),
+    ('/export_data.txt',export_data),
+    ('/import_data',import_data),
 ], debug=True)
