@@ -126,12 +126,7 @@ $(document).ready(function(){
       var $o_t=$groupsToShowOption_t;
       var $options=$();
       var staff=$('body').hasClass('staff')||$('body').hasClass('admin');
-      if (staff){
-	$options=$o_t.clone().prop('value','[0,1,2,3]').text('All');
-      }
-      else{
-	$options=$o_t.clone().prop('value','[]').text('** select your group **');
-      }
+      $options=$o_t.clone().prop('value','[0,1,2,3]').text('All');
       kc.each(groups,function(i,group){
 	$options=$options.add($o_t.clone().prop('value','['+i+']').text(group.name));
       });

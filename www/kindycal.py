@@ -420,9 +420,6 @@ class groups_to_show(webapp2.RequestHandler):
                 raise xn.Exception('You are not logged in')
             try:
                 result=fromJson(self.request.cookies.get('kc-groups-to-show','[0,1,2,3]'))
-                if not session.loginLevel in ['staff','admin'] and len(result)>1:
-                    result=[]
-                    pass
             except:
                 raise inContext('get groups to show from kc-groups-to-show cookie')
             return self.response.write(toJson({'result':result}))
@@ -937,7 +934,7 @@ class maintenance_day_page(webapp2.RequestHandler):
         page.find(pq.attrEquals('id','id')).attr('value',str(id))
         page.find(pq.hasClass('maintenance-day-name')).text(maintenance_day['name'])
         d=formatDate(maintenance_day['date'])
-        page.find(pq.hasClass('date')).text(d)
+        page.find(pq.hasClass('mdate')).text(d)
         page.find(pq.hasClass('maintenance-day-description')).html(
             pq.parse(maintenance_day['description']['html']))
         vrt=page.find(pq.hasClass('volunteer-row')).remove().first()
