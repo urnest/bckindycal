@@ -348,6 +348,21 @@ class edit_groups_page(webapp2.RequestHandler):
     pass
 
 
+def addAdminNavButtonToPage(page,loginLevel):
+    adminNavButton=page.find(pq.attrEquals('id','navigation')).find(
+        pq.tagName('li')).first().clone()
+    adminNavButton.find(pq.tagName('a')).text('ADMIN')
+    if loginLevel=='admin':
+        adminNavButton.find(pq.tagName('a')).attr('href','admin.html')
+        pass
+    if loginLevel=='staff':
+        adminNavButton.find(pq.tagName('a')).attr('href','staff.html')
+        pass
+    adminNavButton.addBefore(
+        page.find(pq.attrEquals('id','navigation')).find(
+            pq.tagName('li')).first())
+    pass
+
 class events_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
@@ -357,6 +372,9 @@ class events_page(webapp2.RequestHandler):
         page=pq.loadFile('events.html')
         page.find(pq.hasClass('staff-only')).remove()
         page.find(pq.hasClass('admin-only')).remove()
+        if session.loginLevel in ['admin','staff']:
+            addAdminNavButtonToPage(page,session.loginLevel)
+            pass
         addScriptToPageHead('events.js',page)
         makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
@@ -384,6 +402,7 @@ class edit_events_page(webapp2.RequestHandler):
             page.find(pq.hasClass('admin-only')).remove()
             pass
         page.find(pq.tagName('body')).addClass(session.loginLevel)
+        addAdminNavButtonToPage(page,session.loginLevel)
         addScriptToPageHead('events.js',page)
         makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
@@ -1228,6 +1247,9 @@ class twyc_page(webapp2.RequestHandler):
         page=pq.loadFile('twyc.html')
         page.find(pq.hasClass('staff-only')).remove()
         page.find(pq.hasClass('admin-only')).remove()
+        if session.loginLevel in ['admin','staff']:
+            addAdminNavButtonToPage(page,session.loginLevel)
+            pass
         addScriptToPageHead('twyc.js',page)
         makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
@@ -1255,6 +1277,7 @@ class edit_twyc_page(webapp2.RequestHandler):
             page.find(pq.hasClass('admin-only')).remove()
             pass
         page.find(pq.tagName('body')).addClass(session.loginLevel)
+        addAdminNavButtonToPage(page,session.loginLevel)
         addScriptToPageHead('twyc.js',page)
         makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))

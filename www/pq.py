@@ -420,6 +420,16 @@ class Selection:
         index=parent.indexOf(nodes[0])
         for n in self.nodeList:
             n.parent=parent
+        parent.children[index+1:index+1]=self.nodeList
+        return self
+    def addBefore(self, nodes):
+        '''add our nodes before first of specified nodes'''
+        if isinstance(nodes, Selection):
+            nodes=nodes.nodeList
+        parent=nodes[0].parent
+        index=parent.indexOf(nodes[0])
+        for n in self.nodeList:
+            n.parent=parent
         parent.children[index:index]=self.nodeList
         return self
     def detach(self):
@@ -616,6 +626,21 @@ def test7():
     s.text('30x40”')
     assert_equal(unicode(s),u'<p>30x40”</p>')
 
+def test8():
+    s=parse('<ul><li class="a">1<li class="b">2</ul>')
+    parse('<li>3').addAfter(s.find(hasClass('b')))
+    assert_equal(unicode(s),u'<ul><li class="a">1<li class="b">2<li>3</ul>')
+    
+def test9():
+    s=parse('<ul><li class="a">1<li class="b">2</ul>')
+    parse('<li>1.5').addBefore(s.find(hasClass('b')))
+    assert_equal(unicode(s),u'<ul><li class="a">1<li>1.5<li class="b">2</ul>')
+    
+def test10():
+    s=parse('<ul><li class="a">1<li class="b">2</ul>')
+    parse('<li>0').addBefore(s.find(hasClass('a')))
+    assert_equal(unicode(s),u'<ul><li>0<li class="a">1<li class="b">2</ul>')
+    
 if __name__=='__main__':
     try:
         test1()
@@ -625,6 +650,9 @@ if __name__=='__main__':
         test5()
         test6()
         test7()
+        test8()
+        test9()
+        test10()
     except:
         print >>sys.stderr, sys.exc_info()[1]
         sys.exit(1)
