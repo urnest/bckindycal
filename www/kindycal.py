@@ -404,7 +404,7 @@ class event_page(webapp2.RequestHandler):
         g=' + '.join([groups[_]['name'] for _ in event['groups']])
         page.find(pq.hasClass('groups')).text(g)
         d=', '.join([formatDate(_) for _ in event['dates']])
-        page.find(pq.hasClass('dates')).text(d)
+        page.find(pq.hasClass('mdate')).text(d)
         page.find(pq.hasClass('event-description')).html(
             pq.parse(event['description']['html']))
         self.response.write(unicode(page).encode('utf-8'))
