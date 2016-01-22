@@ -24,6 +24,12 @@ def toJson(x):
 def fromJson(x):
     return json.loads(x)
 
+def addScriptToPageHead(script,page):
+    pq.parse('<script type="text/javascript" src="%(script)s"></script>'%vars()).appendTo(page.find(pq.tagName('head')))
+    pass
+def makePageBodyInvisible(page):
+    page.find(pq.tagName('body')).addClass('kc-invisible')
+    pass
 
 root_key=ndb.Key('KC', 'KC')
 
@@ -351,6 +357,8 @@ class events_page(webapp2.RequestHandler):
         page=pq.loadFile('events.html')
         page.find(pq.hasClass('staff-only')).remove()
         page.find(pq.hasClass('admin-only')).remove()
+        addScriptToPageHead('events.js',page)
+        makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -360,7 +368,7 @@ class edit_events_page(webapp2.RequestHandler):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff']:
             print 'not logged in'
-            return webapp2.redirect('staff.html?from=events.html')
+            return webapp2.redirect('staff_login.html')
         if fetchTerms() is None:
             print 'terms not defined'
             return webapp2.redirect('edit_terms.html')
@@ -376,6 +384,8 @@ class edit_events_page(webapp2.RequestHandler):
             page.find(pq.hasClass('admin-only')).remove()
             pass
         page.find(pq.tagName('body')).addClass(session.loginLevel)
+        addScriptToPageHead('events.js',page)
+        makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -902,6 +912,8 @@ class edit_event_page(webapp2.RequestHandler):
             return webapp2.redirect('staff_login.html')
         page=pq.loadFile('edit_event.html')
         page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
+        addScriptToPageHead('edit_event.js',page)
+        makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -913,6 +925,8 @@ class edit_public_holiday_page(webapp2.RequestHandler):
             return webapp2.redirect('staff_login.html')
         page=pq.loadFile('edit_public_holiday.html')
         page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
+        addScriptToPageHead('edit_public_holiday.js',page)
+        makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -956,6 +970,8 @@ class edit_maintenance_day_page(webapp2.RequestHandler):
             return webapp2.redirect('staff_login.html')
         page=pq.loadFile('edit_maintenance_day.html')
         page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
+        addScriptToPageHead('edit_maintenance_day.js',page)
+        makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -1212,6 +1228,8 @@ class twyc_page(webapp2.RequestHandler):
         page=pq.loadFile('twyc.html')
         page.find(pq.hasClass('staff-only')).remove()
         page.find(pq.hasClass('admin-only')).remove()
+        addScriptToPageHead('twyc.js',page)
+        makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -1237,6 +1255,8 @@ class edit_twyc_page(webapp2.RequestHandler):
             page.find(pq.hasClass('admin-only')).remove()
             pass
         page.find(pq.tagName('body')).addClass(session.loginLevel)
+        addScriptToPageHead('twyc.js',page)
+        makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -1433,7 +1453,7 @@ application = webapp2.WSGIApplication([
     ('/events.html',events_page),
     ('/index.html', index_page),
     ('/login.html',login_page),
-	('/parent',login_page),
+    ('/parent',login_page),
     ('/maintenance_day.html',maintenance_day_page),
     ('/staff.html',staff_page),
 	('/staff',staff_page),

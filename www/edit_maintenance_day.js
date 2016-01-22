@@ -1,6 +1,8 @@
 $(document).ready(function(){
   var maintenance_day;
+  var rendering=kc.rendering($('div#content'));
   var busyCount=0;
+  $('body').removeClass('kc-invisible');//added by kindycal.py
   $('input.date').prop('value','');
   $('input.name').prop('value','');
   $('input#save-button').click(function(){
@@ -24,18 +26,15 @@ $(document).ready(function(){
       day:parseInt(d[0])
     }
     var volunteers=[];
-    if (!$('.volunteer-childs-name').each(function(){
+    $('.volunteer-childs-name').each(function(){
       var $t=$(this);
-      if ($t.prop('value')==''){
-	$t.addClass('invalid-input');
-	return false;
+      if ($t.prop('value')!=''){
+	volunteers.push({childs_name:$t.prop('value')});
       }
-      volunteers.push({childs_name:$t.prop('value')});
-    })){
-      return false;
-    }
+    });
     var description=$('.maintenance-day-description').html();
     $('body').addClass('kc-busy-cursor');
+    ++busyCount;
     kc.postToServer('maintenance_day',{
       params:kc.json.encode({
 	id:parseInt($('input#id').prop('value')),
@@ -48,6 +47,7 @@ $(document).ready(function(){
 	window.location='edit_events.html';
       })
       .always(function(){
+	--busyCount;
 	$('body').removeClass('kc-busy-cursor');
       });
     return false;
@@ -62,6 +62,7 @@ $(document).ready(function(){
     if (!window.confirm('Delete Maintenance Day?')){
       return false;
     }
+    ++busyCount;
     kc.postToServer('delete_maintenance_day',{
       params:kc.json.encode({
 	id:parseInt($('input#id').prop('value'))
@@ -71,6 +72,7 @@ $(document).ready(function(){
 	window.location='edit_events.html';
       })
       .always(function(){
+	--busyCount;
 	$('body').removeClass('kc-busy-cursor');
       });
     return false;
@@ -80,7 +82,7 @@ $(document).ready(function(){
 
   if ($('input#id').prop('value')=='0'){
     //new maintenance_day
-    ++busyCount&&kc.getFromServer('get_month_to_show')
+    kc.getFromServer('get_month_to_show')
       .then(function(result){
 	var today=new Date();
 	var date={
@@ -101,25 +103,15 @@ $(document).ready(function(){
 	  ]
 	}
 	proceed();
-      })
-      .always(function(){
-	if (--busyCount==0){
-	  $('body').removeClass('kc-busy-cursor');
-	}
       });
   }
   else{
-    ++busyCount&&kc.getFromServer('maintenance_day',
-				  {id:$('input#id').prop('value')})
+    kc.getFromServer('maintenance_day',
+		     {id:$('input#id').prop('value')})
       .then(function(result){
 	maintenance_day=result;
 	proceed();
-      })
-    .always(function(){
-      if (--busyCount==0){
-	$('body').removeClass('kc-busy-cursor');
-      }
-    });
+      });
   }
   var proceed=function(){
     if (maintenance_day){
@@ -140,32 +132,30 @@ $(document).ready(function(){
 	dateFormat: 'dd/mm/yy'
       });
       var $volunteerRow_t=$('tr.volunteer-row').remove().first();
-      kc.each(maintenance_day.volunteers,function(i,volunteer){
+      var addVolunteer=function(name){
 	var $volunteerRow=$volunteerRow_t.clone();
 	$volunteerRow.find('input.volunteer-childs-name').prop(
 	  'value',
-	  volunteer.childs_name);
-	$('table.volunteer-table').append($volunteerRow);
+	  name);
+	$('table.volunteer-table').find('tr.add-volunteer').before(
+	  $volunteerRow);
 	$volunteerRow.find('.delete-volunteer').click(function(){
-	  $volunteerRow.remove();
-	  $('tr.volunteer-row').find('.delete-volunteer').show();
-	  $('tr.volunteer-row').find('.delete-volunteer').first().hide();
+	  var name=$volunteerRow.find('input').prop('value');
+	  if (name=='' || window.confirm('Remove '+name+'?')){
+	    $volunteerRow.remove();
+	  }
+	  return false;
 	});
+	return $volunteerRow;
+      };
+      kc.each(maintenance_day.volunteers,function(i,volunteer){
+	addVolunteer(volunteer.childs_name);
       });
-      $('table.volunteer-table').append(
-	$('table.volunteer-table').find('tr.add-volunteer').remove());
-      $('tr.volunteer-row').find('.delete-volunteer').show();
       $('td.add-volunteer').click(function(){
-	var $volunteerRow=$volunteerRow_t.clone();
-	$volunteerRow.find('input.volunteer-childs-name').prop('value','');
-	$('table.volunteer-table').append($volunteerRow);
-	$volunteerRow.find('.delete-volunteer').click(function(){
-	  $volunteerRow.remove();
-	  $('tr.volunteer-row').find('.delete-volunteer').show();
-	});
-	$('table.volunteer-table').append(
-	  $('table.volunteer-table').find('tr.add-volunteer').remove());
+	addVolunteer('').find('input').focus();
+	return false;
       });
+      rendering.done();
     }
   };
 });

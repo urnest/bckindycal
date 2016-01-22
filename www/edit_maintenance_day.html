@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -16,12 +16,11 @@
     <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
     <script type="text/javascript" src="kc.js"></script>
     
-  <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
-  <script src="jquery-ui-1.11/jquery-ui.js"></script>
-  <script src="ajaxfileupload/ajaxfileupload.js"></script>
-  <script src="tinymce/js/tinymce/tinymce.js"></script>
-  <script type="text/javascript" src="edit_maintenance_day.js"></script>
-<<!-- SMOOTH SCROLL -->
+    <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
+    <script src="jquery-ui-1.11/jquery-ui.js"></script>
+    <script src="ajaxfileupload/ajaxfileupload.js"></script>
+    <script src="tinymce/js/tinymce/tinymce.js"></script>
+    <!-- SMOOTH SCROLL -->
     <script>
     $(function() {
       $('a[href*=#]:not([href=#])').click(function() {
@@ -36,19 +35,22 @@
           }
         }
       });
-  // Sticky Navbar Affix
-  $('#navbar').affix({
-    offset: {
-      top: $('#topbar').outerHeight(),
-    }
-  });
+      // Sticky Navbar Affix
+      $('#navbar').affix({
+        offset: {
+          top: $('#topbar').outerHeight(),
+        }
+      });
     });
     </script>
-	<!-- End of SMOOTH SCROLL -->
-</head>
-<body>
+    <!-- End of SMOOTH SCROLL -->
+    <!-- note kindycal.py uncomments:
+      <script type="text/javascript" src="edit_maintenance_day.js"></script>
+    -->
+  </head>
+  <body>
     <div id="page">
-	<header id="header" class="site-header">
+      <header id="header" class="site-header">
         <nav id="navbar" class="site-navbar navbar navbar-static-top" role="navigation">
           <div class="container">
             <div class="navbar-header">
@@ -70,43 +72,43 @@
           </div>
         </nav>
       </header>
-
-    <main id="main" class="site-main">
-    
-     <div id="content" class="shell">
-
-      <h2>Calendar - Maintenance Days</h2>
-      <div>
-          <form method="POST" action="maintenance_day">
-            <input type="hidden" id="id" name="id" value="0">
-            <span class=admpnk>Name (appears on calendar):</span><br>
-            <input class="GroupName name" type="text" value="Maintenance Day 8am"><br>
-			<span class=admpnk>Date:</span><br>
-            <input class="date" type="text" value="2/5/2016">
-			<br>
-            <span class=admpnk>Description (click to edit):</span>
-            <div class="maintenance-day-descbox">
+      
+      <main id="main" class="site-main">
+	
+	<div id="content" class="shell">
+	  
+	  <h2>Calendar - Maintenance Days</h2>
+	  <div>
+            <form method="POST" action="maintenance_day">
+              <input type="hidden" id="id" name="id" value="0">
+              <span class=admpnk>Name (appears on calendar):</span><br>
+              <input class="GroupName name" type="text" value="Maintenance Day 8am"><br>
+	      <span class=admpnk>Date:</span><br>
+              <input class="date" type="text" value="2/5/2016">
+	      <br>
+              <span class=admpnk>Description (click to edit):</span>
+              <div class="maintenance-day-descbox">
                 <div class="maintenance-day-description">
                   <p>Odd jobs etc.</p>
                 </div>
-            </div>    
-            <br>
-            <span class=admpnk>Volunteers:</span>
-            <table class="volunteer-table">
-              <tr class="volunteer-row">
-            <td><span class="delete-volunteer"><a href="#"><i class="fa fa-minus-square fa-fw"></i> DEL</a></span></td>
-            <td><input class="volunteer-childs-name" type="text" value="Sandy Kay"></td>
-              </tr>
-              <tr class="add-volunteer">
-            <td class="add-volunteer"><a href="#"><i class="fa fa-plus-square fa-fw"></i> ADD NAME</a></td>
-              </tr>
-            </table><br><br>
-            <input type="submit" value="Save" id="save-button" class="job">&nbsp;&nbsp;
-            <input type="submit" value="Delete" id="delete-button" class="del">
-          </form>
-         </div>
-      </div>
-     </main>
+              </div>    
+              <br>
+              <span class=admpnk>Volunteers:</span>
+              <table class="volunteer-table">
+		<tr class="volunteer-row">
+		  <td><span class="delete-volunteer"><a href="#"><i class="fa fa-minus-square fa-fw"></i> DEL</a></span></td>
+		  <td><input class="volunteer-childs-name" type="text" value="Sandy Kay"></td>
+		</tr>
+		<tr class="add-volunteer">
+		  <td class="add-volunteer"><a href="#"><i class="fa fa-plus-square fa-fw"></i> ADD NAME</a></td>
+		</tr>
+              </table><br><br>
+              <input type="submit" value="Save" id="save-button" class="job">&nbsp;&nbsp;
+              <input type="submit" value="Delete" id="delete-button" class="del">
+            </form>
+          </div>
+	</div>
+      </main>
     </div>
-</body>
+  </body>
 </html>

@@ -36,6 +36,13 @@ span.ulhd {
 	font-size: 15px;
 	color: #333333;
 }
+.kc-rendering {
+    /*kc.rendering function in kc.js needs positioning context*/
+    position:relative;
+}
+.kc-invisible {
+    visibility: hidden;
+}
 .kc-busy-cursor { 
     cursor: wait
 }
@@ -49,7 +56,11 @@ span.ulhd {
     height: 70px; /* in case we have no nav items, keep the height */
 }
 #content {
-    margin-bottom: 100px;
+/*    margin-bottom: 100px; not the right way to go... took the align="left"
+                            off the "Please note" table in events.html
+                            instead (that is implemented via a float, which
+                            excludes the table from the containing div
+                            height calculation)  */
 }
 .shell {
     margin: 0 auto;

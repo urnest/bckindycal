@@ -62,6 +62,79 @@
   kc.formatDate=function(date){
     return kc.join('/',[date.day,date.month,date.year]);
   };
+
+  // Get background of (first of) $item, as a css dictionary
+  kc.getBackground=(function(){
+    var result=function($item) {
+      // jquery is bizarre here, $item.parents() is in "upwards" order,
+      // but $item.parents().andSelf() is in "downward" order. There
+      // is no selfAnd().
+      var $items=$item.parents().andSelf();
+      var result=getBackground_($items);
+      return result;
+    };
+    // get the background style of the first item with non-transparent
+    // background
+    // pre: $items.length > 0
+    function getBackground_($items) {
+      if ($items.length == 1 || bgIsOpaque($items.last())) {
+	return {
+	  'background-color' : colourAsHex($items.last().css('background-color')||'transparent'),
+          'background-image' : $items.last().css('background-image')||'none',
+	  'background-position' : $items.last().css('background-position')||'left top',
+	  'background-repeat' : $items.last().css('background-repeat')||'repeat'
+	};
+      }
+      return getBackground_($items.slice(0, -1));
+    }
+    function bgIsOpaque($x) {
+      var b=$x.css('background-color');
+      return (b != 'transparent' && !zeroAlphaColour(b)) ||
+	$x.css('background-image') != 'none';
+    }
+    var alphaRE=
+      /rgba[(][0-9][0-9]*[ ]*,[ ]*[0-9][0-9]*[ ]*,[ ]*[0-9][0-9]*[ ]*,[ ]*([0-9][0-9]*)[ ]*[)]/;
+    function zeroAlphaColour(c){
+      var m=alphaRE.exec(''+c);
+      return m && Number(m[1])==0;
+    }
+    // convert rgb(x,y,z) to #xyz
+    // leave #xyz as #xyz
+    function colourAsHex(c){
+      if (c.search(/rgb/)==0){
+	var r=c.split(',');
+	r[0]=r[0].split('(')[1]
+	r[2]=r[2].split(')')[0]
+	
+	c='#'+
+	  hexChar[parseInt(r[0]/16)]+hexChar[r[0]%16]+
+	  hexChar[parseInt(r[1]/16)]+hexChar[r[1]%16]+
+	  hexChar[parseInt(r[2]/16)]+hexChar[r[2]%16];
+      }
+      return c;
+    }
+    
+    var hexChar=[
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'F'
+    ];
+    return result;
+  })();
+
   kc.inContext=function(e, context){
     var em;
     if (typeof(e)=='object' && 
@@ -610,7 +683,23 @@
     });
     return result;
   };
-
+  kc.rendering=function($x){
+    var $overlay=$('<div class="kc-busy-cursor">&nbsp;</div>').css({
+      position:'absolute',
+      left:0,
+      top:0,
+      width:'100%',
+      height:'100%'})
+      .css(kc.getBackground($x));
+    $x.append($overlay);
+    $x.addClass('kc-rendering');
+    return {
+      done:function(){
+	$overlay.remove();
+	$x.removeClass('kc-rendering');
+      }
+    };
+  };
   kc.showError=function(e){
     alert(''+e);
   };

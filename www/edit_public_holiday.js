@@ -1,6 +1,8 @@
 $(document).ready(function(){
   var public_holiday;
+  var rendering=kc.rendering($('div#content'));
   var busyCount=0;
+  $('body').removeClass('kc-invisible');//added by kindycal.py
   $('input#save-button').click(function(){
     if (busyCount){
       return false;
@@ -30,6 +32,7 @@ $(document).ready(function(){
       });
     });
     $('body').addClass('kc-busy-cursor');
+    ++busyCount;
     kc.postToServer('public_holiday',{
       params:kc.json.encode({
 	id:parseInt($('input#id').prop('value')),
@@ -43,6 +46,7 @@ $(document).ready(function(){
 	window.location='edit_events.html';
       })
       .always(function(){
+	--busyCount;
 	$('body').removeClass('kc-busy-cursor');
       });
     return false;
@@ -57,6 +61,7 @@ $(document).ready(function(){
     if (!window.confirm('Delete Public Holiday?')){
       return false;
     }
+    ++busyCount;
     kc.postToServer('delete_public_holiday',{
       params:kc.json.encode({
 	id:parseInt($('input#id').prop('value'))
@@ -66,6 +71,7 @@ $(document).ready(function(){
 	window.location='edit_events.html';
       })
       .always(function(){
+	--busyCount;
 	$('body').removeClass('kc-busy-cursor');
       });
     return false;
@@ -73,7 +79,7 @@ $(document).ready(function(){
 
   if ($('input#id').prop('value')=='0'){
     //new PublicHoliday
-    ++busyCount&&kc.getFromServer('get_month_to_show')
+    kc.getFromServer('get_month_to_show')
       .then(function(result){
 	var today=new Date();
 	var date={
@@ -90,31 +96,29 @@ $(document).ready(function(){
 	  }
 	}
 	proceed();
-      })
-      .always(function(){
-	if (--busyCount==0){
-	  $('body').removeClass('kc-busy-cursor');
-	}
       });
   }
   else{
-    ++busyCount&&kc.getFromServer('public_holiday',
-				  {id:$('input#id').prop('value')})
+    kc.getFromServer('public_holiday',
+		     {id:$('input#id').prop('value')})
       .then(function(result){
 	public_holiday=result;
 	proceed();
-      })
-    .always(function(){
-      if (--busyCount==0){
-	$('body').removeClass('kc-busy-cursor');
-      }
-    });
+      });
   }
   var proceed=function(){
     if (public_holiday){
       $('input#name').prop('value',public_holiday.name.text);
       var $dateRow_t=$('tr.date-row').remove().first();
-      kc.each(public_holiday.dates,function(i,date){
+      var adjustDeleteButtons=function(){
+	if ($('tr.date-row').length>1){
+	  $('tr.date-row').find('.delete-date').show();
+	}
+	else{
+	  $('tr.date-row').find('.delete-date').hide();
+	}
+      };
+      var addDate=function(date){
 	var $dateRow=$dateRow_t.clone();
 	$dateRow.find('input.date').prop('value',
 					 date.day+'/'+
@@ -123,33 +127,28 @@ $(document).ready(function(){
 	$('table.date-table').find('tr.add-date').before($dateRow);
 	$dateRow.find('.delete-date').click(function(){
 	  $dateRow.remove();
-	  $('tr.date-row').find('.delete-date').show();
-	  $('tr.date-row').find('.delete-date').first().hide();
+	  adjustDeleteButtons();
+	  return false;
 	});
 	$dateRow.find('input.date').datepicker({
 	  dateFormat: 'dd/mm/yy'
 	});
+	return $dateRow;
+      };
+      kc.each(public_holiday.dates,function(i,date){
+	addDate(date);
       });
-      $('tr.date-row').find('.delete-date').show();
-      $('tr.date-row').find('.delete-date').first().hide();
+      adjustDeleteButtons();
       $('td.add-date').click(function(){
-	var $dateRow=$dateRow_t.clone();
 	var today=new Date();
-	$dateRow.find('input.date').prop(
-	  'value',
-	  today.getDate()+'/'+
-	    (today.getMonth()+1)+'/'+
-	    today.getFullYear());
-	$('table.date-table').find('tr.add-date').before($dateRow);
-	$dateRow.find('.delete-date').click(function(){
-	  $dateRow.remove();
-	  $('tr.date-row').find('.delete-date').show();
-	  $('tr.date-row').find('.delete-date').first().hide();
-	});
-	$dateRow.find('input.date').datepicker({
-	  dateFormat: 'd/m/yy'
-	});
+	addDate({
+	  year:today.getFullYear(),
+	  month:(today.getMonth()+1),
+	  day:today.getDate()}).find('input').focus();
+	adjustDeleteButtons();
+	return false;
       });
+      rendering.done();
     }
   };
 });

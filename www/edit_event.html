@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -16,12 +16,10 @@
     <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
     <script type="text/javascript" src="kc.js"></script>
     
-  <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
-  <script src="jquery-ui-1.11/jquery-ui.js"></script>
-  <script src="ajaxfileupload/ajaxfileupload.js"></script>
-  <script src="tinymce/js/tinymce/tinymce.js"></script>
-  <script type="text/javascript" src="edit_event.js"></script>
-
+    <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
+    <script src="jquery-ui-1.11/jquery-ui.js"></script>
+    <script src="ajaxfileupload/ajaxfileupload.js"></script>
+    <script src="tinymce/js/tinymce/tinymce.js"></script>
     <!-- SMOOTH SCROLL -->
     <script>
     $(function() {
@@ -37,19 +35,22 @@
           }
         }
       });
-  // Sticky Navbar Affix
-  $('#navbar').affix({
-    offset: {
-      top: $('#topbar').outerHeight(),
-    }
-  });
+      // Sticky Navbar Affix
+      $('#navbar').affix({
+        offset: {
+          top: $('#topbar').outerHeight(),
+        }
+      });
     });
     </script>
-	<!-- End of SMOOTH SCROLL -->
-</head>
-<body>
+    <!-- End of SMOOTH SCROLL -->
+    <!-- note the following is uncommented dynamically by kindycal.py
+      <script type="text/javascript" src="edit_event.js"></script>
+      -->
+  </head>
+  <body>
     <div id="page">
-	<header id="header" class="site-header">
+      <header id="header" class="site-header">
         <nav id="navbar" class="site-navbar navbar navbar-static-top" role="navigation">
           <div class="container">
             <div class="navbar-header">
@@ -71,45 +72,46 @@
           </div>
         </nav>
       </header>
-
-    <main id="main" class="site-main">
-    
-     <div id="content" class="shell">
-
-      <h2>Calendar Events</h2>
-       <div>
-          <form method="POST" action="event">
-            <input type="hidden" id="id" name="id" value="0">
-            <span class=admpnk>Name (appears on calendar): &nbsp;&nbsp;</span><br>
-            <input name="name" id="name" type="text" class="GroupName"><input type="hidden" id="name-colour"><br>
-			<span class=admpnk>Groups: &nbsp;&nbsp;</span><br>
-            <select class="grouplst"><option>Matt Mon-Wed + Jane Mon-Wed</option></select><br></span><br>
-            <span class=admpnk>Dates: &nbsp;&nbsp;</span><br>
-               <table class="date-table">
-                <tr class="date-row">
-                  <td><span class="delete-date"><a href="#"><i class="fa fa-minus-square fa-fw"></i> DEL</a></span></td>
-                  <td><input class="date" type="text" value="2/5/2016"></td>
-                </tr>
-                <tr class="add-date">
-                  <td class="add-date"><a href="#"><i class="fa fa-plus-square fa-fw"></i> ADD DATE</a></td>
-                </tr>
-              </table>
-            </td>
-              </tr>
-            </table><br>
-            <span class=admpnk>Description (click to edit):</span><br>
-            <div class="maintenance-day-descbox">
-                <div class="event-description">
-                  <p>Today we will walk down to the <a href="https://www.google.com.au/maps/place/Bowman+Park,+Bardon+QLD+4065,+Australia/@-27.4584688,152.9772335,15z/data=!4m2!3m1!1s0x6b9150d23865f899:0xf02a35bd721b320">park</a> to see the crocodiles that live there.</p>
-                  <p>Wear appropriate shoes (no crocs!).</p>
-                </div>
-            </div><br>
-            <input type="submit" value="Save" id="save-button" class="job">&nbsp;&nbsp;
-            <input type="submit" value="Delete" id="delete-button" class="del">
-          </form>
-         </div>
-      </div>
-     </main>
+      
+      <main id="main" class="site-main">
+	<div id="content" class="shell">
+	  
+	  <h2>Calendar Events</h2>
+	  <div>
+            <form method="POST" action="event">
+              <input type="hidden" id="id" name="id" value="0">
+              <span class=admpnk>Name (appears on calendar): &nbsp;&nbsp;</span><br>
+              <input name="name" id="name" type="text" class="GroupName"><input type="hidden" id="name-colour"><br>
+	      <span class=admpnk>Groups: &nbsp;&nbsp;</span><br>
+              <select class="grouplst">
+		<option>Matt Mon-Wed + Jane Mon-Wed</option>
+	      </select>
+	      <br>
+	      <br>
+	      <span class=admpnk>Dates: &nbsp;&nbsp;</span><br>
+	      <table class="date-table">
+		<tr class="date-row">
+		  <td><span class="delete-date"><a href="#"><i class="fa fa-minus-square fa-fw"></i> DEL</a></span></td>
+		  <td><input class="date" type="text" value="2/5/2016"></td>
+		</tr>
+		<tr class="add-date">
+		  <td class="add-date"><a href="#"><i class="fa fa-plus-square fa-fw"></i> ADD DATE</a></td>
+		</tr>
+	      </table>
+	      <br>
+	      <span class=admpnk>Description (click to edit):</span><br>
+	      <div class="maintenance-day-descbox">
+		<div class="event-description">
+		  <p>Today we will walk down to the <a href="https://www.google.com.au/maps/place/Bowman+Park,+Bardon+QLD+4065,+Australia/@-27.4584688,152.9772335,15z/data=!4m2!3m1!1s0x6b9150d23865f899:0xf02a35bd721b320">park</a> to see the crocodiles that live there.</p>
+		  <p>Wear appropriate shoes (no crocs!).</p>
+		</div>
+	      </div><br>
+	      <input type="submit" value="Save" id="save-button" class="job">&nbsp;&nbsp;
+              <input type="submit" value="Delete" id="delete-button" class="del">
+            </form>
+          </div>
+	</div>
+      </main>
     </div>
-</body>
+  </body>
 </html>

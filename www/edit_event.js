@@ -1,8 +1,11 @@
 $(document).ready(function(){
   var groups;
   var event;
-  var busyCount=0;
   var $groupsOption_t=$('select.grouplst option').remove().first();
+  var rendering=kc.rendering($('div#content'));
+  var busyCount=0;
+  $('body').removeClass('kc-invisible');//added by kindycal.py
+
   $('input#save-button').click(function(){
     if (busyCount){
       return false;
@@ -33,6 +36,7 @@ $(document).ready(function(){
     });
     var groups=kc.json.decode($('select.grouplst').prop('value'));
     var description=$('.event-description').html();
+    ++busyCount;
     $('body').addClass('kc-busy-cursor');
     kc.postToServer('event',{
       params:kc.json.encode({
@@ -50,6 +54,7 @@ $(document).ready(function(){
 	window.location='edit_events.html';
       })
       .always(function(){
+	--busyCount;
 	$('body').removeClass('kc-busy-cursor');
       });
     return false;
@@ -64,6 +69,7 @@ $(document).ready(function(){
     if (!window.confirm('Delete event?')){
       return false;
     }
+    ++busyCount;
     kc.postToServer('delete_event',{
       params:kc.json.encode({
 	id:parseInt($('input#id').prop('value'))
@@ -73,6 +79,7 @@ $(document).ready(function(){
 	window.location='edit_events.html';
       })
       .always(function(){
+	--busyCount;
 	$('body').removeClass('kc-busy-cursor');
       });
     return false;
@@ -80,19 +87,14 @@ $(document).ready(function(){
 
   $('.event-description').html('');
 
-  ++busyCount&&kc.getFromServer('groups')
+  kc.getFromServer('groups')
     .then(function(result){
       groups=result;
       proceed();
     })
-    .always(function(){
-      if (--busyCount==0){
-	$('body').removeClass('kc-busy-cursor');
-      }
-    });
   if ($('input#id').prop('value')=='0'){
     //new event
-    ++busyCount&&kc.getFromServer('get_month_to_show')
+    kc.getFromServer('get_month_to_show')
       .then(function(result){
 	var today=new Date();
 	var date={
@@ -114,25 +116,15 @@ $(document).ready(function(){
 	  }
 	}
 	proceed();
-      })
-      .always(function(){
-	if (--busyCount==0){
-	  $('body').removeClass('kc-busy-cursor');
-	}
       });
   }
   else{
-    ++busyCount&&kc.getFromServer('event',
-				  {id:$('input#id').prop('value')})
+    kc.getFromServer('event',
+		     {id:$('input#id').prop('value')})
       .then(function(result){
 	event=result;
 	proceed();
-      })
-    .always(function(){
-      if (--busyCount==0){
-	$('body').removeClass('kc-busy-cursor');
-      }
-    });
+      });
   }
   var proceed=function(){
     if (groups && event){
@@ -167,7 +159,15 @@ $(document).ready(function(){
 	toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
       });
       var $dateRow_t=$('tr.date-row').remove().first();
-      kc.each(event.dates,function(i,date){
+      var adjustDeleteButtons=function(){
+	if ($('tr.date-row').length>1){
+	  $('tr.date-row').find('.delete-date').show();
+	}
+	else{
+	  $('tr.date-row').find('.delete-date').hide();
+	}
+      };
+      var addDate=function(date){
 	var $dateRow=$dateRow_t.clone();
 	$dateRow.find('input.date').prop('value',
 					 date.day+'/'+
@@ -176,33 +176,28 @@ $(document).ready(function(){
 	$('table.date-table').find('tr.add-date').before($dateRow);
 	$dateRow.find('.delete-date').click(function(){
 	  $dateRow.remove();
-	  $('tr.date-row').find('.delete-date').show();
-	  $('tr.date-row').find('.delete-date').first().hide();
+	  adjustDeleteButtons();
+	  return false;
 	});
 	$dateRow.find('input.date').datepicker({
 	  dateFormat: 'dd/mm/yy'
 	});
+	return $dateRow;
+      };
+      kc.each(event.dates,function(i,date){
+	addDate(date);
       });
-      $('tr.date-row').find('.delete-date').show();
-      $('tr.date-row').find('.delete-date').first().hide();
+      adjustDeleteButtons();
       $('td.add-date').click(function(){
-	var $dateRow=$dateRow_t.clone();
 	var today=new Date();
-	$dateRow.find('input.date').prop(
-	  'value',
-	  today.getDate()+'/'+
-	    (today.getMonth()+1)+'/'+
-	    today.getFullYear());
-	$('table.date-table').find('tr.add-date').before($dateRow);
-	$dateRow.find('.delete-date').click(function(){
-	  $dateRow.remove();
-	  $('tr.date-row').find('.delete-date').show();
-	  $('tr.date-row').find('.delete-date').first().hide();
-	});
-	$dateRow.find('input.date').datepicker({
-	  dateFormat: 'd/m/yy'
-	});
+	addDate({
+	  year:today.getFullYear(),
+	  month:(today.getMonth()+1),
+	  day:today.getDate()}).find('input').focus();
+	adjustDeleteButtons();
+	return false;
       });
+      rendering.done();
     }
   };
 });

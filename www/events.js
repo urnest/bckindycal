@@ -45,56 +45,36 @@ $(document).ready(function(){
   var groups;
   var terms;
   var groupsToShow;
-  var busyCount=0;
   var $groupsToShowOption_t=$('select.groups-to-show option').remove().first();
   var monthToShow;
+  var rendering=kc.rendering($('div#content'));
+  $('body').removeClass('kc-invisible');//added by kindycal.py
   $calendar=$('table.month-of-events');
   $event_t=$calendar.find('div.event').remove().first();
   $public_holiday_t=$calendar.find('div.public-holiday').remove().first();
   
-  $week_t=$calendar.find('tr.week').remove().first();
-  
-  $('body').addClass('kc-busy-cursor');
-  ++busyCount&&kc.getFromServer('groups')
+  $week_t=$calendar.find('tr.week').first();
+
+  kc.getFromServer('groups')
     .then(function(result){
       groups=result;
       proceed();
     })
-    .always(function(e){
-      if (--busyCount){
-	$('body').removeClass('kc-busy-cursor');
-      }
-    });
-  ++busyCount&&kc.getFromServer('groups_to_show')
+  kc.getFromServer('groups_to_show')
     .then(function(result){
       groupsToShow=result;
       proceed();
     })
-    .always(function(){
-      if (--busyCount==0){
-	$('body').removeClass('kc-busy-cursor');
-      }
-    });
-  ++busyCount&&kc.getFromServer('terms')
+  kc.getFromServer('terms')
     .then(function(result){
       terms=result;
       proceed();
     })
-    .always(function(){
-      if (--busyCount){
-	$('body').removeClass('kc-busy-cursor');
-      }
-    });
-  ++busyCount&&kc.getFromServer('get_month_to_show')
+  kc.getFromServer('get_month_to_show')
     .then(function(result){
       monthToShow=result;
       proceed();
     })
-    .always(function(){
-      if (--busyCount){
-	$('body').removeClass('kc-busy-cursor');
-      }
-    });
   var proceed=function(){
     if (kc.defined(groups)&&
 	kc.defined(terms)&&
@@ -154,24 +134,24 @@ $(document).ready(function(){
     kc.getFromServer('month_calendar',{params:kc.json.encode(monthToShow)})
       .then(function(result){
 	cal=result;
-	proceed();
+	proceed2();
       });
     kc.getFromServer('month_events',monthToShow)
       .then(function(result){
 	events=result;
-	proceed();
+	proceed2();
       });
     kc.getFromServer('month_public_holidays',monthToShow)
       .then(function(result){
 	public_holidays=result;
-	proceed();
+	proceed2();
       });
     kc.getFromServer('month_maintenance_days',monthToShow)
       .then(function(result){
 	maintenance_days=result;
-	proceed();
+	proceed2();
       });
-    var proceed=function(){
+    var proceed2=function(){
       var groupSet={};
       if (kc.defined(cal) &&
 	  kc.defined(events) &&
@@ -273,6 +253,7 @@ $(document).ready(function(){
 	    dateDays[date.day].append($event);
 	  }
 	});
+	rendering.done();
       }
     };
   };
