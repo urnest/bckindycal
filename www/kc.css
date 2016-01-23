@@ -259,6 +259,9 @@ a:hover.staff-only {
     color: #000000;
 	font-size: 16px;
 }
+div.events-toolbar {
+    text-align:right;
+}
 a.add-staff {
 	background: #388fe0 none repeat scroll 0 0;
     border: 1px solid #388fe0;
@@ -266,7 +269,6 @@ a.add-staff {
     border: 1px solid #fff;
     border-radius: 20px;
     display: inline-block;
-    float: right;
     line-height: 35px;
     margin: 0 10px 0 0;
     padding: 0 15px;
@@ -540,7 +542,8 @@ div.filebox	{
 	padding:10px 15px;
 	border:none;
 }
-.volunteer-child-name {
+.volunteer-child-name,
+.volunteer-parent-name {
 	font-size: 14px;
 	color: #666666;
 	text-align: left;

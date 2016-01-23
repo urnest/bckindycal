@@ -792,7 +792,8 @@ maintenance_day_schema=jsonschema.Schema({
             'html' : StringType
             },
         'volunteers':[{
-                'childs_name':StringType
+                'childs_name':StringType,
+                'parents_name':StringType
                 }]
         })
 
@@ -1061,6 +1062,8 @@ class maintenance_day_page(webapp2.RequestHandler):
             vr=vrt.clone()
             vr.find(pq.hasClass('volunteer-child-name')).text(
                 v['childs_name'])
+            vr.find(pq.hasClass('volunteer-parent-name')).text(
+                v['parents_name'])
             vr.appendTo(page.find(pq.hasClass('volunteers-table')))
             pass
         self.response.write(unicode(page).encode('utf-8'))
@@ -1089,14 +1092,17 @@ class add_maintenance_day_volunteer(webapp2.RequestHandler):
             else:
                 assert self.request.get('id','')
                 assert self.request.get('childs_name','')
+                assert self.request.get('parents_name','')
                 id=int(self.request.get('id'))
                 childs_name=self.request.get('childs_name')
+                parents_name=self.request.get('parents_name')
                 maintenance_day=MaintenanceDay.query(
                     MaintenanceDay.id==id,
                     ancestor=root_key).fetch(1)[0]
                 data=fromJson(maintenance_day.data)
                 data['volunteers'].append({
-                    'childs_name':childs_name
+                    'childs_name':childs_name,
+                    'parents_name':parents_name
                     })
                 maintenance_day_schema.validate(data)
                 maintenance_day.data=toJson(data)
