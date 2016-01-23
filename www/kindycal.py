@@ -84,7 +84,7 @@ def expireOldSessions():
         Session.touched < datetime.datetime.now()-datetime.timedelta(days=1),
         ancestor=root_key)
     for x in q.fetch(10000):
-        print 'expire session %(x)s'%vars()
+        log('expire session %(x)s'%vars())
         for i in SessionFile.query(
             SessionFile.sid==x.sid,
             ancestor=root_key).fetch(100000):
@@ -95,11 +95,11 @@ def expireOldSessions():
 
 def getSession(id):
     expireOldSessions()
-    print 'get session %(id)s'%vars()
+    log('get session %(id)s'%vars())
     if id=='':
         result=[]
     else:
-        print 'query session %(id)s'%vars()
+        log('query session %(id)s'%vars())
         q=Session.query(Session.sid==str(id),ancestor=root_key)
         result=q.fetch(1)
         pass
@@ -107,9 +107,9 @@ def getSession(id):
         result=[Session(parent=root_key,
                         sid=uuid.uuid1().hex,
                         touched=datetime.datetime.now())]
-        print 'new session '+result[0].sid
+        log('new session '+result[0].sid)
     else:
-        print 'existing session '+result[0].sid+ ' level '+result[0].loginLevel
+        log('existing session '+result[0].sid+ ' level '+result[0].loginLevel)
         result[0].touched=datetime.datetime.now()
         pass
     result[0].put()
@@ -135,7 +135,7 @@ class admin_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if session.loginLevel!='admin':
-            print 'not logged in as admin'
+            log('not logged in as admin')
             return webapp2.redirect('admin_login.html')
         self.response.write(file('admin.html').read())
         self.response.set_cookie('kc-session',session.sid)
@@ -146,7 +146,7 @@ class staff_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
-            print 'not logged in as staff or admin'
+            log('not logged in as staff or admin')
             return webapp2.redirect('staff_login.html?from=staff.html')
         self.response.write(file('staff.html').read())
         self.response.set_cookie('kc-session',session.sid)
@@ -164,10 +164,10 @@ class login_page(webapp2.RequestHandler):
         session=getSession(self.request.cookies.get('kc-session',''))
         if self.request.get('password','')==getPassword('parent'):
             session.loginLevel='parent'
-            print 'session %(id)s now logged in to level %(loginLevel)s'%{
-                'id':session.sid,
-                'loginLevel':session.loginLevel
-                }
+            log('session %(id)s now logged in to level %(loginLevel)s'%{
+                    'id':session.sid,
+                    'loginLevel':session.loginLevel
+                    })
             session.put()
             from_=str(self.request.get('from'))
             if from_=='' or from_=='login.html':
@@ -186,7 +186,7 @@ class change_parent_password_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
-            print 'not logged in as staff or admin'
+            log('not logged in as staff or admin')
             return webapp2.redirect('staff_login.html')
         page=pq.loadFile('change_parent_password.html')
         page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer',session.loginLevel+'.html'))
@@ -197,7 +197,7 @@ class change_parent_password_page(webapp2.RequestHandler):
         level=None
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
-            print 'not logged in as staff or admin'
+            log('not logged in as staff or admin')
             return webapp2.redirect('staff_login.html')
         page=pq.loadFile('change_parent_password.html')
         inputs=page.find(pq.tagName('input'))
@@ -219,7 +219,7 @@ class change_staff_password_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin']:
-            print 'not logged in as admin'
+            log('not logged in as admin')
             return webapp2.redirect('admin_login.html')
         page=pq.loadFile('change_staff_password.html')
         page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer',session.loginLevel+'.html'))
@@ -230,7 +230,7 @@ class change_staff_password_page(webapp2.RequestHandler):
         level=None
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin']:
-            print 'not logged in as admin'
+            log('not logged in as admin')
             return webapp2.redirect('admin_login.html')
         page=pq.loadFile('change_staff_password.html')
         inputs=page.find(pq.tagName('input'))
@@ -258,10 +258,10 @@ class admin_login_page(webapp2.RequestHandler):
         session=getSession(self.request.cookies.get('kc-session',''))
         if self.request.get('password','')==getPassword('admin'):
             session.loginLevel='admin'
-            print 'session %(id)s now logged in to level %(loginLevel)s'%{
-                'id':session.sid,
-                'loginLevel':session.loginLevel
-                }
+            log('session %(id)s now logged in to level %(loginLevel)s'%{
+                    'id':session.sid,
+                    'loginLevel':session.loginLevel
+                    })
             session.put()
             from_=str(self.request.get('from'))
             if from_=='' or from_=='admin_login.html':
@@ -286,10 +286,10 @@ class staff_login_page(webapp2.RequestHandler):
         session=getSession(self.request.cookies.get('kc-session',''))
         if self.request.get('password','')==getPassword('staff'):
             session.loginLevel='staff'
-            print 'session %(id)s now logged in to level %(loginLevel)s'%{
-                'id':session.sid,
-                'loginLevel':session.loginLevel
-                }
+            log('session %(id)s now logged in to level %(loginLevel)s'%{
+                    'id':session.sid,
+                    'loginLevel':session.loginLevel
+                    })
             session.put()
             from_=str(self.request.get('from'))
             if from_=='' or from_=='staff_login.html':
@@ -347,7 +347,7 @@ class terms(webapp2.RequestHandler):
                 data=fromJson(self.request.get('params'))
                 assert not data is None
                 terms_schema.validate(data)
-                print 'save terms: '+toJson(data)
+                log('save terms: '+toJson(data))
                 for x in Terms.query(ancestor=root_key).fetch(100000): x.key.delete()
                 Terms(parent=root_key,
                       data=toJson(data)).put()
@@ -364,9 +364,9 @@ class edit_terms_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
-            print 'not logged in as staff or admin'
+            log('not logged in as staff or admin')
             return webapp2.redirect('staff_login.html?from=edit_terms.html')
-        print self.request.headers
+        log(self.request.headers)
         page=pq.loadFile('edit_terms.html')
         page.find(pq.tagName('input')).filter(pq.attrEquals('id','referer')).attr('value',self.request.headers.get('Referer','staff.html'))
         self.response.write(unicode(page).encode('utf-8'))
@@ -425,7 +425,7 @@ class edit_groups_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff']:
-            print 'not logged in as staff'
+            log('not logged in as staff')
             return webapp2.redirect('staff_login.html?from=edit_groups.html')
         page=pq.loadFile('edit_groups.html')
 
@@ -453,7 +453,7 @@ class events_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff','parent']:
-            print 'not logged in'
+            log('not logged in')
             return webapp2.redirect('login.html')
         page=pq.loadFile('events.html')
         page.find(pq.hasClass('staff-only')).remove()
@@ -471,13 +471,13 @@ class edit_events_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff']:
-            print 'not logged in'
+            log('not logged in')
             return webapp2.redirect('staff_login.html')
         if fetchTerms() is None:
-            print 'terms not defined'
+            log('terms not defined')
             return webapp2.redirect('edit_terms.html')
         if fetchGroups() is None:
-            print 'groups not defined'
+            log('groups not defined')
             return webapp2.redirect('edit_groups.html')
         page=pq.loadFile('events.html')
         page.find(pq.hasClass('parent-only')).remove()
@@ -502,7 +502,7 @@ class event_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff','parent']:
-            print 'not logged in'
+            log('not logged in')
             return webapp2.redirect('events.html?from=events.html')
         id=int(self.request.get('id'))
         if session.loginLevel in ['admin','staff']:
@@ -514,8 +514,8 @@ class event_page(webapp2.RequestHandler):
         page=pq.loadFile('event.html')
         page.find(pq.hasClass('event-name')).text(event['name']['text'])
         groups=fetchGroups()
-        print groups
-        print event['groups']
+        log(groups)
+        log(event['groups'])
         g=' + '.join([groups[_]['name'] for _ in event['groups']])
         page.find(pq.hasClass('groups')).text(g)
         d=', '.join([formatDate(_) for _ in event['dates']])
@@ -943,11 +943,11 @@ class month_events(webapp2.RequestHandler):
             else:
                 y=int(self.request.get('y'))
                 m=int(self.request.get('m'))
-                print y*100+m
+                log(y*100+m)
                 events=[fromJson(_.data) for _ in
                         Event.query(Event.months==y*100+m,
                                     ancestor=root_key).fetch(10000)]
-                print events
+                log(events)
                 month_events_schema.validate(events)
                 self.response.write(toJson({'result':events}))
         except:
@@ -967,12 +967,12 @@ class month_public_holidays(webapp2.RequestHandler):
             else:
                 y=int(self.request.get('y'))
                 m=int(self.request.get('m'))
-                print y*100+m
+                log(y*100+m)
                 public_holidays=[fromJson(_.data) for _ in
                         PublicHoliday.query(
                         PublicHoliday.months==y*100+m,
                         ancestor=root_key).fetch(10000)]
-                print public_holidays
+                log(public_holidays)
                 month_public_holidays_schema.validate(public_holidays)
                 self.response.write(toJson({'result':public_holidays}))
         except:
@@ -992,7 +992,7 @@ class month_maintenance_days(webapp2.RequestHandler):
             else:
                 y=int(self.request.get('y'))
                 m=int(self.request.get('m'))
-                print y*100+m
+                log(y*100+m)
                 maintenance_days=[fromJson(_.data) for _ in
                         MaintenanceDay.query(
                         MaintenanceDay.months==y*100+m,
@@ -1000,7 +1000,7 @@ class month_maintenance_days(webapp2.RequestHandler):
                 for data in maintenance_days:
                     if not 'name' in data: data['name']='Maintenance Day 8am'
                     pass
-                print maintenance_days
+                log(maintenance_days)
                 month_maintenance_days_schema.validate(maintenance_days)
                 self.response.write(toJson({'result':maintenance_days}))
         except:
@@ -1013,7 +1013,7 @@ class edit_event_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
-            print 'not logged in as staff or admin'
+            log('not logged in as staff or admin')
             return webapp2.redirect('staff_login.html')
         page=pq.loadFile('edit_event.html')
         page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
@@ -1026,7 +1026,7 @@ class edit_public_holiday_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
-            print 'not logged in as staff or admin'
+            log('not logged in as staff or admin')
             return webapp2.redirect('staff_login.html')
         page=pq.loadFile('edit_public_holiday.html')
         page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
@@ -1039,7 +1039,7 @@ class maintenance_day_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff','parent']:
-            print 'not logged in'
+            log('not logged in')
             return webapp2.redirect('events.html')
         id=int(self.request.get('id'))
         if session.loginLevel in ['admin','staff']:
@@ -1071,7 +1071,7 @@ class edit_maintenance_day_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin']:
-            print 'not logged in as staff or admin'
+            log('not logged in as staff or admin')
             return webapp2.redirect('staff_login.html')
         page=pq.loadFile('edit_maintenance_day.html')
         page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
@@ -1162,7 +1162,7 @@ class session_file(webapp2.RequestHandler):
             if session.loginLevel not in ['staff','admin']:
                 result={'error':'You are not logged in.'}
             else:
-                print self.request.POST.keys()
+                log(self.request.POST.keys())
                 data=self.request.get('filename')
                 mime_type=self.request.POST['filename'].type
                 id=session.nextFileId
@@ -1213,7 +1213,7 @@ add_delete_twyc_schema=jsonschema.Schema({
 def delete_twyc_(data):
     'delete twyc %(data)r'
     try:
-        print l1(delete_twyc_.__doc__)%vars()
+        log(l1(delete_twyc_.__doc__)%vars())
         add_delete_twyc_schema.validate(data)
         date=data['date']
         group=data['group']
@@ -1309,11 +1309,11 @@ class month_twycs(webapp2.RequestHandler):
             else:
                 y=int(self.request.get('y'))
                 m=int(self.request.get('m'))
-                print y*100+m
+                log(y*100+m)
                 twycs=[fromJson(_.data) for _ in
                         TWYC.query(TWYC.months==y*100+m,
                                    ancestor=root_key).fetch(10000)]
-                print twycs
+                log(twycs)
                 month_twycs_schema.validate(twycs)
                 self.response.write(toJson({'result':twycs}))
         except:
@@ -1326,7 +1326,7 @@ class twyc_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel:
-            print 'not logged in'
+            log('not logged in')
             return webapp2.redirect('login.html')
         if session.loginLevel in ['staff','admin']:
             return webapp2.redirect('edit_twyc.html')
@@ -1346,13 +1346,13 @@ class edit_twyc_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff']:
-            print 'not logged in'
+            log('not logged in')
             return webapp2.redirect('staff.html?from=events.html')
         if fetchTerms() is None:
-            print 'terms not defined'
+            log('terms not defined')
             return webapp2.redirect('edit_terms.html')
         if fetchGroups() is None:
-            print 'groups not defined'
+            log('groups not defined')
             return webapp2.redirect('edit_groups.html')
         page=pq.loadFile('twyc.html')
         page.find(pq.hasClass('parent-only')).remove()
@@ -1380,7 +1380,7 @@ class export_data(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff']:
-            print 'not logged in'
+            log('not logged in')
             return webapp2.redirect('staff.html?from=events.html')
         terms=[fromJson(_.data) for _ in Terms.query(ancestor=root_key).fetch(100)]
         groups=[fromJson(_.data) for _ in Groups.query(ancestor=root_key).fetch(100)]
@@ -1429,7 +1429,7 @@ class import_data_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin']:
-            print 'not logged in'
+            log('not logged in')
             return webapp2.redirect('admin.html')
         page=pq.loadFile('import_data.html')
         self.response.write(unicode(page).encode('utf-8'))
@@ -1442,7 +1442,7 @@ class import_data(webapp2.RequestHandler):
         if session.loginLevel not in ['staff','admin']:
             result={'error':'You are not logged in.'}
         else:
-            print self.request.POST.keys()
+            log(self.request.POST.keys())
             data=fromJson(self.request.get('filename'))
             assert 'terms' in data, data.keys()
             assert 'groups' in data, data.keys()
