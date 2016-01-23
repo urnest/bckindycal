@@ -155,3 +155,5 @@ x fix + button after adding new date (use before rather than append)
   git status
   git push ~/kindycal.bare/
   /usr/local/google_appengine/dev_appserver.py --host 192.168.0.3 --datastore_path=~/kindycal-data --blobstore_path=~/kindycal-blob ~/kindycal/www
+
+  git push https://github.com/urnest/bckindycal
