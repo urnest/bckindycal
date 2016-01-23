@@ -184,8 +184,12 @@ class login_page(webapp2.RequestHandler):
 
 class change_parent_password_page(webapp2.RequestHandler):
     def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['staff','admin']:
+            print 'not logged in as staff or admin'
+            return webapp2.redirect('staff_login.html')
         page=pq.loadFile('change_parent_password.html')
-        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer','events.html'))
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer',session.loginLevel+'.html'))
         addScriptToPageHead('change_parent_password.js',page)
         self.response.write(unicode(page).encode('utf-8'))
         pass
@@ -203,9 +207,11 @@ class change_parent_password_page(webapp2.RequestHandler):
             page.find(pq.hasClass('login_failed')).text('passwords do not match')
         else:
             setPassword('parent',self.request.get('new_password'))
-            from_=inputs.filter(pq.attrEquals('name','from')).attr('value')[0] or session.loginLevel.encode('utf8')+'.html'
+            from_=self.request.get('from')
+            log('from input '+repr(from_))
+            from_=from_ or session.loginLevel.encode('utf8')+'.html'
             log(repr(from_))
-            return webapp2.redirect(from_)
+            return webapp2.redirect(from_.encode('utf-8'))
         self.response.write(unicode(page).encode('utf-8'))
         pass
 
