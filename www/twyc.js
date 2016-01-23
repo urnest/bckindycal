@@ -94,20 +94,32 @@ function selectYourGroup(options,$from){
   return result;
 };
 var promptForName=function(){
-  var $dialog=$('<p>Your Name: <input type="text" class="GroupName"></p>');
+  var $dialog=$('<form><p>Your Name: <input type="text" class="GroupName"></p></form>');
   var result={
   };
   result.then=function(f){
     result.then_=f;
   };
-    $dialog.dialog({
-	'title':'TWYC',
-    'buttons':{
-      'OK':function(){ result.then_($dialog.find('input').prop('value')); 
-		       $dialog.dialog('close'); },
-      'Cancel':function(){ $dialog.dialog('close'); }
-    }
-  }).show();
+  $dialog.dialog({
+    'title':'TWYC',
+    'buttons':[
+      {
+	text:'Cancel',
+	click:function(){ $dialog.dialog('close'); }
+      },
+      {
+	text:'OK',
+	click:function(){ result.then_($dialog.find('input').prop('value')); 
+			  $dialog.dialog('close'); },
+      }
+    ],
+    dialogClass:'kc-in-front-of-navbar'
+  });
+  $dialog.submit(function(){
+    result.then_($dialog.find('input').prop('value')); 
+    $dialog.dialog('close'); 
+    return false;
+  });
   return result;
 };
 $(document).ready(function(){
