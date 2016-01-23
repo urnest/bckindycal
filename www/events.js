@@ -41,11 +41,54 @@ function nextMonth(m){
     'm':m.m+1
   }
 };
+function selectYourGroup(options,$from){
+  var animDuration=200;
+  var $dialogContent=$('<div>');
+  var $dialog;
+  var $option_t=$from.clone();
+  var result={
+    then_:function(groupsToShow){
+    }
+  };
+  result.then=function(f){
+    result.then_=f;
+  };
+  kc.each(options,function(i,option){
+    var $o=$option_t.clone();
+    $o.text(option.text);
+    $dialogContent.append($('<div>').html($o));
+    $o.click(function(){
+      $dialog.addClass('kc-invisible');
+      $dialog.effect('transfer',{
+	to:$from,
+	className:'kc-transfer-effect'
+      },animDuration);
+      setTimeout(function(){
+	$dialog.removeClass('kc-invisible');
+	$dialogContent.dialog('close');
+	$dialog.remove();
+	result.then_(option.groups);
+      },animDuration);
+      return false;
+    });
+  });
+  $dialogContent.dialog({autoOpen:false});
+  $dialog=$dialogContent.parent('.ui-dialog');
+  $dialog.addClass('kc-invisible');
+  $dialogContent.dialog('open');
+  $from.effect('transfer',{
+    to:$dialog,
+    className:'kc-transfer-effect'
+  },animDuration);
+  setTimeout(function(){ $dialog.removeClass('kc-invisible');},animDuration);
+  return result;
+};
 $(document).ready(function(){
   var groups;
   var terms;
   var groupsToShow;
-  var $groupsToShowOption_t=$('select.groups-to-show option').remove().first();
+  var groupsToShowOptions;
+  var $groupsToShowOption_t=$('a.select-your-group').first().clone();
   var monthToShow;
   var rendering=kc.rendering($('div#content'));
   $('body').removeClass('kc-invisible');//added by kindycal.py
@@ -80,34 +123,36 @@ $(document).ready(function(){
 	kc.defined(terms)&&
 	kc.defined(groupsToShow)&&
 	kc.defined(monthToShow)){
-      var $o_t=$groupsToShowOption_t;
-      var $options=$();
+      groupsToShowOptions=[ {text:'All',groups:[0,1,2,3]} ];
       var staff=$('body').hasClass('staff')||$('body').hasClass('admin');
-      $options=$o_t.clone().prop('value','[0,1,2,3]').text('All');
       kc.each(groups,function(i,group){
-	$options=$options.add($o_t.clone().prop('value','['+i+']').text(group.name));
+	groupsToShowOptions.push({text:group.name,groups:[i]})
       });
       if (staff){
 	// assumes 4 groups
-	$options=$options.add($o_t.clone().prop('value','[0,1]')
-			      .text(groups[0].name+'+'+groups[1].name));
-	$options=$options.add($o_t.clone().prop('value','[2,3]')
-			      .text(groups[2].name+'+'+groups[3].name));
-	$options=$options.add($o_t.clone().prop('value','[0,2]')
-			      .text(groups[0].name+'+'+groups[2].name));
-	$options=$options.add($o_t.clone().prop('value','[1,3]')
-			      .text(groups[1].name+'+'+groups[3].name));
+	groupsToShowOptions.push(
+	  {text:groups[0].name+' + '+groups[1].name, groups:[0,1]});
+	groupsToShowOptions.push(
+	  {text:groups[2].name+' + '+groups[3].name, groups:[2,3] });
+	groupsToShowOptions.push(
+	  {text:groups[0].name+' + '+groups[2].name, groups:[0,2] });
+	groupsToShowOptions.push(
+	  {text:groups[1].name+' + '+groups[3].name, groups:[1,3] });
       }
-      $('select.groups-to-show').html($options);
-      $('select.groups-to-show').prop('value','['+kc.join(',',groupsToShow)+']');
-      $('select.groups-to-show').change(function(){
-	setTimeout(function(){
-	  groupsToShow=kc.json.decode($('select.groups-to-show').prop('value'));
-	  kc.postToServer('groups_to_show',{
-	    params:kc.json.encode(groupsToShow)
-	  });
-	  refresh();
-	},0);
+      var showGroups=function(newGroupsToShow){
+	var is=kc.find(groupsToShowOptions,function(x){
+	  return kc.json.encode(x.groups)==kc.json.encode(newGroupsToShow);
+	});
+	$('a.select-your-group').text(groupsToShowOptions[is[0]].text);
+	groupsToShow=newGroupsToShow;
+	kc.postToServer('groups_to_show',{
+	  params:kc.json.encode(groupsToShow)
+	});
+	refresh();
+      };
+      $('a.select-your-group').click(function(){
+	selectYourGroup(groupsToShowOptions,$('a.select-your-group'))
+	  .then(showGroups);
       });
       $('a.prevmonth').click(function(){
 	monthToShow=prevMonth(monthToShow);
@@ -160,6 +205,11 @@ $(document).ready(function(){
 	kc.each(groupsToShow,function(i,g){
 	  groupSet[g]=true;
 	});
+	var i=kc.find(groupsToShowOptions,function(x){
+	  return kc.json.encode(x.groups)==kc.json.encode(groupsToShow);
+	});
+	i.push(0); //default
+	$('a.select-your-group').text(groupsToShowOptions[i[0]].text);
 	$calendar.find('tr.week').remove();
 	var dateDays={};
 	kc.each(cal.weeks,function(i,week){

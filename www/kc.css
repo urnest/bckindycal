@@ -46,6 +46,16 @@ span.ulhd {
 .kc-busy-cursor { 
     cursor: wait
 }
+.kc-transfer-effect {
+    border: 2px dotted black;
+}
+.kc-in-front-of-navbar.ui-front,
+.kc-in-front-of-navbar {
+    z-index:1000
+}
+.kc-no-close-dialog .ui-dialog-titlebar-close {
+display: none;
+}
 input.kc-invalid-input,
 .kc-invalid-input,
 .invalid-input {
@@ -278,6 +288,27 @@ a:hover.add-staff {
  	transition: all 0.1s ease-out 0s;
     text-decoration: none;
     font-size: 100%;
+}
+a.select-your-group {
+    background: #388fe0 none repeat scroll 0 0;
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 20px;
+    display: inline-block;
+    line-height: 35px;
+    margin: 0 10px 0 0;
+    padding: 0 15px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+    min-width: 150px;
+    text-align: center;
+}
+a:hover.select-your-group {
+    background: #000000 none repeat scroll 0 0;
+    border: 1px solid #000000;
+    color: #fff;
+    border: 1px solid #fff;
 }
 .hdmth	{
 	font-size: 20px;
