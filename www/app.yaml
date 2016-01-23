@@ -30,6 +30,9 @@ handlers:
 - url: /change_parent_password.html
   script: kindycal.application
 
+- url: /change_staff_password.html
+  script: kindycal.application
+
 - url: /staff_login.html$
   script: kindycal.application
 

@@ -215,6 +215,39 @@ class change_parent_password_page(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
         pass
 
+class change_staff_password_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin']:
+            print 'not logged in as admin'
+            return webapp2.redirect('admin_login.html')
+        page=pq.loadFile('change_staff_password.html')
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer',session.loginLevel+'.html'))
+        addScriptToPageHead('change_staff_password.js',page)
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+    def post(self):
+        level=None
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin']:
+            print 'not logged in as admin'
+            return webapp2.redirect('admin_login.html')
+        page=pq.loadFile('change_staff_password.html')
+        inputs=page.find(pq.tagName('input'))
+        if self.request.get('new_password')=='':
+            inputs.filter(pq.attrEquals('name','new_password')).addClass('kc-invalid-input')
+        elif self.request.get('confirm_new_password')!=self.request.get('new_password'):
+            page.find(pq.hasClass('login_failed')).text('passwords do not match')
+        else:
+            setPassword('staff',self.request.get('new_password'))
+            from_=self.request.get('from')
+            log('from input '+repr(from_))
+            from_=from_ or session.loginLevel.encode('utf8')+'.html'
+            log(repr(from_))
+            return webapp2.redirect(from_.encode('utf-8'))
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+
 class admin_login_page(webapp2.RequestHandler):
     def get(self):
         page=pq.loadFile('admin_login.html')
@@ -1519,6 +1552,7 @@ application = webapp2.WSGIApplication([
 	('/guru',admin_page),
     ('/admin_login.html',admin_login_page),
     ('/change_parent_password.html',change_parent_password_page),
+    ('/change_staff_password.html',change_staff_password_page),
     ('/edit_terms.html',edit_terms_page),
     ('/edit_groups.html',edit_groups_page),
     ('/edit_event.html',edit_event_page),
