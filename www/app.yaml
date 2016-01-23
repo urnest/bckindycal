@@ -27,6 +27,9 @@ handlers:
 - url: /admin_login.html$
   script: kindycal.application
 
+- url: /change_parent_password.html
+  script: kindycal.application
+
 - url: /staff_login.html$
   script: kindycal.application
 

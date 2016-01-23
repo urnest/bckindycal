@@ -7,6 +7,7 @@ import pq
 import datetime
 import uuid
 import stuff
+import logging
 
 from google.appengine.ext import ndb
 
@@ -30,6 +31,9 @@ def addScriptToPageHead(script,page):
 def makePageBodyInvisible(page):
     page.find(pq.tagName('body')).addClass('kc-invisible')
     pass
+
+def log(s):
+    return logging.info(s)
 
 root_key=ndb.Key('KC', 'KC')
 
@@ -56,8 +60,24 @@ def getPassword(level):
     assert level in defaultPasswords.keys(),(level,defaultPasswords.keys())
     p=Password.query(Password.loginLevel==level,ancestor=root_key).fetch(1)
     if len(p):
-        return p.password
+        return p[0].password
     return defaultPasswords.get(level)
+
+@ndb.transactional
+def setPassword(level,new_password):
+    'set %(level)s password to %(new_password)s'
+    try:
+        assert level in defaultPasswords.keys(),(level,defaultPasswords.keys())
+        p=Password.query(Password.loginLevel==level,ancestor=root_key).fetch(1)
+        if len(p)==0:
+            p=[Password(parent=root_key,loginLevel=level,password='')]
+            pass
+        p[0].password=new_password
+        p[0].put()
+        log(l1(setPassword.__doc__)%vars())
+    except:
+        raise inContext(l1(setPassword.__doc__)%vars())
+    pass
 
 def expireOldSessions():
     q=Session.query(
@@ -159,6 +179,33 @@ class login_page(webapp2.RequestHandler):
         page=pq.loadFile('login.html')
         page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
         page.find(pq.hasClass('login_failed')).text('Incorrect Password')
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+
+class change_parent_password_page(webapp2.RequestHandler):
+    def get(self):
+        page=pq.loadFile('change_parent_password.html')
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.headers.get('Referer','events.html'))
+        addScriptToPageHead('change_parent_password.js',page)
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+    def post(self):
+        level=None
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['staff','admin']:
+            print 'not logged in as staff or admin'
+            return webapp2.redirect('staff_login.html')
+        page=pq.loadFile('change_parent_password.html')
+        inputs=page.find(pq.tagName('input'))
+        if self.request.get('new_password')=='':
+            inputs.filter(pq.attrEquals('name','new_password')).addClass('kc-invalid-input')
+        elif self.request.get('confirm_new_password')!=self.request.get('new_password'):
+            page.find(pq.hasClass('login_failed')).text('passwords do not match')
+        else:
+            setPassword('parent',self.request.get('new_password'))
+            from_=inputs.filter(pq.attrEquals('name','from')).attr('value')[0] or session.loginLevel.encode('utf8')+'.html'
+            log(repr(from_))
+            return webapp2.redirect(from_)
         self.response.write(unicode(page).encode('utf-8'))
         pass
 
@@ -1465,6 +1512,7 @@ application = webapp2.WSGIApplication([
     ('/admin.html',admin_page),
 	('/guru',admin_page),
     ('/admin_login.html',admin_login_page),
+    ('/change_parent_password.html',change_parent_password_page),
     ('/edit_terms.html',edit_terms_page),
     ('/edit_groups.html',edit_groups_page),
     ('/edit_event.html',edit_event_page),
