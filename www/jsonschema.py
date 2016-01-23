@@ -1,4 +1,4 @@
-from types import IntType,StringType,UnicodeType,FloatType,DictType,ListType,TupleType,ObjectType
+from types import IntType,StringType,UnicodeType,FloatType,DictType,ListType,TupleType,ObjectType,BooleanType
 import xn
 from xn import Xn,inContext,firstLineOf
 
@@ -32,7 +32,7 @@ def validateSchemaElement(x):
     'verify that %(x)r is a valid json schema element'
     try:
         if x is None: return
-        if x in [IntType,StringType,FloatType]: return
+        if x in [IntType,StringType,FloatType,BooleanType]: return
         if type(x) is DictType:
             if len(x) == 1 and x.keys()[0] in (IntType,StringType):
                 validateSchemaElement(x.values()[0])
@@ -68,7 +68,7 @@ def validateSchemaElement(x):
             return
         t=type(x)
         if t is ObjectType: t=x.__class__
-        raise Xn('jsonschema element may not be a %(t)s, it must be a list, a dictionary or types.IntType, types.StringType, types.FloatType, types.TupleType or None'%vars())
+        raise Xn('jsonschema element may not be a %(t)s, it must be a list, a dictionary or types.IntType, types.StringType, types.FloatType, types.BooleanType, types.TupleType or None'%vars())
     except:
         raise inContext(l1(validateSchemaElement.__doc__)%vars())
     pass
@@ -80,6 +80,8 @@ def validate(schema,x):
         if schema is None and not x is None:
             raise Xn('%(x)r is not None'%vars())
         if schema is IntType and not type(x) is IntType:
+            raise Xn('%(x)r is not an Int'%vars())
+        if schema is BooleanType and not type(x) is BooleanType:
             raise Xn('%(x)r is not an Int'%vars())
         if schema is FloatType and not type(x) in [IntType,FloatType]:
             raise Xn('%(x)r is not a Float'%vars())
@@ -154,6 +156,7 @@ def validate(schema,x):
 
 def test():
     Schema(IntType).validate(4)
+    Schema(BooleanType).validate(True)
     Schema(FloatType).validate(4)
     Schema(FloatType).validate(7.6)
     Schema(StringType).validate('fred')

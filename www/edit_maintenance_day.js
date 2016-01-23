@@ -30,9 +30,11 @@ $(document).ready(function(){
       var $t=$(this);
       var childs_name=$t.find('.volunteer-childs-name').prop('value');
       var parents_name=$t.find('.volunteer-parents-name').prop('value');
+      var attended=$t.find('.volunteer-attended').prop('checked');
       if (childs_name||parents_name){
 	volunteers.push({childs_name:childs_name,
-			 parents_name:parents_name});
+			 parents_name:parents_name,
+			 attended:attended});
       }
     });
     var description=$('.maintenance-day-description').html();
@@ -135,7 +137,7 @@ $(document).ready(function(){
 	dateFormat: 'dd/mm/yy'
       });
       var $volunteerRow_t=$('tr.volunteer-row').remove().first();
-      var addVolunteer=function(child_name,parent_name){
+      var addVolunteer=function(child_name,parent_name,attended){
 	var $volunteerRow=$volunteerRow_t.clone();
 	$volunteerRow.find('input.volunteer-childs-name').prop(
 	  'value',
@@ -143,6 +145,9 @@ $(document).ready(function(){
 	$volunteerRow.find('input.volunteer-parents-name').prop(
 	  'value',
 	  parent_name);
+	$volunteerRow.find('input.volunteer-attended').prop(
+	  'checked',
+	  attended);
 	$('table.volunteer-table').find('tr.add-volunteer').before(
 	  $volunteerRow);
 	$volunteerRow.find('.delete-volunteer').click(function(){
@@ -155,10 +160,10 @@ $(document).ready(function(){
 	return $volunteerRow;
       };
       kc.each(maintenance_day.volunteers,function(i,volunteer){
-	addVolunteer(volunteer.childs_name,volunteer.parents_name);
+	addVolunteer(volunteer.childs_name,volunteer.parents_name,volunteer.attended);
       });
       $('td.add-volunteer').click(function(){
-	addVolunteer('','').find('input.volunteer-childs-name').focus();
+	addVolunteer('','',false).find('input.volunteer-childs-name').focus();
 	return false;
       });
       rendering.done();

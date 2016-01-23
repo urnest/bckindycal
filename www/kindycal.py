@@ -15,7 +15,7 @@ from xn import Xn,inContext,firstLineOf
 
 l1=firstLineOf
 
-from types import IntType,StringType,FloatType,DictType,ListType,TupleType,ObjectType
+from types import IntType,StringType,FloatType,DictType,ListType,TupleType,ObjectType,BooleanType
 import jsonschema
 
 import json
@@ -793,7 +793,8 @@ maintenance_day_schema=jsonschema.Schema({
             },
         'volunteers':[{
                 'childs_name':StringType,
-                'parents_name':StringType
+                'parents_name':StringType,
+                'attended':BooleanType,
                 }]
         })
 
@@ -1102,7 +1103,8 @@ class add_maintenance_day_volunteer(webapp2.RequestHandler):
                 data=fromJson(maintenance_day.data)
                 data['volunteers'].append({
                     'childs_name':childs_name,
-                    'parents_name':parents_name
+                    'parents_name':parents_name,
+                    'attended':False,
                     })
                 maintenance_day_schema.validate(data)
                 maintenance_day.data=toJson(data)
