@@ -52,8 +52,8 @@ class Password(ndb.Model):
 
 defaultPasswords={
     'admin':'10greenfrogs',
-    'staff':'3blackbats',
-    'parent':'88happykids'
+    'staff':'password',
+    'parent':'password'
 }
 
 def getPassword(level):
