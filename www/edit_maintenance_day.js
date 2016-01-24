@@ -31,13 +31,15 @@ $(document).ready(function(){
       var childs_name=$t.find('.volunteer-childs-name').prop('value');
       var parents_name=$t.find('.volunteer-parents-name').prop('value');
       var attended=$t.find('.volunteer-attended').prop('checked');
+      var note=$t.find('.volunteer-note').prop('value');
       if (childs_name||parents_name){
 	volunteers.push({childs_name:childs_name,
 			 parents_name:parents_name,
-			 attended:attended});
+			 attended:attended,
+			 note:note});
       }
     });
-    var description=$('.maintenance-day-description').html();
+    var description=$('.job-description').html();
     $('body').addClass('kc-busy-cursor');
     ++busyCount;
     kc.postToServer('maintenance_day',{
@@ -83,7 +85,7 @@ $(document).ready(function(){
     return false;
   });
 
-  $('.maintenance-day-description').html('');
+  $('.job-description').html('');
 
   if ($('input#id').prop('value')=='0'){
     //new maintenance_day
@@ -120,9 +122,9 @@ $(document).ready(function(){
   }
   var proceed=function(){
     if (maintenance_day){
-      $('div.maintenance-day-description').html(maintenance_day.description.html);
+      $('div.job-description').html(maintenance_day.description.html);
       tinymce.init({
-	selector: 'div.maintenance-day-description',
+	selector: 'div.job-description',
 	inline: true,
 	plugins: [
 	  'advlist autolink lists link image charmap print preview anchor',
@@ -137,7 +139,7 @@ $(document).ready(function(){
 	dateFormat: 'dd/mm/yy'
       });
       var $volunteerRow_t=$('tr.volunteer-row').remove().first();
-      var addVolunteer=function(child_name,parent_name,attended){
+      var addVolunteer=function(child_name,parent_name,attended,note){
 	var $volunteerRow=$volunteerRow_t.clone();
 	$volunteerRow.find('input.volunteer-childs-name').prop(
 	  'value',
@@ -148,6 +150,9 @@ $(document).ready(function(){
 	$volunteerRow.find('input.volunteer-attended').prop(
 	  'checked',
 	  attended);
+	$volunteerRow.find('input.volunteer-note').prop(
+	  'value',
+	  note);
 	$('table.volunteer-table').find('tr.add-volunteer').before(
 	  $volunteerRow);
 	$volunteerRow.find('.delete-volunteer').click(function(){
@@ -160,10 +165,10 @@ $(document).ready(function(){
 	return $volunteerRow;
       };
       kc.each(maintenance_day.volunteers,function(i,volunteer){
-	addVolunteer(volunteer.childs_name,volunteer.parents_name,volunteer.attended);
+	addVolunteer(volunteer.childs_name,volunteer.parents_name,volunteer.attended,volunteer.note);
       });
       $('td.add-volunteer').click(function(){
-	addVolunteer('','',false).find('input.volunteer-childs-name').focus();
+	addVolunteer('','',false,'').find('input.volunteer-childs-name').focus();
 	return false;
       });
       rendering.done();

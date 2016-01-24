@@ -81,28 +81,29 @@
 	  <div>
             <form method="POST" action="maintenance_day">
               <input type="hidden" id="id" name="id" value="0">
-              <span class=admpnk>Name (appears on calendar):</span><br>
+              <span class="admpnk">Name (appears on calendar):</span><br>
               <input class="GroupName name" type="text" value="Maintenance Day 8am"><br>
-	      <span class=admpnk>Date:</span><br>
+	      <span class="admpnk">Date:</span><br>
               <input class="date" type="text" value="2/5/2016">
 	      <br>
-              <span class=admpnk>Description (click to edit):</span>
-              <div class="maintenance-day-descbox">
-                <div class="maintenance-day-description">
+              <span class="admpnk">Description (click to edit):</span>
+              <div class="kc-descbox">
+                <div class="job-description">
                   <p>Odd jobs etc.</p>
                 </div>
               </div>    
               <br>
-              <span class=admpnk>Volunteers:</span>
+              <span class="admpnk">Volunteers:</span>
               <table class="volunteer-table">
 		<tr>
-		  <td></td><td>Child</td><td>Parent</td><td>Attended</td>
+		  <td></td><td>Child</td><td>Parent</td><td>Attended</td><td>Note</td>
 		</tr>
 		<tr class="volunteer-row">
 		  <td><span class="delete-volunteer"><a href="#"><i class="fa fa-minus-square fa-fw"></i> DEL</a></span></td>
 		  <td><input class="volunteer-childs-name" type="text" value="Sandy Kay"></td>
 		  <td><input class="volunteer-parents-name" type="text" value="Fred Kay"></td>
 		  <td><input class="volunteer-attended" type="checkbox"></td>
+		  <td><input class="volunteer-note" type="textarea" lines="2"></td>
 		</tr>
 		<tr class="add-volunteer">
 		  <td class="add-volunteer"><a href="#"><i class="fa fa-plus-square fa-fw"></i> ADD NAME</a></td>

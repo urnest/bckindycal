@@ -33,6 +33,7 @@ def validateSchemaElement(x):
     try:
         if x is None: return
         if x in [IntType,StringType,FloatType,BooleanType]: return
+        if type(x) in [IntType,StringType,UnicodeType]: return #literal
         if type(x) is DictType:
             if len(x) == 1 and x.keys()[0] in (IntType,StringType):
                 validateSchemaElement(x.values()[0])
@@ -73,12 +74,23 @@ def validateSchemaElement(x):
         raise inContext(l1(validateSchemaElement.__doc__)%vars())
     pass
 
-
 def validate(schema,x):
     'verify %(x)r conforms to json schema %(schema)r'
     try:
         if schema is None and not x is None:
             raise Xn('%(x)r is not None'%vars())
+        if type(schema) is IntType:
+            if not type(x) is IntType:
+                raise Xn('%(x)r is not an integer'%vars())
+            if not x==schema:
+                raise Xn('%(x)r is not %(schema)r'%vars())
+            pass
+        if type(schema) in [UnicodeType,StringType]:
+            if not type(x) in [StringType,UnicodeType]:
+                raise Xn('%(x)r is not a string'%vars())
+            if not x==schema:
+                raise Xn('%(x)r is not %(schema)r'%vars())
+            pass
         if schema is IntType and not type(x) is IntType:
             raise Xn('%(x)r is not an Int'%vars())
         if schema is BooleanType and not type(x) is BooleanType:
@@ -155,6 +167,9 @@ def validate(schema,x):
                     
 
 def test():
+    Schema(None).validate(None)
+    Schema(2).validate(2)
+    Schema('fred').validate('fred')
     Schema(IntType).validate(4)
     Schema(BooleanType).validate(True)
     Schema(FloatType).validate(4)
@@ -204,15 +219,47 @@ def test():
         pass
     try:
         Schema({IntType:StringType}).validate({'sal':'fred',2:'jock'})
+        assert None
     except Exception,e:
         assert str(e)=="Failed to verify {2: 'jock', 'sal': 'fred'} conforms to json schema {<type 'int'>: <type 'str'>} because\nfailed to validate dictionary item 'sal' because\n'sal' is not a 'int'.",repr(str(e))
         pass
     try:
         Schema(OneOf(IntType,StringType)).validate(None)
+        assert None
     except Exception,e:
         assert str(e)=="Failed to verify None conforms to json schema one of (<type 'int'>, <type 'str'>) because\nFailed to verify None conforms to json schema <type 'int'> because\nNone is not an Int. and Failed to verify None conforms to json schema <type 'str'> because\nNone is not a String..",repr(str(e))
         
-    pass
-        
+        pass
+    try:
+        Schema(None).validate(True)
+        assert None
+    except Exception,e:
+        assert str(e)=='Failed to verify True conforms to json schema None because\nTrue is not None.',repr(str(e))
+        pass
+    try:
+        Schema(2).validate(3)
+        assert None
+    except Exception,e:
+        assert str(e)=='Failed to verify 3 conforms to json schema 2 because\n3 is not 2.',repr(str(e))
+        pass
+    try:
+        Schema(2).validate('jock')
+        assert None
+    except Exception,e:
+        assert str(e)=='''Failed to verify 'jock' conforms to json schema 2 because\n'jock' is not an integer.''',repr(str(e))
+        pass
+    try:
+        Schema('fred').validate(1)
+        assert None
+    except Exception,e:
+        assert str(e)=='''Failed to verify 1 conforms to json schema 'fred' because\n1 is not a string.''',repr(str(e))
+        pass
+    try:
+        Schema('fred').validate('jock')
+        assert None
+    except Exception,e:
+        assert str(e)=='''Failed to verify 'jock' conforms to json schema 'fred' because\n'jock' is not 'fred'.''',repr(str(e))
+        pass
+
 if __name__=='__main__':
     test()
