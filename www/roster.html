@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bardon Community Kindy</title>
     <link href='//fonts.googleapis.com/css?family=Montserrat|Open+Sans|Lato' rel='stylesheet' type='text/css' media='all'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link href="bckfair.css" rel="stylesheet" type="text/css" media="all" />
     <link href="kc.css" rel="stylesheet" type="text/css" media="all" />
     <link href="inputs.css" rel="stylesheet" type="text/css" media="all" />
     <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
+    <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
+    <script src="jquery-ui-1.11/jquery-ui.js"></script>
     <script type="text/javascript" src="kc.js"></script>
     
     <!-- SMOOTH SCROLL -->
@@ -30,19 +33,23 @@
           }
         }
       });
-  // Sticky Navbar Affix
-  $('#navbar').affix({
-    offset: {
-      top: $('#topbar').outerHeight(),
-    }
-  });
+      // Sticky Navbar Affix
+      $('#navbar').affix({
+        offset: {
+          top: $('#topbar').outerHeight(),
+        }
+      });
     });
     </script>
-	<!-- End of SMOOTH SCROLL -->
-</head>
-<body>
+    <!-- End of SMOOTH SCROLL -->
+    
+    <!-- note kindycal.py uncomments:
+	 <script type="text/javascript" src="roster.js"></script>
+	 -->
+  </head>
+  <body>
     <div id="page">
-	<header id="header" class="site-header">
+      <header id="header" class="site-header">
         <nav id="navbar" class="site-navbar navbar navbar-static-top" role="navigation">
           <div class="container">
             <div class="navbar-header">
@@ -64,539 +71,585 @@
           </div>
         </nav>
       </header>
-
-    <main id="main" class="site-main">    
+      
+      <main id="main" class="site-main">    
         <div id="content" class="shell">
-            <h2>Roster Jobs</h2>
-            <p>Families are asked to complete two maintenance duties per semester (one per term). A Maintance Levy is charged in Semester 1 on the Term 1 account. If maintenace duties are completed, this money is carried forward to Semester 2 and refunded at the end of the year.</p>
-            <p>Maintenance Days are organised by the Maintenance Officer and run from 8:00am to 12:00pm. Duties on the day might include gardening, painting, mending of equipment and cleaning. If you are unable to attend any of the nominated Maintenance Days you may be able to arrange to complete some other tasks (eg Sewing, Library Repairs, Washing).</p>
-            <div class="Groupselect">
-              <div class="toolbar">
-                <span class="toolbar-item">
-                  Show jobs for Groups: <br><select class="groups-to-show" name="groups-to-show"><option>All</option><option>U1G1 Matt Mon-Wed</option><option>U1G2 Matt Wed-Fri</option><option>U2G1 Julie Mon-Wed</option><option>U2G2 Paul Wed-Fri</option></select>
-                </span>    
-              </div>
-            </div>
-            <div class="Jobs">
-                <table border="0" bordercolor="#ffffff" cellspacing="0" cellpadding="0" class="month-of-events">
-                <tr class="head1">
-                  <td class="jobhd">UNIT</td>
-                  <td class="cal"> </td>
-                  <td class="jobhd">GROUP</td>
-                  <td class="cal"> </td>
-                  <td class="jobhd">TASK</td>
-                  <td class="cal"> </td>
-                  <td class="jobhd">FREQUENCY</td>
-                  <td class="cal"> </td>
-                  <td class="jobhd">REQUIRED</td>
-                  <td class="cal"> </td>
-                  <td class="jobhd">VOLUNTEERS</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1/G2</td>
-                  <td class="cal"> </td>
-                  <td class="job">Dump Runs</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Sally Jones</td>
-                </tr>
-                 <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1/G2</td>
-                  <td class="cal"> </td>
-                  <td class="job">Holiday Centre care (chickens/gardens etc)</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Sally Jones</td>
-                </tr>
-                 <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1/G2</td>
-                  <td class="cal"> </td>
-                  <td class="job">Sewing</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Sally Jones</td>
-                </tr>
-                 <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1/G2</td>
-                  <td class="cal"> </td>
-                  <td class="job">Toy Repairs</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Sally Jones</td>
-                </tr>
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"> </td>
-                  <td class="job">Book Repairs and Covering</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"> </td>
-                  <td class="job">End of term and random washing</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Term</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc"><a class=job href="addme.html">ADD ME</a></td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"> </td>
-                  <td class="job"> End of term washing - HATS</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Term</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"> </td>
-                  <td class="job">Naming Hats</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Yearly</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"> </td>
-                  <td class="job">Puzzle Library</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"> </td>
-                  <td class="job">Weekly washing - Semester 1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Weekly</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">1</td>
-                  <td class="cal"> </td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"></td>
-                  <td class="job">Weekly washing - Semester 2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Weekly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Book Repairs and Covering</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">End of term and random washing</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Term</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc"><a class=job href="addme.html">ADD ME</a></td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job"> End of term washing - HATS</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Term</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Naming Hats</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Yearly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Puzzle Library</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Weekly washing - Semester 1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Weekly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Weekly washing - Semester 2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Weekly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1/G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Dump Runs</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Sally Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1/G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Holiday Centre care (chickens/gardens etc)</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Sally Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1/G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Sewing</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Sally Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1/G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Toy Repairs</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Sally Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"></td>
-                  <td class="job">Book Repairs and Covering</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"></td>
-                  <td class="job">End of term and random washing</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Term</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc"><a class=job href="addme.html">ADD ME</a></td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"></td>
-                  <td class="job"> End of term washing - HATS</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Term</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"></td>
-                  <td class="job">Naming Hats</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Yearly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"></td>
-                  <td class="job">Puzzle Library</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"></td>
-                  <td class="job">Weekly washing - Semester 1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Weekly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G1</td>
-                  <td class="cal"></td>
-                  <td class="job">Weekly washing - Semester 2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Weekly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Book Repairs and Covering</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">End of term and random washing</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Term</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc"><a class=job href="addme.html">ADD ME</a></td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job"> End of term washing - HATS</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Term</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Naming Hats</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Yearly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Puzzle Library</td>
-                  <td class="cal"></td>
-                  <td class="jobc">As required</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Weekly washing - Semester 1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Weekly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                <tr class="jobs">
-                  <td class="jobc">U2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">G2</td>
-                  <td class="cal"></td>
-                  <td class="job">Weekly washing - Semester 2</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Weekly</td>
-                  <td class="cal"></td>
-                  <td class="jobc">1</td>
-                  <td class="cal"></td>
-                  <td class="jobc">Tom Jones</td>
-                </tr>
-                </table>
+          <h2>Roster Jobs</h2>
+          <p>Families are asked to complete two maintenance duties per semester (one per term). A Maintance Levy is charged in Semester 1 on the Term 1 account. If maintenace duties are completed, this money is carried forward to Semester 2 and refunded at the end of the year.</p>
+          <p>Maintenance Days are organised by the Maintenance Officer and run from 8:00am to 12:00pm. Duties on the day might include gardening, painting, mending of equipment and cleaning. If you are unable to attend any of the nominated Maintenance Days you may be able to arrange to complete some other tasks (eg Sewing, Library Repairs, Washing).</p>
+	  <div class="roster-jobs-toolbar">
+	    <div class="roster-jobs-group-select">
+	      Select Your Group: <br><a href="#" class="roster-jobs-toolbar-button select-your-group">*** click to select your group ***</a>
+	    </div>
+	    <a href="edit_roster_job.html" class="staff-only add-roster-job roster-jobs-toolbar-button">New Job</a>
+	  </div>
+          <div class="Jobs">
+            <table border="0" bordercolor="#ffffff" cellspacing="0" cellpadding="0" class="roster-jobs-table">
+              <tr class="head1">
+                <td class="jobhd">UNIT</td>
+                <td class="cal"> </td>
+                <td class="jobhd">GROUP</td>
+                <td class="cal"> </td>
+                <td class="jobhd">TASK</td>
+                <td class="cal"> </td>
+                <td class="jobhd">FREQUENCY</td>
+                <td class="cal"> </td>
+                <td class="jobhd">REQUIRED</td>
+                <td class="cal"> </td>
+                <td class="jobhd">VOLUNTEERS</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobhd staff-only">CHILD'S NAME</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobhd staff-only">ATTENDED</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobhd staff-only">NOTE (Click cell to edit)</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc unit">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc group">G1/G2</td>
+                <td class="cal"> </td>
+                <td class="jobc name">Dump Runs</td>
+                <td class="cal"> </td>
+                <td class="jobc frequency">As required</td>
+                <td class="cal"> </td>
+                <td class="jobc volunteers-required">1</td>
+                <td class="cal"> </td>
+                <td class="jobc volunteer-parent-name">Sally Jones</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobc staff-only volunteer-child-name">Sally Jones Jr.</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobc staff-only volunteer-attended"><input type="checkbox"></td>
+                <td class="cal staff-only"> </td>
+                <td class="jobc staff-only volunteer-note"></td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc">G1/G2</td>
+                <td class="cal"> </td>
+                <td class="job">Holiday Centre care (chickens/gardens etc)</td>
+                <td class="cal"> </td>
+                <td class="jobc">As required</td>
+                <td class="cal"> </td>
+                <td class="jobc">1</td>
+                <td class="cal"> </td>
+                <td class="jobc">Sally Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc">G1/G2</td>
+                <td class="cal"> </td>
+                <td class="job">Sewing</td>
+                <td class="cal"> </td>
+                <td class="jobc">As required</td>
+                <td class="cal"> </td>
+                <td class="jobc">1</td>
+                <td class="cal"> </td>
+                <td class="jobc">Sally Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc">G1/G2</td>
+                <td class="cal"> </td>
+                <td class="job">Toy Repairs</td>
+                <td class="cal"> </td>
+                <td class="jobc">As required</td>
+                <td class="cal"> </td>
+                <td class="jobc">1</td>
+                <td class="cal"> </td>
+                <td class="jobc">Sally Jones</td>
+              </tr>
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc">G1</td>
+                <td class="cal"> </td>
+                <td class="job">Book Repairs and Covering</td>
+                <td class="cal"> </td>
+                <td class="jobc">As required</td>
+                <td class="cal"> </td>
+                <td class="jobc">1</td>
+                <td class="cal"> </td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc">G1</td>
+                <td class="cal"> </td>
+                <td class="job">End of term and random washing</td>
+                <td class="cal"> </td>
+                <td class="jobc">Term</td>
+                <td class="cal"> </td>
+                <td class="jobc">1</td>
+                <td class="cal"> </td>
+                <td class="jobc"><a class="job" href="addme.html">ADD ME</a></td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc">G1</td>
+                <td class="cal"> </td>
+                <td class="job"> End of term washing - HATS</td>
+                <td class="cal"> </td>
+                <td class="jobc">Term</td>
+                <td class="cal"> </td>
+                <td class="jobc">1</td>
+                <td class="cal"> </td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc">G1</td>
+                <td class="cal"> </td>
+                <td class="job">Naming Hats</td>
+                <td class="cal"> </td>
+                <td class="jobc">Yearly</td>
+                <td class="cal"> </td>
+                <td class="jobc">1</td>
+                <td class="cal"> </td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc">G1</td>
+                <td class="cal"> </td>
+                <td class="job">Puzzle Library</td>
+                <td class="cal"> </td>
+                <td class="jobc">As required</td>
+                <td class="cal"> </td>
+                <td class="jobc">1</td>
+                <td class="cal"> </td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"> </td>
+                <td class="jobc">G1</td>
+                <td class="cal"> </td>
+                <td class="job">Weekly washing - Semester 1</td>
+                <td class="cal"> </td>
+                <td class="jobc">Weekly</td>
+                <td class="cal"> </td>
+                <td class="jobc">1</td>
+                <td class="cal"> </td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"></td>
+                <td class="jobc">G1</td>
+                <td class="cal"></td>
+                <td class="job">Weekly washing - Semester 2</td>
+                <td class="cal"></td>
+                <td class="jobc">Weekly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Book Repairs and Covering</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">End of term and random washing</td>
+                <td class="cal"></td>
+                <td class="jobc">Term</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc"><a class="job" href="addme.html">ADD ME</a></td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job"> End of term washing - HATS</td>
+                <td class="cal"></td>
+                <td class="jobc">Term</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Naming Hats</td>
+                <td class="cal"></td>
+                <td class="jobc">Yearly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Puzzle Library</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Weekly washing - Semester 1</td>
+                <td class="cal"></td>
+                <td class="jobc">Weekly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U1</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Weekly washing - Semester 2</td>
+                <td class="cal"></td>
+                <td class="jobc">Weekly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1/G2</td>
+                <td class="cal"></td>
+                <td class="job">Dump Runs</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Sally Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1/G2</td>
+                <td class="cal"></td>
+                <td class="job">Holiday Centre care (chickens/gardens etc)</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Sally Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1/G2</td>
+                <td class="cal"></td>
+                <td class="job">Sewing</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Sally Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1/G2</td>
+                <td class="cal"></td>
+                <td class="job">Toy Repairs</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Sally Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1</td>
+                <td class="cal"></td>
+                <td class="job">Book Repairs and Covering</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1</td>
+                <td class="cal"></td>
+                <td class="job">End of term and random washing</td>
+                <td class="cal"></td>
+                <td class="jobc">Term</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc"><a class="job" href="addme.html">ADD ME</a></td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1</td>
+                <td class="cal"></td>
+                <td class="job"> End of term washing - HATS</td>
+                <td class="cal"></td>
+                <td class="jobc">Term</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1</td>
+                <td class="cal"></td>
+                <td class="job">Naming Hats</td>
+                <td class="cal"></td>
+                <td class="jobc">Yearly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1</td>
+                <td class="cal"></td>
+                <td class="job">Puzzle Library</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1</td>
+                <td class="cal"></td>
+                <td class="job">Weekly washing - Semester 1</td>
+                <td class="cal"></td>
+                <td class="jobc">Weekly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G1</td>
+                <td class="cal"></td>
+                <td class="job">Weekly washing - Semester 2</td>
+                <td class="cal"></td>
+                <td class="jobc">Weekly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Book Repairs and Covering</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">End of term and random washing</td>
+                <td class="cal"></td>
+                <td class="jobc">Term</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc"><a class="job" href="addme.html">ADD ME</a></td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job"> End of term washing - HATS</td>
+                <td class="cal"></td>
+                <td class="jobc">Term</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Naming Hats</td>
+                <td class="cal"></td>
+                <td class="jobc">Yearly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Puzzle Library</td>
+                <td class="cal"></td>
+                <td class="jobc">As required</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Weekly washing - Semester 1</td>
+                <td class="cal"></td>
+                <td class="jobc">Weekly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+              <tr class="jobs">
+                <td class="jobc">U2</td>
+                <td class="cal"></td>
+                <td class="jobc">G2</td>
+                <td class="cal"></td>
+                <td class="job">Weekly washing - Semester 2</td>
+                <td class="cal"></td>
+                <td class="jobc">Weekly</td>
+                <td class="cal"></td>
+                <td class="jobc">1</td>
+                <td class="cal"></td>
+                <td class="jobc">Tom Jones</td>
+              </tr>
+            </table>
           </div>
-            <br><br>
-            <h2>Maintenance Days</h2>
-            <div class="Mday">
-                <span class=mdate>13/2/2016 </span> <a class=job href="addme.html">ADD ME</a><br>
-                <span class=mname>Timothy Jones, Nancy Jefferson, Paulo Pistalionus</span>            
-            </div>
-            <br>
-            <div class="Mday">
-                <span class=mdate>25/11/2016 </span> <a class=job href="addme.html">ADD ME</a><br>
-                <span class=mname>Pam Shriver, Ivan Lendl, Roger Federer, Patrick Cash, Leyton Hewitt, Nancy Pancy</span>      
-            </div>
-            <br>
-            <div class="Mday">
-                <span class=mdate>23/8/2016 </span> <a class=job href="addme.html">ADD ME</a><br>
-                <span class=mname>Mandy Pandy, Andy Hiratio, Celia Plum, Stephanie Goosebumps</span>   
-            </div>
-            <br>
+          <br><br>
+	  <h2>Kindy-Wide Jobs</h2>
+            <table border="0" bordercolor="#ffffff" cellspacing="0" cellpadding="0" class="kindy-wide-roster-jobs-table">
+              <tr class="head1">
+                <td class="jobhd">TASK</td>
+                <td class="cal"> </td>
+                <td class="jobhd">FREQUENCY</td>
+                <td class="cal"> </td>
+                <td class="jobhd">REQUIRED</td>
+                <td class="cal"> </td>
+                <td class="jobhd">VOLUNTEERS</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobhd staff-only">CHILD'S NAME</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobhd staff-only">ATTENDED</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobhd staff-only">NOTE (Click cell to edit)</td>
+              </tr>
+              <tr class="jobs">
+                <td class="job name">Dump Runs</td>
+                <td class="cal"> </td>
+                <td class="jobc frequency">As required</td>
+                <td class="cal"> </td>
+                <td class="jobc volunteers_required">1</td>
+                <td class="cal"> </td>
+                <td class="jobc volunteer-parent-name">Sally Jones</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobc staff-only volunteer-child-name">Sally Jones Jr.</td>
+                <td class="cal staff-only"> </td>
+                <td class="jobc staff-only volunteer-attended"><input type="checkbox"></td>
+                <td class="cal staff-only"> </td>
+                <td class="jobc staff-only volunteer-note"></td>
+              </tr>
+            </table>
+	  <br><br>
+          <h2>Maintenance Days</h2>
+          <div class="Mday">
+            <span class="mdate">13/2/2016 </span> <a class=job href="addme.html">ADD ME</a><br>
+            <span class="mname">Timothy Jones, Nancy Jefferson, Paulo Pistalionus</span>            
+          </div>
+          <br>
+          <div class="Mday">
+            <span class="mdate">25/11/2016 </span> <a class=job href="addme.html">ADD ME</a><br>
+            <span class="mname">Pam Shriver, Ivan Lendl, Roger Federer, Patrick Cash, Leyton Hewitt, Nancy Pancy</span>      
+          </div>
+          <br>
+          <div class="Mday">
+            <span class="mdate">23/8/2016 </span> <a class=job href="addme.html">ADD ME</a><br>
+            <span class="mname">Mandy Pandy, Andy Hiratio, Celia Plum, Stephanie Goosebumps</span>   
+          </div>
+          <br>
         </div>
-    </main>
+      </main>
     </div>
-</body>
+  </body>
+</html>

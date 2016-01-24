@@ -54,10 +54,19 @@ handlers:
 - url: /edit_events.html$
   script: kindycal.application
 
+- url: /edit_roster.html$
+  script: kindycal.application
+
+- url: /edit_roster_job.html$
+  script: kindycal.application
+
 - url: /events.html$
   script: kindycal.application
 
 - url: /twyc.html$
+  script: kindycal.application
+
+- url: /roster.html$
   script: kindycal.application
 
 - url: /edit_twyc.html$

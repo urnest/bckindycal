@@ -4,45 +4,36 @@
 
 x login.html
 
-- index.html
+x index.html
   x if not logged in, redirect to login.html?from=index.html
 
-- classes for adjusting pages:
-   kc-staff-only-editable
-   ... use python to add readonly="readonly" to all such inputs unless
-   logged in as staff or admin
-   kc-admin-only-editable similar
-   kc-staff-only-visible, remove unless logged in as staff or admin
-   kc-admin-only-visible, remove unless logged in as admin
-   kc-parent-only-visible, remove if logged in as admin or staff
+x admin password
+x staff password (editable via super password)
+x parent password (editable via staff password)
 
-- admin password
-- staff password (editable via super password)
-- parent password (editable via staff password)
+x session:
+  x key : uid sent as cookie
+  x level : admin||staff||parent
+  x touched : server-time
 
-- session:
-  - key : uid sent as cookie
-  - level : admin||staff||parent
-  - touched : server-time
-
-- view: set<group> - sent as cookie
+x view: set<group> - sent as cookie
 
 x terms:
   x number of terms
   x dates : [ (start date,end date) ]
   x editable via admin password edit-terms.html
 
-- groups
+x groups
   x editable via staff password
   x edit_groups.html
   x edit_groups.js
     x get
     x post
-    - polish
+    x polish
 
 - schema:
-  - BoolType
-  - allow literals (matches that literal)
+  x BoolType
+  x allow literals (matches that literal)
   x OneOf(a,b,c) - match exactly one of the items
     (so OneOf('a','b','c') is an enum)
   - set(x) - set of x
@@ -51,16 +42,16 @@ x terms:
   x embed Schema
 
 - events.html
-  - show group(s) selector
+  x show group(s) selector
     x get/set cookie
     x generate options all,1,2,3,4,1+2,3+4,1+3,2+4
     x select option based on cookie
     x update cookie on change
-  - new event link (staff only)
+  x new event link (staff only)
     x display form
     x save form
-    - mce for description
-  - calendar month
+    x mce for description
+  x calendar month
     x get current month via month_calendar and display
     x highlight days of groups-to-show
       x adjust month_calendar to return {'term':IntType,'week':IntType}||None as 'term_week' instead of 'name'
@@ -70,10 +61,10 @@ x terms:
     x fetch events for this month
       x query via months but how?
     x filter events by groups-to-show
-    - allow date(s) select
+    x allow date(s) select
   x use jquery date picker (edit_terms.js)
-  - find colour picker (edit_event.html)
-  - use mce (edit_event.html)
+  ~ find colour picker (edit_event.html)
+  x use mce (edit_event.html)
     
   x prev/next month links
   x delete event
@@ -99,8 +90,8 @@ x event.html
 - edit_event.html
   - edit_event.js
     x fetch event (for non-zero id passed in)
-    - mce
-    - name colour
+    x mce
+    ~ name colour
     x save (return to calendar for monthToShow)
     - image/document upload (later)
 
@@ -123,8 +114,8 @@ x maintenance days separate and allow add names (you can
   x events.js
   x edit_maintenance_day.js
 
-- nav bar (make it mobile style always)
-- start on events page
+~ nav bar (make it mobile style always)
+x start on events page
 - login pages use referer to go to requested page after login
 x return to previous month after edit/view event etc (via cookie?)
 x new event etc init date from month cookie
@@ -132,7 +123,7 @@ x new event etc init date from month cookie
 x View Events for: All Groups
 x grey out next/prev-months days
 
-- time with your child
+x time with your child
 - roster jobs
 - fair rosters
 
@@ -146,9 +137,14 @@ x grey out next/prev-months days
     mime_type
     data
     ref_count
+- family information
+
+- hash passwords
 
 x fix + button after adding new date (use before rather than append)
-  
+
+- allow remove of stuff added during parent's session  
+
 -----------------------
 
   /usr/local/google_appengine/appcfg.py -e xju360@gmail.com update .

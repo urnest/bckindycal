@@ -40,6 +40,9 @@ span.ulhd {
     /*kc.rendering function in kc.js needs positioning context*/
     position:relative;
 }
+.kc-inline-block {
+    display: inline-block;
+}
 .kc-invisible {
     visibility: hidden;
 }
@@ -283,7 +286,6 @@ a:hover.add-staff {
     border: 1px solid #fff;
     border-radius: 20px;
     display: inline-block;
-    float: right;
     line-height: 35px;
     margin: 0 10px 0 0;
     padding: 0 15px;
@@ -312,6 +314,9 @@ a:hover.select-your-group {
     color: #fff;
     border: 1px solid #fff;
 }
+.toolbar-item.select-your-group {
+    float: left;
+}
 .hdmth	{
 	font-size: 20px;
 }
@@ -334,6 +339,56 @@ span.hdmth {
     padding: 8px 10px 9px 12px;
 	font-size: 10px;
 	color: #FFFFFF;
+}
+.roster-jobs-toolbar > * {
+    display: inline-block;
+    margin: 0 10px;
+}
+a.roster-jobs-toolbar-button {
+    display: inline-block;
+
+    background: #388fe0 none repeat scroll 0 0;
+    color: #fff;
+
+    border-radius: 20px;
+    height: 35px;
+    line-height: 35px;
+    padding: 0 15px;
+    transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+    min-width: 150px;
+    text-align: center;
+}
+a:hover.roster-jobs-toolbar-button {
+    background: #000000 none repeat scroll 0 0;
+    color: #fff;
+
+    border-radius: 20px;
+    height: 35px;
+    line-height: 35px;
+    padding: 0 15px;
+    transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+    min-width: 150px;
+    text-align: center;
+}
+.roster-jobs-group-select {
+    background: #264452 none repeat scroll 0 0;
+    border-radius: 5px 5px 0 0;
+    box-sizing: border-box;
+    margin: 0 20px 0 12px;
+    padding: 8px 10px 9px 12px;
+    font-size: 10px;
+    color: #FFFFFF;
+}
+.edit-roster-job-field-label {
+    display: block;
+    margin-top: 20px;
+}
+div.edit-roster-job-form-buttons {
+    margin-top: 50px;
 }
 .Jobs {
 	text-align: center;
@@ -524,7 +579,7 @@ a:hover.adm, a:focus.adm {
 	font-size: 14px;
 	color: #DD017F;
 }
-div.maintenance-day-descbox	{
+div.kc-desc-box	{
 	display:block;
 	border:1px solid #eaeaea !important;
 	color:#444444;
@@ -548,7 +603,7 @@ div.filebox	{
 	color: #666666;
 	text-align: left;
 }
-P.maintenance-day-description {
+P.job-description {
 	font-size: 14px;
 	color: #666666;
 	text-align: left;

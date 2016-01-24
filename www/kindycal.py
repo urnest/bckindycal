@@ -782,7 +782,12 @@ def nextMaintenanceDayId():
     x.put()
     return result
 
-
+volunteer_schema=jsonschema.Schema({
+        'childs_name':StringType,
+        'parents_name':StringType,
+        'attended':BooleanType,
+        'note':StringType,
+        })
 maintenance_day_schema=jsonschema.Schema({
         'id': IntType, #0 for new MaintenanceDay
         'name': StringType,
@@ -791,11 +796,7 @@ maintenance_day_schema=jsonschema.Schema({
         'description' : {
             'html' : StringType
             },
-        'volunteers':[{
-                'childs_name':StringType,
-                'parents_name':StringType,
-                'attended':BooleanType,
-                }]
+        'volunteers':[volunteer_schema]
         })
 
 class MaintenanceDay(ndb.Model):
@@ -1056,7 +1057,7 @@ class maintenance_day_page(webapp2.RequestHandler):
         page.find(pq.hasClass('maintenance-day-name')).text(maintenance_day['name'])
         d=formatDate(maintenance_day['date'])
         page.find(pq.hasClass('mdate')).text(d)
-        page.find(pq.hasClass('maintenance-day-description')).html(
+        page.find(pq.hasClass('job-description')).html(
             pq.parse(maintenance_day['description']['html']))
         vrt=page.find(pq.hasClass('volunteer-row')).remove().first()
         for v in maintenance_day['volunteers']:
@@ -1080,6 +1081,7 @@ class edit_maintenance_day_page(webapp2.RequestHandler):
         page=pq.loadFile('edit_maintenance_day.html')
         page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
         addScriptToPageHead('edit_maintenance_day.js',page)
+        addAdminNavButtonToPage(page,session.loginLevel)
         makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
@@ -1105,6 +1107,7 @@ class add_maintenance_day_volunteer(webapp2.RequestHandler):
                     'childs_name':childs_name,
                     'parents_name':parents_name,
                     'attended':False,
+                    'note':'',
                     })
                 maintenance_day_schema.validate(data)
                 maintenance_day.data=toJson(data)
@@ -1418,6 +1421,9 @@ class export_data(webapp2.RequestHandler):
                  'id':_.id,
                  'months':_.months} for _ in
                 TWYC.query(ancestor=root_key).fetch(100000)]
+        roster_jobs=[{'data':fromJson(_.data),
+                      'id':_.id} for _ in
+                     RosterJob.query(ancestor=root_key).fetch(100000)]
         self.response.headers['Content-Type'] = 'text/json'
         self.response.write(toJson({
                 'terms':terms,
@@ -1429,6 +1435,7 @@ class export_data(webapp2.RequestHandler):
                 'nextMaintenanceDayId':nextMaintenanceDayId,
                 'maintenanceDays':maintenanceDays,
                 'twycs':twycs,
+                'roster_jobs':roster_jobs,
                 }))
         pass
     pass
@@ -1549,7 +1556,320 @@ class import_data(webapp2.RequestHandler):
                     pass
                 self.response.write('%s twycs<br>'%len(data['twycs']))
                 pass
+            if 'roster_jobs' in data:
+                for _ in RosterJob.query(ancestor=root_key).fetch(100000): _.key.delete()
+                for _ in data['roster_jobs']:
+                    roster_job_schema.validate(_)
+                    t=TWYC(parent=root_key,
+                           data=toJson(_),
+                           id=_['id'])
+                    t.put()
+                    pass
+                self.response.write('%s roster jobs<br>'%len(data['roster_jobs']))
+                pass
             self.response.write('OK')
+            pass
+        pass
+    pass
+
+roster_job_instance_schema=jsonschema.Schema({
+        'groups':[IntType], # eg [0,1] for unit 1 "per-unit" task
+                            #    [0,1,2,3] for "kindy-wide" task
+        'volunteers':[ volunteer_schema ]})
+
+roster_job_schema=jsonschema.Schema({
+        'id': IntType,
+        'name': StringType,
+        'per': jsonschema.OneOf('group','unit','kindy-wide'),
+        'description': StringType,
+        'frequency': jsonschema.OneOf('as_required',
+                                      'week',
+                                      'term',
+                                      'year'),
+        'volunteers_required': IntType,
+        'instances':[roster_job_instance_schema]})
+
+class roster_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            log('not logged in')
+            return webapp2.redirect('login.html')
+        if session.loginLevel in ['staff','admin']:
+            return webapp2.redirect('edit_roster.html')
+        page=pq.loadFile('roster.html')
+        page.find(pq.hasClass('staff-only')).remove()
+        page.find(pq.hasClass('admin-only')).remove()
+        if session.loginLevel in ['admin','staff']:
+            addAdminNavButtonToPage(page,session.loginLevel)
+            pass
+        addScriptToPageHead('roster.js',page)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+
+class edit_roster_job_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['staff','admin']:
+            log('not logged in as staff or admin')
+            return webapp2.redirect('staff_login.html')
+        page=pq.loadFile('edit_roster_job.html')
+        page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
+        addScriptToPageHead('edit_roster_job.js',page)
+        addAdminNavButtonToPage(page,session.loginLevel)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+class RosterJobIdCounter(ndb.Model):
+    """Counter to assign ids to Roster Jobs."""
+    nextRosterJobId = ndb.IntegerProperty()
+
+nextRosterJobIdKey=ndb.Key('nextRosterJobId','nextRosterJobId')
+
+@ndb.transactional
+def nextRosterJobId():
+    q=RosterJobIdCounter.query(ancestor=root_key)
+    x=q.fetch(1)
+    if len(x)==0:
+        x=RosterJobIdCounter(parent=root_key)
+        x.nextRosterJobId=100
+    else:
+        x=x[0]
+    result=x.nextRosterJobId
+    x.nextRosterJobId=x.nextRosterJobId+1
+    x.put()
+    return result
+
+class RosterJob(ndb.Model):
+    # data is json encoded roster_job_schema-conformant
+    data=ndb.StringProperty(indexed=False,repeated=False)
+    # id from data['id']
+    id=ndb.IntegerProperty(indexed=True,repeated=False)
+    pass
+
+class delete_roster_job(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                data=fromJson(self.request.get('params'))
+                assert not data is None
+                for x in RosterJob.query(
+                    RosterJob.id==data['id'],
+                    ancestor=root_key).fetch(1): x.key.delete()
+                self.response.write(toJson({'result':'OK'}))
+                return
+        except:
+            result={'error':str(inContext('delete roster_job'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+@ndb.transactional
+def updateRosterJob(json_data):
+    'update roster job %(json_data)r keeping any existing volunteers'
+    try:
+        data=fromJson(json_data)
+        assert not 'volunteers' in data
+        roster_job_schema.validate(data)
+        id=int(data['id'])
+        if id>0:
+            job=RosterJob.query(RosterJob.id==id,
+                                ancestor=root_key).fetch(1)[0]
+            existing_instances=fromJson(job.data)['instances']
+            jsonschema.Schema([roster_job_instance_schema]).validate(
+                existing_instances)
+        else:
+            assert id==0
+            id=nextRosterJobId()
+            data['id']=id
+            job=RosterJob(parent=root_key,id=id)
+            existing_instances=[]
+            pass
+        new_data=dict(data.items()+[('instances',existing_instances)])
+        roster_job_schema.validate(new_data)
+        job.data=toJson(new_data)
+        job.put()
+    except:
+        raise inContext(l1(updateRosterJob.__doc__)%vars())
+    pass
+
+class roster_job(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+        else:
+            roster_job=RosterJob.query(
+                RosterJob.id==int(self.request.get('id')),
+                ancestor=root_key).fetch(1)
+            result=fromJson(roster_job[0].data)
+            roster_job_schema.validate(result)
+            del(result['instances'])
+            pass
+        return self.response.write(toJson({'result':result}))
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                updateRosterJob(self.request.get('params'))
+                result={'result':'OK'}
+                pass
+            pass
+        except:
+            result={'error':str(inContext('post roster_job'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+class roster_jobs(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+        else:
+            roster_jobs=RosterJob.query(ancestor=root_key).fetch(10000)
+            result={'result':[fromJson(_.data) for _ in roster_jobs]}
+            pass
+        return self.response.write(toJson(result))
+    pass
+
+class edit_roster_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff']:
+            log('not logged in')
+            return webapp2.redirect('staff.html?from=events.html')
+        if fetchTerms() is None:
+            log('terms not defined')
+            return webapp2.redirect('edit_terms.html')
+        if fetchGroups() is None:
+            log('groups not defined')
+            return webapp2.redirect('edit_groups.html')
+        page=pq.loadFile('roster.html')
+        page.find(pq.hasClass('parent-only')).remove()
+        if not session.loginLevel in ['staff','admin']:
+            page.find(pq.hasClass('staff-only')).remove()
+            pass
+        if not session.loginLevel in ['admin']:
+            page.find(pq.hasClass('admin-only')).remove()
+            pass
+        page.find(pq.tagName('body')).addClass(session.loginLevel)
+        addAdminNavButtonToPage(page,session.loginLevel)
+        addScriptToPageHead('roster.js',page)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+@ndb.transactional
+def addRosterJobVolunteer(id,groups,parents_name,childs_name):
+    'add %(parents_name)r (parent of %(childs_name)r as groups %(groups)r volunteer for job %(id)s'
+    try:
+        log(l1(addRosterJobVolunteer.__doc__)%vars())
+        roster_job=RosterJob.query(
+            RosterJob.id==id,
+            ancestor=root_key).fetch(1)[0]
+        data=fromJson(roster_job.data)
+        instances=dict(
+            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
+        log('groups %(groups)s'%vars())
+        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
+        instance=instances.setdefault(tuple(groups),[])
+        added=False
+        if len(instance)>=data['volunteers_required']:
+            log('already have %s volunteers of %s - cannot add more'%(
+                    len(instance),data['volunteers_required']))
+        elif len([_ for _ in instance if _['childs_name']==childs_name]):
+            log('%(childs_name)r is already in %(instance)r'%vars())
+        else:
+            instance.append({
+                    'parents_name':parents_name,
+                    'childs_name':childs_name,
+                    'attended':False,
+                    'note':''
+                    })
+            data['instances']=[ {'groups':list(_[0]),
+                                 'volunteers':_[1]} for _ in instances.items() ]
+            roster_job_schema.validate(data)
+            roster_job.data=toJson(data)
+            roster_job.put()
+            added=True
+            pass
+        result={
+            'added':added,
+            'instances':data['instances']
+            }
+        return result
+    except:
+        raise inContext(l1(addRosterJobVolunteer.__doc__)%vars())
+    pass
+
+class add_roster_job_volunteer(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                result=addRosterJobVolunteer(**params)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('add roster job volunteer'))}))
+            pass
+        pass
+    pass
+
+@ndb.transactional
+def updateVolunteerAttended(id,groups,childs_name,attended):
+    'record %(attended)s as attendance of parent of %(childs_name)r as groups %(groups)r volunteer for job %(id)s'
+    try:
+        log(l1(updateVolunteerAttended.__doc__)%vars())
+        roster_job=RosterJob.query(
+            RosterJob.id==id,
+            ancestor=root_key).fetch(1)[0]
+        data=fromJson(roster_job.data)
+        instances=dict(
+            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
+        log('groups %(groups)s'%vars())
+        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
+        instance=instances.get(tuple(groups))
+        indices=[_[0] for _ in enumerate(instance) if _[1]['childs_name']==childs_name]
+        for i in indices:
+            instance[i]['attended']=attended
+            pass
+        roster_job_schema.validate(data)
+        roster_job.data=toJson(data)
+        roster_job.put()
+        result='OK'
+        return result
+    except:
+        raise inContext(l1(updateVolunteerAttended.__doc__)%vars())
+    pass
+
+class update_volunteer_attended(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                result=updateVolunteerAttended(**params)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('update_volunteer_attended'))}))
             pass
         pass
     pass
@@ -1568,6 +1888,8 @@ application = webapp2.WSGIApplication([
     ('/edit_maintenance_day.html',edit_maintenance_day_page),
     ('/edit_public_holiday.html',edit_public_holiday_page),
     ('/edit_twyc.html',edit_twyc_page),
+    ('/edit_roster.html',edit_roster_page),
+    ('/edit_roster_job.html',edit_roster_job_page),
     ('/event.html',event_page),
     ('/events.html',events_page),
     ('/index.html', redirect_to_events_page),
@@ -1578,12 +1900,14 @@ application = webapp2.WSGIApplication([
 	('/staff',staff_page),
     ('/staff_login.html',staff_login_page),
     ('/twyc.html',twyc_page),
+    ('/roster.html',roster_page),
     ('/index-rc.html',indexrc_page),
     ('/import_data.html',import_data_page),
     
     # following are not real pages, they are called by javascript files
     # to get and save data
     ('/add_maintenance_day_volunteer',add_maintenance_day_volunteer),
+    ('/add_roster_job_volunteer',add_roster_job_volunteer),
     ('/get_month_to_show',get_month_to_show),
     ('/groups',groups),
     ('/groups_to_show',groups_to_show),
@@ -1598,6 +1922,8 @@ application = webapp2.WSGIApplication([
     ('/event',event),
     ('/maintenance_day',maintenance_day),
     ('/public_holiday',public_holiday),
+    ('/roster_job',roster_job),
+    ('/roster_jobs',roster_jobs),
     ('/delete_event',delete_event),
     ('/delete_maintenance_day',delete_maintenance_day),
     ('/delete_public_holiday',delete_public_holiday),
@@ -1605,4 +1931,5 @@ application = webapp2.WSGIApplication([
     ('/session_file',session_file),
     ('/export_data.txt',export_data),
     ('/import_data',import_data),
+    ('/update_volunteer_attended',update_volunteer_attended),
 ], debug=True)
