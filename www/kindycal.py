@@ -52,8 +52,8 @@ class Password(ndb.Model):
 
 defaultPasswords={
     'admin':'10greenfrogs',
-    'staff':'3blackbats',
-    'parent':'88happykids'
+    'staff':'password',
+    'parent':'password'
 }
 
 def getPassword(level):
@@ -1892,7 +1892,7 @@ application = webapp2.WSGIApplication([
     ('/edit_roster_job.html',edit_roster_job_page),
     ('/event.html',event_page),
     ('/events.html',events_page),
-    ('/index.html', index_page),
+    ('/index.html', redirect_to_events_page),
     ('/login.html',login_page),
     ('/parent',login_page),
     ('/maintenance_day.html',maintenance_day_page),
