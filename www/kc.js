@@ -715,7 +715,7 @@
     kc.each(options,function(i,option){
       var $o=$option_t.clone();
       $o.text(option.text);
-      $dialogContent.append($('<div>').html($o));
+      $dialogContent.append($('<div class="select-your-group-button">').html($o));
       $o.click(function(){
 	$dialog.addClass('kc-invisible');
 	$dialog.effect('transfer',{

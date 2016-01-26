@@ -53,7 +53,7 @@ var promptForName=function(){
     result.then_=f;
   };
   $dialog.dialog({
-    'title':'TWYC',
+    'title':'TWYC - Add Your Name',
     'buttons':[
       {
 	text:'Cancel',
@@ -148,7 +148,7 @@ $(document).ready(function(){
 	refresh();
       };
       $selectYourGroup.click(function(){
-	kc.selectYourGroup('TWYC Choose Your Class',
+	kc.selectYourGroup('TWYC - Choose Your Class',
 			   groupsToShowOptions,
 			   $selectYourGroup)
 	  .then(showGroups);
@@ -166,7 +166,7 @@ $(document).ready(function(){
 	return false;
       });
       if (!staff && groupsToShow.length!=1){
-	kc.selectYourGroup('TWYC Choose Your Class',
+	kc.selectYourGroup('TWYC - Choose Your Class',
 			   groupsToShowOptions,
 			   $selectYourGroup)
 	  .then(showGroups);
