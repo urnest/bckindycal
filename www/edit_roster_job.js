@@ -56,7 +56,7 @@ $(document).ready(function(){
       })
     })
       .then(function(){
-	window.location='edit_events.html';
+	window.location='roster.html';
       })
       .always(function(){
 	--busyCount;

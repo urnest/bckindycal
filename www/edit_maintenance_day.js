@@ -158,6 +158,9 @@ $(document).ready(function(){
 	  var name=$volunteerRow.find('input').prop('value');
 	  if (name=='' || window.confirm('Remove '+name+'?')){
 	    $volunteerRow.remove();
+	    if ($('table.volunteer-table tr.volunteer-row').length==0){
+	      $('table.volunteer-table tr').first().hide();
+	    }
 	  }
 	  return false;
 	});
@@ -172,11 +175,15 @@ $(document).ready(function(){
 	  toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
 	});
 	++nextVolunteerRowId;
+	$('table.volunteer-table tr').first().show();
 	return $volunteerRow;
       };
       kc.each(maintenance_day.volunteers,function(i,volunteer){
 	addVolunteer(volunteer.childs_name,volunteer.parents_name,volunteer.attended,volunteer.note);
       });
+      if(maintenance_day.volunteers.length==0){
+	$('table.volunteer-table tr').first().hide();
+      }
       $('td.add-volunteer').click(function(){
 	addVolunteer('','',false,'<p></p>').find('input.volunteer-childs-name').focus();
 	return false;

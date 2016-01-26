@@ -641,7 +641,6 @@ class event(webapp2.RequestHandler):
                 result={'error':'You are not logged in.'}
             else:
                 data=fromJson(self.request.get('params'))
-                assert not data is None
                 event_schema.validate(data)
                 if data['id']==0: data['id']=nextEventId()
                 event=Event(parent=root_key,
@@ -649,7 +648,9 @@ class event(webapp2.RequestHandler):
                             months=[_['year']*100+_['month'] \
                                     for _ in data['dates']],
                             data=toJson(data))
-                for x in Event.query(Event.id==event.id,ancestor=root_key).fetch(1): x.key.delete()
+                old_images=set()
+                for x in Event.query(Event.id==event.id,ancestor=root_key).fetch(1): 
+                    x.key.delete()
                 event.put()
                 result=fromJson(event.data)
                 event_schema.validate(result)
@@ -1198,6 +1199,93 @@ class session_file(webapp2.RequestHandler):
     pass
 
 
+class UploadedFileIdCounter(ndb.Model):
+    """Counter to assign ids to UploadedFiles."""
+    nextUploadedFileId = ndb.IntegerProperty()
+
+@ndb.transactional
+def nextUploadedFileId():
+    q=UploadedFileIdCounter.query(ancestor=root_key)
+    x=q.fetch(1)
+    if len(x)==0:
+        x=UploadedFileIdCounter(parent=root_key)
+        x.nextUploadedFileId=100
+    else:
+        x=x[0]
+    result=x.nextUploadedFileId
+    x.nextUploadedFileId=x.nextUploadedFileId+1
+    x.put()
+    return result
+
+
+class UploadedFile(ndb.Model):
+    id=ndb.IntegerProperty(indexed=True)
+    hash=ndb.StringProperty(indexed=True)
+    mime_type=ndb.StringProperty(indexed=False,repeated=False) #eg image/jpeg
+    data=ndb.BlobProperty(indexed=False,repeated=False)#file data
+    ref_count=ndb.IntegerProperty(indexed=False)
+    pass
+
+class uploaded_file(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+            self.response.write(toJson(result))
+        else:
+            assert self.request.get('id')
+            id=int(self.request.get('id'))
+            f=UploadedFile.query(
+                UploadedFile.id==id,
+                ancestor=root_key).fetch(1)[0]
+            self.response.headers['Content-Type'] = \
+                f.mime_type.encode('ascii','ignore')
+            self.response.write(f.data)
+            pass
+        pass
+
+@ndb.transactional
+def saveFile(mime_type,data):
+    'save file as an UploadedFile, returning id'
+    'post: caller has a reference to id (see deref_uploaded_file)'
+    try:
+        h='%x'%(hash(data)&0xFFFFFFFF)
+        c=[_ for _ in UploadedFile.query(UploadedFile.hash==h,
+                                         ancestor=root_key).fetch(100000)
+           if _.data==data and _.mime_type==mime_type]
+        if len(c):
+            assert len(c)==c,c
+            c[0].ref_count=c[0].ref_count+1
+            c[0].put()
+            return c.id
+        c=UploadedFile(parent=root_key,
+                       id=nextUploadedFileId(),
+                       hash=h,
+                       mime_type=mime_type,
+                       data=data,
+                       ref_count=1)
+        c.put()
+        return c.id
+    except:
+        raise inContext(l1(saveFile.__doc__)%vars())
+    pass
+
+@ndb.transactional
+def deref_uploaded_file(id):
+    'dereference UploadedFile %(id)r'
+    try:
+        c=UploadedFile.query(UploadedFile.id==id,
+                             ancestor=root_key).fetch(2)
+        assert len(c)==1,c
+        c.ref_count=c.ref_count-1
+        if c.ref_count==0:
+            c.key.delete()
+        else:
+            c.put()
+            pass
+    except:
+        raise inContext(l1(deref_uploaded_file.__doc__)%vars())
+    pass
 
 twyc_schema=jsonschema.Schema({
         'date' : {'year':IntType,'month':IntType,'day':IntType},
@@ -2040,6 +2128,7 @@ application = webapp2.WSGIApplication([
     ('/add_maintenance_day_volunteer',add_maintenance_day_volunteer),
     ('/add_roster_job_volunteer',add_roster_job_volunteer),
     ('/all_maintenance_days',all_maintenance_days),
+    ('/delete_roster_job',delete_roster_job),
     ('/delete_roster_job_volunteer',delete_roster_job_volunteer),
     ('/get_month_to_show',get_month_to_show),
     ('/groups',groups),
@@ -2066,4 +2155,5 @@ application = webapp2.WSGIApplication([
     ('/import_data',import_data),
     ('/update_roster_job_volunteer_attended',update_roster_job_volunteer_attended),
     ('/update_roster_job_volunteer',update_roster_job_volunteer),
+    ('/uploaded_file',uploaded_file),
 ], debug=True)
