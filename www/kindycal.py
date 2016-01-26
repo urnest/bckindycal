@@ -1786,8 +1786,10 @@ def addRosterJobVolunteer(id,groups,parents_name,childs_name):
         if len(instance)>=data['volunteers_required']:
             log('already have %s volunteers of %s - cannot add more'%(
                     len(instance),data['volunteers_required']))
-        elif len([_ for _ in instance if _['childs_name']==childs_name]):
-            log('%(childs_name)r is already in %(instance)r'%vars())
+        elif len([_ for _ in instance 
+                  if _['parents_name']==parents_name and _['childs_name']==childs_name]):
+            log('%(parents_name)r is already in %(instance)r'%vars())
+            added=True #in a sense
         else:
             instance.append({
                     'parents_name':parents_name,
@@ -1830,8 +1832,8 @@ class add_roster_job_volunteer(webapp2.RequestHandler):
     pass
 
 @ndb.transactional
-def updateVolunteerAttended(id,groups,childs_name,attended):
-    'record %(attended)s as attendance of parent of %(childs_name)r as groups %(groups)r volunteer for job %(id)s'
+def updateVolunteerAttended(id,groups,volunteer,new_attended):
+    'record %(new_attended)s as attendance of %(volunteer)r as groups %(groups)r volunteer for job %(id)s'
     try:
         log(l1(updateVolunteerAttended.__doc__)%vars())
         roster_job=RosterJob.query(
@@ -1843,9 +1845,11 @@ def updateVolunteerAttended(id,groups,childs_name,attended):
         log('groups %(groups)s'%vars())
         assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
         instance=instances.get(tuple(groups))
-        indices=[_[0] for _ in enumerate(instance) if _[1]['childs_name']==childs_name]
+        indices=[_[0] for _ in enumerate(instance) 
+                 if _[1]['childs_name']==volunteer['childs_name'] and
+                    _[1]['parents_name']==volunteer['parents_name']]
         for i in indices:
-            instance[i]['attended']=attended
+            instance[i]['attended']=new_attended
             pass
         roster_job_schema.validate(data)
         roster_job.data=toJson(data)
@@ -1856,7 +1860,7 @@ def updateVolunteerAttended(id,groups,childs_name,attended):
         raise inContext(l1(updateVolunteerAttended.__doc__)%vars())
     pass
 
-class update_volunteer_attended(webapp2.RequestHandler):
+class update_roster_job_volunteer_attended(webapp2.RequestHandler):
     def post(self):
         try:
             session=getSession(self.request.cookies.get('kc-session',''))
@@ -1870,6 +1874,105 @@ class update_volunteer_attended(webapp2.RequestHandler):
             self.response.write(toJson(result))
         except:
             self.response.write(toJson({'error':str(inContext('update_volunteer_attended'))}))
+            pass
+        pass
+    pass
+
+@ndb.transactional
+def updateVolunteer(id,groups,volunteer,new_volunteer):
+    'update %(volunteer)s as a groups %(groups)r volunteer for job %(id)s to %(new_volunteer)s'
+    try:
+        log(l1(updateVolunteer.__doc__)%vars())
+        roster_job=RosterJob.query(
+            RosterJob.id==id,
+            ancestor=root_key).fetch(1)[0]
+        data=fromJson(roster_job.data)
+        instances=dict(
+            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
+        log('groups %(groups)s'%vars())
+        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
+        instance=instances.get(tuple(groups))
+        indices=[_[0] for _ in enumerate(instance) 
+                 if _[1]['childs_name']==volunteer['childs_name'] and
+                    _[1]['parents_name']==volunteer['parents_name']]
+        for i in indices:
+            instance[i]=new_volunteer
+            pass
+        roster_job_schema.validate(data)
+        roster_job.data=toJson(data)
+        roster_job.put()
+        result='OK'
+        return result
+    except:
+        raise inContext(l1(updateVolunteer.__doc__)%vars())
+    pass
+
+class update_roster_job_volunteer(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                result=updateVolunteer(**params)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('update_volunteer'))}))
+            pass
+        pass
+    pass
+
+@ndb.transactional
+def deleteRosterJobVolunteer(id,groups,childs_name):
+    'delete parent of %(childs_name)r as groups %(groups)r volunteer for job %(id)s'
+    try:
+        log(l1(deleteRosterJobVolunteer.__doc__)%vars())
+        roster_job=RosterJob.query(
+            RosterJob.id==id,
+            ancestor=root_key).fetch(1)[0]
+        data=fromJson(roster_job.data)
+        instances=dict(
+            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
+        log('groups %(groups)s'%vars())
+        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
+        if tuple(groups) in instances:
+            log('found groups instance')
+            instance=instances.get(tuple(groups))
+            childs_names=dict( (_[1]['childs_name'],_[0]) for _ in enumerate(instance))
+            log('childs_names %(childs_names)r')
+            if childs_name in childs_names:
+                index=childs_names[childs_name]
+                log('found childs_name (index %(index)s)'%vars())
+                del(instance[index])
+                roster_job_schema.validate(data)
+                roster_job.data=toJson(data)
+                roster_job.put()
+                log('job now %(data)r'%vars())
+                pass
+            pass
+        result=data['instances']
+        return result
+    except:
+        raise inContext(l1(deleteRosterJobVolunteer.__doc__)%vars())
+    pass
+
+class delete_roster_job_volunteer(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                result=deleteRosterJobVolunteer(**params)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('delete_roster_job_volunteer'))}))
             pass
         pass
     pass
@@ -1908,6 +2011,7 @@ application = webapp2.WSGIApplication([
     # to get and save data
     ('/add_maintenance_day_volunteer',add_maintenance_day_volunteer),
     ('/add_roster_job_volunteer',add_roster_job_volunteer),
+    ('/delete_roster_job_volunteer',delete_roster_job_volunteer),
     ('/get_month_to_show',get_month_to_show),
     ('/groups',groups),
     ('/groups_to_show',groups_to_show),
@@ -1931,5 +2035,6 @@ application = webapp2.WSGIApplication([
     ('/session_file',session_file),
     ('/export_data.txt',export_data),
     ('/import_data',import_data),
-    ('/update_volunteer_attended',update_volunteer_attended),
+    ('/update_roster_job_volunteer_attended',update_roster_job_volunteer_attended),
+    ('/update_roster_job_volunteer',update_roster_job_volunteer),
 ], debug=True)

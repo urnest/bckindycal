@@ -29,7 +29,10 @@ var promptForName=function(){
 			  $dialog.dialog('close'); },
       }
     ],
-    dialogClass:'kc-in-front-of-navbar'
+    dialogClass:'kc-in-front-of-navbar',
+    close: function(){
+      $dialog.dialog('destroy');
+    }
   });
   $dialog.submit(function(){
     result.then_($dialog.find('input').prop('value')); 
@@ -48,15 +51,30 @@ var addMe=function($from,job,groups){
   }
   var $dialog=$('<div><p>Your Name: <input type="text" name="parent_name"></p><p>Your Child\'s Name: <input type="text" name="child_name"></p></div>');
   var add=function(childs_name,parents_name){
-      if (parents_name==''){
-	$dialog.find('input[name="parent_name"]').addClass('invalid-input');
-	return false;
+    if (parents_name==''){
+      $dialog.find('input[name="parent_name"]').addClass('invalid-input');
+      return false;
+    }
+    if (childs_name==''){
+      $dialog.find('input[name="child_name"]').addClass('invalid-input');
+      return false;
+    }
+    var alreadyDown=false;
+    kc.each(job.instances,function(i,instance){
+      if (kc.json.encode(instance.groups)==kc.json.encode(groups)){
+	kc.each(instance.volunteers,function(i,volunteer){
+	  if (volunteer.parents_name==parents_name &&
+	      volunteer.childs_name==childs_name){
+	    window.alert('You are already down for this job.');
+	    alreadyDown=true;
+	  }
+	});
       }
-      if (childs_name==''){
-	$dialog.find('input[name="child_name"]').addClass('invalid-input');
-	return false;
-      }
-      $dialog.find('input').removeClass('invalid-input');
+    });
+    if (alreadyDown){
+      return;
+    }
+    $dialog.find('input').removeClass('invalid-input');
       kc.postToServer('add_roster_job_volunteer',{
 	params:kc.json.encode({
 	  id:job.id,
@@ -70,7 +88,7 @@ var addMe=function($from,job,groups){
 	    alert('Sorry, someone else snuck in ahead of you :-(');
 	  }
 	  job.instances=r.instances;
-	  $dialog.dialog('close');
+	  $dialog.dialog('destroy');
 	  result.then_();
 	});
   };
@@ -83,13 +101,16 @@ var addMe=function($from,job,groups){
       },
       {
 	text:'OK',
-	click:function(){ 
+	click:function(){
 	  add($dialog.find('input[name="child_name"]').prop('value'),
 	      $dialog.find('input[name="parent_name"]').prop('value')); 
 	}
       }
     ],
-    dialogClass:'kc-in-front-of-navbar'
+    dialogClass:'kc-in-front-of-navbar',
+    close:function(){
+      setTimeout(function(){$dialog.dialog('destroy');},0);
+    }
   }).show();
   $dialog.submit(function(){
     add($dialog.find('input[name="child_name"]').prop('value'),
@@ -99,15 +120,122 @@ var addMe=function($from,job,groups){
   });
   return result;
 };
+var editVolunteer=function($from,job,groups,volunteer){
+  var result={
+    then_:function(){
+    }
+  };
+  result.then=function(f){
+    result.then_=f;
+  }
+  var $dialog=$(
+    '<div>'+
+      '  <p>Parent\'s Name: <input type="text" name="parent_name"></p>'+
+      '  <p>Child\'s Name: <input type="text" name="child_name"></p>'+
+      '  <p>Attended: <input type="checkbox" name="attended"></p>'+
+      '  <p>Note: <div class="note edit-volunteer-note-mce"></p>'+
+      '</div>');
+  $dialog.find('input[name="child_name"]').prop('value',volunteer.childs_name);
+  $dialog.find('input[name="parent_name"]').prop('value',volunteer.parents_name);
+  $dialog.find('input[name="attended"]').prop('checked',volunteer.attended);
+  $dialog.find('div.note').html(volunteer.note);
+  var update=function(childs_name,parents_name,attended,note){
+    if (parents_name==''){
+      $dialog.find('input[name="parent_name"]').addClass('invalid-input');
+      return false;
+    }
+    if (childs_name==''){
+      $dialog.find('input[name="child_name"]').addClass('invalid-input');
+      return false;
+    }
+    $dialog.find('input').removeClass('invalid-input');
+    kc.postToServer('update_roster_job_volunteer',{
+      params:kc.json.encode({
+	id:job.id,
+	groups:groups,
+	volunteer:volunteer,
+	new_volunteer:{
+	  childs_name:childs_name,
+	  parents_name:parents_name,
+	  attended:attended,
+	  note:note
+	}
+      })
+    })
+      .then(function(r){
+	volunteer.parents_name=parents_name;
+	volunteer.childs_name=childs_name;
+	volunteer.attended=attended;
+	volunteer.note=note;
+	$dialog.dialog('destroy');
+	result.then_();
+      });
+  };
+  $dialog.dialog({
+    'title':'Edit Volunteer',
+    'buttons':[
+      {
+	text:'Cancel',
+	click:function(){ $dialog.dialog('close'); }
+      },
+      {
+	text:'OK',
+	click:function(){
+	  update($dialog.find('input[name="child_name"]').prop('value'),
+		 $dialog.find('input[name="parent_name"]').prop('value'),
+		 $dialog.find('input[name="attended"]').prop('checked'),
+		 $dialog.find('div.note').html()); 
+	}
+      }
+    ],
+    dialogClass:'kc-in-front-of-navbar',
+    close:function(){
+      setTimeout(function(){$dialog.dialog('destroy');},0);
+    }
+  });
+  tinymce.init({
+    selector: 'div.edit-volunteer-note-mce',
+    inline: true,
+    plugins: [
+      'advlist autolink lists link image charmap print preview anchor',
+      'searchreplace visualblocks code fullscreen',
+      'insertdatetime media table contextmenu paste code'
+    ],
+    toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
+  });
+  
+  $dialog.submit(function(){
+    add($dialog.find('input[name="child_name"]').prop('value'),
+	$dialog.find('input[name="parent_name"]').prop('value')); 
+    $dialog.dialog('close'); 
+    return false;
+  });
+  return result;
+};
 var jobRow=function($r,staff,job,c,groups,volunteer,refresh){
+  $r.find('.name a').text(job.name);
   if (staff){
-    $r.find('.name').html(
-      $('<a>')
-	.text(job.name)
-	.attr('href','edit_roster_job.html?id='+job.id));
+    $r.find('.name a').attr('href','edit_roster_job.html?id='+job.id);
   }
   else{
-    $r.find('.name').text(job.name);
+    $r.find('.name a').click(function(){
+      var $d=$('<div>').html(job.description);
+      $d.dialog({
+	title: job.name,
+	modal: true,
+	buttons:[
+	  {
+	    text:'Close',
+	    click:function(){
+	      $d.dialog('close');
+	    }
+	  }
+	],
+	close:function(){
+	  $d.dialog('destroy');
+	}
+      });
+    });
   }
   $r.find('.frequency').text(frequencies[job.frequency]);
   $r.find('.volunteers-required').text(job.volunteers_required);
@@ -131,12 +259,14 @@ var jobRow=function($r,staff,job,c,groups,volunteer,refresh){
   $r.find('.volunteer-attended input').prop('checked',volunteer.attended);
   $r.find('.volunteer-note').html(volunteer.note);
   $r.find('.volunteer-attended input').change(function(){
-    kc.postToServer('update_volunteer_attended',{
+    var new_attended=$(this).prop('checked');
+    volunteer.attended=new_attended;
+    kc.postToServer('update_roster_job_volunteer_attended',{
       params:kc.json.encode({
 	id:job.id,
 	groups:groups,
-	childs_name:volunteer.childs_name,
-	attended:$(this).prop('checked')
+	volunteer:volunteer,
+	new_attended:new_attended
       })
     });
   });
@@ -149,13 +279,21 @@ var jobRow=function($r,staff,job,c,groups,volunteer,refresh){
 	  childs_name:volunteer.childs_name
 	})
       })
-	.then(refresh);
+	.then(function(result){
+	  job.instances=result;
+	  refresh();
+	});
     }
+    return false;
+  });
+  $r.find('.edit-volunteer a').click(function(){
+    editVolunteer($(this),job,groups,volunteer)
+      .then(refresh);
     return false;
   });
   return $r;
 };
-var addMeRow=function($r,$addMe,staff,job,c,groups){
+var addMeRow=function($r,$addMe,staff,job,c,groups,refresh){
   jobRow($r,staff,job,c,groups);
   $r.find('.volunteer-parent-name').html($addMe);
   $r.find('.volunteer-child-name').text('');
@@ -305,6 +443,8 @@ $(document).ready(function(){
 		jobRow($rr,staff,job,c,groups,v,function(){
 		  refresh();
 		});
+		$r.find('.unit').text('');
+		$r.find('.group').text('');
 		++c;
 	      });
 	    }
@@ -313,10 +453,6 @@ $(document).ready(function(){
 	    $rosterJobsTable.append($r);
 	    addMeRow($r,$addMe_t.clone(),staff,job,c,groups,
 		     function(){refresh();});
-	    if (c>0){
-	      $r.find('.unit').text('');
-	      $r.find('.group').text('');
-	    }
 	  }
 	}
       });
@@ -340,6 +476,8 @@ $(document).ready(function(){
 		  jobRow($rr,staff,job,c,groups,v,function(){
 		    refresh();
 		  });
+		  $r.find('.unit').text('');
+		  $r.find('.group').text('');
 		  ++c;
 		});
 	      }
@@ -348,10 +486,6 @@ $(document).ready(function(){
 	      $rosterJobsTable.append($r);
 	      addMeRow($r,$addMe_t.clone(),staff,job,c,groups,
 		       function(){refresh();});
-	      if (c>0){
-		$r.find('.unit').text('');
-		$r.find('.group').text('');
-	      }
 	    };
 	  }
 	});
