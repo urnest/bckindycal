@@ -1,4 +1,5 @@
 $(document).ready(function(){
+  var $vrt=$('.vr-template').remove().first().removeClass('vr-template');
   $('.add-volunteer').click(function(){
     var id=$('input#id').prop('value');
     var $dialog=$('<div><p>Your Name: <input type="text" name="parent_name"></p><p>Your Child\'s Name: <input type="text" name="child_name"></p></div>');
@@ -18,7 +19,12 @@ $(document).ready(function(){
 	parents_name:parents_name
       })
 	.then(function(){
-	  window.location='maintenance_day.html?id='+id;
+	  var $vr=$vrt.clone();
+	  $vr.find('.volunteer-parent-name').text(parents_name);
+	  $vr.find('.volunteer-parent-name').text(childs_name);
+	  $('table.volunteers-table').append($vr);
+	  $vr.show();
+	  $dialog.dialog('close');
 	});
     };
     $dialog.dialog({

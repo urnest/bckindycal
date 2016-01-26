@@ -1060,15 +1060,19 @@ class maintenance_day_page(webapp2.RequestHandler):
         page.find(pq.hasClass('mdate')).text(d)
         page.find(pq.hasClass('job-description')).html(
             pq.parse(maintenance_day['description']['html']))
-        vrt=page.find(pq.hasClass('volunteer-row')).remove().first()
+        volunteer_table=page.find(pq.hasClass('volunteers-table'))
+        vrt=volunteer_table.find(pq.hasClass('volunteer-row')).remove().first()
         for v in maintenance_day['volunteers']:
             vr=vrt.clone()
             vr.find(pq.hasClass('volunteer-child-name')).text(
                 v['childs_name'])
             vr.find(pq.hasClass('volunteer-parent-name')).text(
                 v['parents_name'])
-            vr.appendTo(page.find(pq.hasClass('volunteers-table')))
+            vr.appendTo(volunteer_table)
             pass
+        vrt.attr('style',"display:none")
+        vrt.addClass('vr-template')
+        vrt.appendTo(volunteer_table)
         page.find(pq.tagName('form')).filter(pq.attrEquals('id','close')).attr(
             'action',self.request.headers.get('Referer','events.html'))
         self.response.write(unicode(page).encode('utf-8'))
