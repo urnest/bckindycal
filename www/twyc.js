@@ -61,8 +61,17 @@ var promptForName=function(){
       },
       {
 	text:'OK',
-	click:function(){ result.then_($dialog.find('input').prop('value')); 
-			  $dialog.dialog('close'); },
+	click:function(){ 
+	  var name=$dialog.find('input').prop('value');
+	  if (name==''){
+	    $dialog.find('input').addClass('kc-invalid-input');
+	    return false;
+	  }
+	  $dialog.find('input').removeClass('kc-invalid-input');
+	  result.then_(name); 
+	  $dialog.dialog('close'); 
+	  return false;
+	},
       }
     ],
     dialogClass:'kc-in-front-of-navbar'
