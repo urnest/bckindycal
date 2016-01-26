@@ -73,7 +73,7 @@ $(document).ready(function(){
       name:'',
       per:'kindy-wide',
       description:{
-	html:'TBD'
+	html:''
       },
       frequency:'as_required',
       volunteers_required:1

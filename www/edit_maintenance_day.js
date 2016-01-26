@@ -105,7 +105,7 @@ $(document).ready(function(){
 	  groups:[],
 	  date:date,
 	  description:{
-	    html:'(click to edit)'
+	    html:''
 	  },
 	  volunteers:[
 	  ]

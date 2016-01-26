@@ -17,12 +17,12 @@ body, input, textarea {
 }
 a.ulink {
 	font-size: 14px;
-	color: #ef4a5a;
+	color: #41ad48;
 	text-decoration: none;
 }
 a:hover.ulink, a:focus.ulink {
-	font-size: 14px
-	color: #000000;
+	font-size: 14px;
+	color: #00a7e7;
 	text-decoration: none;
 }
 span.ulhd {
@@ -347,7 +347,7 @@ span.hdmth {
 a.roster-jobs-toolbar-button {
     display: inline-block;
 
-    background: #81c344 none repeat scroll 0 0;
+    background: #388fe0 none repeat scroll 0 0;
     color: #ffffff;
 
     border-radius: 20px;
@@ -610,13 +610,13 @@ input[type="submit"]:hover.del {
 }
 a.adm {
 	font-size: 14px;
-	color: #ef4a5a;
+	color: #41ad48;
 	text-decoration: none;
 	line-height: 22px;
 }
 a:hover.adm, a:focus.adm {
 	font-size: 14px;
-	color: #000000;
+	color: #ef4a5a;
 	text-decoration: none;
 	line-height: 22px;
 }
@@ -679,12 +679,12 @@ p.mid {
 }
 .gry {
 	font-family: "Lato",Helvetica,Arial,sans-serif;
-	font-size: 11px;
+	font-size: 12px;
 	color: #666666;
 }
 .gryc {
 	font-family: "Lato",Helvetica,Arial,sans-serif;
-	font-size: 11px;
+	font-size: 12px;
 	color: #666666;
 	text-align: center;
 	background-color: #CCCCCC;
@@ -693,7 +693,7 @@ p.mid {
     border: 1px solid #EAEAEA !important;
 }
 .kc-tinymce-div .volunteer-note {
-    min-width: 50px;
+    min-width: 150px;
     min-height: 32px;
 }
 .Mday {

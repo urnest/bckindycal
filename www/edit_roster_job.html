@@ -81,16 +81,16 @@
 	  <div>
             <form method="POST" action="#">
               <input type="hidden" id="id" name="id" value="0">
-              <span class="admpnk edit-roster-job-field-label">Name (appears on calendar):</span>
+              <span class="admpnk edit-roster-job-field-label">Job Name:</span>
               <input name="name" class="GroupName" type="text" value="Roster Job">
-	      <span class="admpnk edit-roster-job-field-label">Per:</span>
+	      <span class="admpnk edit-roster-job-field-label">Applies to:</span>
               <select name="per" class="">
-		<option value="group">Group</option>
-		<option value="unit">Unit</option>
-		<option value="kindy-wide">Kindy-wide</option>
+		<option value="group">per Group</option>
+		<option value="unit">per Unit</option>
+		<option value="kindy-wide">per Kindy-wide</option>
 	      </select>
               <span class="admpnk edit-roster-job-field-label">Description (click to edit):</span>
-              <div class="kc-descbox">
+              <div class="kc-descbox kc-tinymce-div">
                 <div class="job-description">
                   <p>Odd jobs etc.</p>
                 </div>
@@ -102,7 +102,9 @@
 		<option value="term">Term</option>
 		<option value="year">Yearly</option>
 	      </select>
-              <span class="admpnk edit-roster-job-field-label">Number of volunteers required:</span>
+              <span class="admpnk edit-roster-job-field-label">Number of volunteers required:<br>
+              <p class=gry>Note -<br> If you chose "per Kindy-wide" and enter "1" volunteer this creates 1 job, with one volunteer. <br>If you chose "per Unit" and enter "1" volunteer this creates 2 jobs, with one volunteer for each Unit. <br>If you chose "per Group" and enter "1" volunteer this creates 4 jobs, with one volunteer for each Group. <br>
+              For example, if you want to create a centre-wide job with 5 volunteers (eg "Holiday Gardens"), choose "per Kindy-wide" and enter "5" volunteers.</p></span>
               <input name="volunteers_required" class="GroupName" type="text" value="1">
 	      <div class="edit-roster-job-form-buttons">
 		<input type="submit" value="Save" id="save-button" class="job">&nbsp;&nbsp;
