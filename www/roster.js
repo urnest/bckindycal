@@ -221,7 +221,7 @@ var jobRow=function($r,staff,job,c,groups,volunteer,refresh){
     $r.find('.name a').click(function(){
       var $d=$('<div>').html(job.description);
       $d.dialog({
-	title: job.name,
+	title: job.name+' - Description',
 	modal: true,
 	buttons:[
 	  {
