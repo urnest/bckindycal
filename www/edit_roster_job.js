@@ -72,9 +72,7 @@ $(document).ready(function(){
       id:0,
       name:'',
       per:'kindy-wide',
-      description:{
-	html:''
-      },
+      description:'<p></p>',
       frequency:'as_required',
       volunteers_required:1
     }
@@ -92,7 +90,7 @@ $(document).ready(function(){
     if (roster_job){
       $('input[name="name"]').prop('value',roster_job.name);
       $('select[name="per"]').prop('value',roster_job.per);
-      $('div.job-description').html(roster_job.description.html);
+      $('div.job-description').html(roster_job.description);
       $('select[name="frequency"]').prop('value',roster_job.frequency);
       $('input[name="volunteers_required"]').prop('value',roster_job.volunteers_required);
       tinymce.init({
