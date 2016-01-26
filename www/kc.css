@@ -616,3 +616,13 @@ p.event-description {
 p.mid {
 	text-align: center;
 }
+.kc-tinymce-div {
+    border: 1px solid #EAEAEA !important;
+}
+.kc-tinymce-div .volunteer-note {
+    min-width: 50px;
+    min-height: 32px;
+}
+.Mday {
+    margin-top: 15px;
+}

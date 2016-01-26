@@ -1068,6 +1068,8 @@ class maintenance_day_page(webapp2.RequestHandler):
                 v['parents_name'])
             vr.appendTo(page.find(pq.hasClass('volunteers-table')))
             pass
+        page.find(pq.tagName('form')).filter(pq.attrEquals('id','close')).attr(
+            'action',self.request.headers.get('Referer','events.html'))
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -1083,6 +1085,7 @@ class edit_maintenance_day_page(webapp2.RequestHandler):
         addScriptToPageHead('edit_maintenance_day.js',page)
         addAdminNavButtonToPage(page,session.loginLevel)
         makePageBodyInvisible(page)
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','referer')).attr('value',self.request.headers.get('Referer','roster.html'))
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -1977,6 +1980,31 @@ class delete_roster_job_volunteer(webapp2.RequestHandler):
         pass
     pass
 
+all_maintenance_days_schema=jsonschema.Schema([
+        maintenance_day_schema])
+
+class all_maintenance_days(webapp2.RequestHandler):
+    def get(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                result=[fromJson(_.data) for _ in MaintenanceDay.query(ancestor=root_key).fetch(1000)]
+                cmpDate=lambda x, y: cmp( (x['year'],x['month'],x['day']),
+                                          (y['year'],y['month'],y['day']))
+                                          
+                result.sort(lambda x,y: cmpDate(x['date'],y['date']))
+                all_maintenance_days_schema.validate(result)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('all_maintenance_days'))}))
+            pass
+        pass
+    pass
+        
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
@@ -2011,6 +2039,7 @@ application = webapp2.WSGIApplication([
     # to get and save data
     ('/add_maintenance_day_volunteer',add_maintenance_day_volunteer),
     ('/add_roster_job_volunteer',add_roster_job_volunteer),
+    ('/all_maintenance_days',all_maintenance_days),
     ('/delete_roster_job_volunteer',delete_roster_job_volunteer),
     ('/get_month_to_show',get_month_to_show),
     ('/groups',groups),
