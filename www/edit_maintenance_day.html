@@ -20,6 +20,7 @@
     <script src="jquery-ui-1.11/jquery-ui.js"></script>
     <script src="ajaxfileupload/ajaxfileupload.js"></script>
     <script src="tinymce/js/tinymce/tinymce.js"></script>
+    <script src="tinymce/js/tinymce/jquery.tinymce.min.js"></script>
     <!-- SMOOTH SCROLL -->
     <script>
     $(function() {
@@ -103,7 +104,7 @@
 		  <td><input class="volunteer-childs-name" type="text" value="Sandy Kay"></td>
 		  <td><input class="volunteer-parents-name" type="text" value="Fred Kay"></td>
 		  <td class=gryc><input class="volunteer-attended" type="checkbox"></td>
-		  <td>&nbsp;<input class="volunteer-note" type="textarea" lines="2" size=50></td>
+		  <td><div class="kc-tinymce-div"><div class="volunteer-note">fred had a ball</div></div></td>
 		</tr>
 		<tr class="add-volunteer">
 		  <td class="add-volunteer"><a href="#"><i class="fa fa-plus-square fa-fw"></i> ADD NAME</a></td>
@@ -116,5 +117,6 @@
 	</div>
       </main>
     </div>
+    <input type="hidden" id="referer" name="referer">
   </body>
 </html>

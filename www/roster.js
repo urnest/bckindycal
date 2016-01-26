@@ -312,6 +312,7 @@ var addMeRow=function($r,$addMe,staff,job,c,groups,refresh){
 $(document).ready(function(){
   var groups;
   var rosterJobs;
+  var maintenanceDays;
   var groupsToShow;
   var groupsToShowOptions;
   var $groupsToShowOption_t=$('a.select-your-group').first().clone();
@@ -322,6 +323,7 @@ $(document).ready(function(){
   var $kindyWideRosterJobsTable=$('table.kindy-wide-roster-jobs-table');
   var $addMe_t=$('a[href="addme.html"]').remove().first();;
   var $job_t=$('table.roster-jobs-table tr.jobs').remove().first();
+  var $mday_t=$('div.maintenance-days .Mday').remove().first();
   var $kindyWideJob_t=$('table.kindy-wide-roster-jobs-table tr.jobs').remove().first();
   var unitOfGroups=function(groups){
     if (groups.length==4){
@@ -361,10 +363,16 @@ $(document).ready(function(){
       });
       proceed();
     })
+  kc.getFromServer('all_maintenance_days')
+    .then(function(result){
+      maintenanceDays=result;
+      proceed();
+    })
   var proceed=function(){
     if (kc.defined(groups)&&
 	kc.defined(groupsToShow)&&
-	kc.defined(rosterJobs)){
+	kc.defined(rosterJobs)&&
+	kc.defined(maintenanceDays)){
       groupsToShowOptions=[];
       if (staff){
 	groupsToShowOptions.push({text:'All',groups:[0,1,2,3]});
@@ -516,6 +524,80 @@ $(document).ready(function(){
 		   function(){refresh();});
 	}
       }
+    });
+    $('div.maintenance-days').find('.Mday').remove();
+    kc.each(maintenanceDays,function(i,m){
+      var id=m.id;
+      var $mday=$mday_t.clone();
+      var $addme=$addMe_t.clone();
+      $mday.find('.mdate a')
+	.text(kc.formatDate(m.date))
+	.attr('href',(staff?'edit_maintenance_day.html':'maintenance_day.html')+'?id='+m.id);
+      var names=[];
+      kc.each(m.volunteers,function(i,volunteer){
+	names.push(volunteer.parents_name);
+      });
+      if (names.length==0){
+	names.push('(no volunteers yet)');
+      }
+      $mday.find('.mname').text(kc.join(', ',names));
+      $('div.maintenance-days').append($mday);
+      $mday.find('.mday-addme').html($addme);
+      $addme.click(function(){
+	var $dialog=$('<div><p>Your Name: <input type="text" name="parent_name"></p><p>Your Child\'s Name: <input type="text" name="child_name"></p></div>');
+	var add=function(childs_name,parents_name){
+	  if (parents_name==''){
+	    $dialog.find('input[name="parent_name"]').addClass('invalid-input');
+	    return false;
+	  }
+	  if (childs_name==''){
+	    $dialog.find('input[name="child_name"]').addClass('invalid-input');
+	    return false;
+	  }
+	  $dialog.find('input').removeClass('invalid-input');
+	  kc.postToServer('add_maintenance_day_volunteer',{
+	    id:id,
+	    childs_name:childs_name,
+	    parents_name:parents_name
+	  })
+	    .then(function(){
+	      $dialog.dialog('close');
+	      m.volunteers.push({
+		parents_name:parents_name,
+		childs_name:childs_name,
+		attended:false,
+		note:'<p></p>'
+	      });
+	      refresh();
+	    });
+	  return false;
+	};
+	$dialog.dialog({
+	  'title':'Maintenance Day',
+	  'buttons':[
+	    {
+	      text:'Cancel',
+	      click:function(){ 
+		$dialog.dialog('close');
+		return false;
+	      }
+	    },
+	    {
+	      text:'OK',
+	      click:function(){ 
+		add($dialog.find('input[name="child_name"]').prop('value'),
+		    $dialog.find('input[name="parent_name"]').prop('value')); 
+		return false;
+	      }
+	    }
+	  ],
+	  close: function(){
+	    $dialog.dialog('destroy');
+	  }
+	});
+	return false;
+	
+      });
     });
     rendering.done();
   };

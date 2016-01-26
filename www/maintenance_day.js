@@ -35,8 +35,11 @@ $(document).ready(function(){
 		$dialog.find('input[name="parent_name"]').prop('value')); 
 	  }
 	}
-      ]
-    }).show();
+      ],
+      close: function(){
+	$dialog.dialog('destroy');
+      }
+    });
     return false;
   });
 });

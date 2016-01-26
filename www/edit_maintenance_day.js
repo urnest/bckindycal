@@ -2,6 +2,7 @@ $(document).ready(function(){
   var maintenance_day;
   var rendering=kc.rendering($('div#content'));
   var busyCount=0;
+  var nextVolunteerRowId=1;
   $('body').removeClass('kc-invisible');//added by kindycal.py
   $('input.date').prop('value','');
   $('input.name').prop('value','');
@@ -31,7 +32,7 @@ $(document).ready(function(){
       var childs_name=$t.find('.volunteer-childs-name').prop('value');
       var parents_name=$t.find('.volunteer-parents-name').prop('value');
       var attended=$t.find('.volunteer-attended').prop('checked');
-      var note=$t.find('.volunteer-note').prop('value');
+      var note=$t.find('.volunteer-note').html();
       if (childs_name||parents_name){
 	volunteers.push({childs_name:childs_name,
 			 parents_name:parents_name,
@@ -51,7 +52,7 @@ $(document).ready(function(){
       })
     })
       .then(function(){
-	window.location='edit_events.html';
+	window.location=$('input[name="referer"]').prop('value')||'edit_events.html';
       })
       .always(function(){
 	--busyCount;
@@ -123,8 +124,7 @@ $(document).ready(function(){
   var proceed=function(){
     if (maintenance_day){
       $('div.job-description').html(maintenance_day.description.html);
-      tinymce.init({
-	selector: 'div.job-description',
+      $('div.job-description').tinymce({
 	inline: true,
 	plugins: [
 	  'advlist autolink lists link image charmap print preview anchor',
@@ -150,9 +150,8 @@ $(document).ready(function(){
 	$volunteerRow.find('input.volunteer-attended').prop(
 	  'checked',
 	  attended);
-	$volunteerRow.find('input.volunteer-note').prop(
-	  'value',
-	  note);
+	$volunteerRow.find('div.volunteer-note').html(note)
+	  .attr('id','volunteer-note-'+nextVolunteerRowId);
 	$('table.volunteer-table').find('tr.add-volunteer').before(
 	  $volunteerRow);
 	$volunteerRow.find('.delete-volunteer').click(function(){
@@ -162,13 +161,24 @@ $(document).ready(function(){
 	  }
 	  return false;
 	});
+	tinymce.init({
+	  inline: true,
+	  selector: '#volunteer-note-'+nextVolunteerRowId,
+	  plugins: [
+	    'advlist autolink lists link image charmap print preview anchor',
+	    'searchreplace visualblocks code fullscreen',
+	    'insertdatetime media table contextmenu paste code'
+	  ],
+	  toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
+	});
+	++nextVolunteerRowId;
 	return $volunteerRow;
       };
       kc.each(maintenance_day.volunteers,function(i,volunteer){
 	addVolunteer(volunteer.childs_name,volunteer.parents_name,volunteer.attended,volunteer.note);
       });
       $('td.add-volunteer').click(function(){
-	addVolunteer('','',false,'').find('input.volunteer-childs-name').focus();
+	addVolunteer('','',false,'<p></p>').find('input.volunteer-childs-name').focus();
 	return false;
       });
       rendering.done();
