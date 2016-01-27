@@ -134,17 +134,6 @@ $(document).ready(function(){
       kc.each(groups,function(i,group){
 	groupsToShowOptions.push({text:group.name,groups:[i]})
       });
-      if (staff){
-	// assumes 4 groups
-	groupsToShowOptions.push(
-	  {text:groups[0].name+' + '+groups[1].name, groups:[0,1]});
-	groupsToShowOptions.push(
-	  {text:groups[2].name+' + '+groups[3].name, groups:[2,3] });
-	groupsToShowOptions.push(
-	  {text:groups[0].name+' + '+groups[2].name, groups:[0,2] });
-	groupsToShowOptions.push(
-	  {text:groups[1].name+' + '+groups[3].name, groups:[1,3] });
-      }
       var showGroups=function(newGroupsToShow){
 	var is=kc.find(groupsToShowOptions,function(x){
 	  return kc.json.encode(x.groups)==kc.json.encode(newGroupsToShow);
