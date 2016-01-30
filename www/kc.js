@@ -779,7 +779,7 @@
       buttons:{
 	'OK': function(){
           $.ajaxFileUpload({
-            url:'session_file',
+            url:'uploaded_file',
             secureuri:false,
             fileElementId:'filename',
             dataType: 'text',
@@ -790,7 +790,7 @@
                 result.error_(data.error);
               }
 	      else {
-                result.then_('session_file?id='+data.result.id);
+                result.then_('uploaded_file?id='+data.result.id);
                 $dialog.dialog('close');
               }
             },

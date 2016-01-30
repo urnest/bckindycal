@@ -254,6 +254,7 @@ tinymce.PluginManager.add('link', function(editor) {
 			};
 		}
 
+		var jquery_=$;
 		win = editor.windowManager.open({
 			title: 'Insert link',
 			data: data,
@@ -267,6 +268,22 @@ tinymce.PluginManager.add('link', function(editor) {
 					label: 'Url',
 					onchange: urlChange,
 					onkeyup: updateText
+				},
+				{
+					type: 'label',
+					text: ' or '
+				},
+				{
+					type: 'button', 
+					text: 'Upload...',
+					onclick: function(){
+						kc.uploadFile(jquery_)
+							.then(function(url){
+								win.find('#href').value(url);
+							})
+							.$dialog.closest('.ui-dialog').css('z-index',65539)
+							.closest('.ui-widget-overlay').css('z-index',65538);
+					}
 				},
 				textListCtrl,
 				linkTitleCtrl,

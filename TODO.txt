@@ -94,7 +94,7 @@ x event.html
     x mce
     ~ name colour
     x save (return to calendar for monthToShow)
-    - image/document upload (later)
+
 
 x terms start with monday/tue or monday/tue/wed, not per group
   x grey out of term
@@ -129,7 +129,58 @@ x time with your child
 - fair rosters
 
 - upload document/image
-- hash(data) & 0xffffffff
+  - logout (return to loginLevel login page)
+  - rewrite mce dialogs as jquery ui dialogs with image:
+         url ____   
+         or file ____
+         Next
+         
+         preview Change
+         size
+         title
+         OK
+    ... link:
+         url ____ Upload...
+         text (default to uploaded file name)
+         OK (must have text)
+
+An upload looks like:
+Accept	text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Encoding	gzip, deflate
+Accept-Language	en-US,en;q=0.5
+Connection	keep-alive
+Cookie	kc-session=f903cc11c6f811e589f46d06fceec485; month-to-show="\173\012 \"m\": 2\054\012 \"y\": 2016\012\175"
+Host	192.168.0.3:8080
+Referer	http://192.168.0.3:8080/edit_event.html?id=100
+User-Agent	Mozilla/5.0 (X11; Linux i686; rv:24.0) Gecko/20140429 Firefox/24.0 Iceweasel/24.5.0
+R
+Content-Length	29628
+Content-Type	multipart/form-data; boundary=---------------------------2906405429423721941612351615
+
+-----------------------------2906405429423721941612351615
+Content-Disposition: form-data; name="filename"; filename="1003-orig.jpeg"
+Content-Type: image/jpeg
+
+xxxxx
+-----------------------------2906405429423721941612351615--
+
+
+
+INFO     2016-01-30 05:37:54,799 kindycal.py:37] {'Content-Type': 'multipart/form-data; boundary=---------------------------21355231821231987527755659472', 'Content_Type': 'multipart/form-data; boundary=---------------------------21355231821231987527755659472', 'Host': '192.168.0.3:8080', 'Referer': 'http://192.168.0.3:8080/edit_event.html?id=100', 'Content-Length': '225', 'X-Appengine-Country': 'ZZ', 'Accept-Language': 'en-US,en;q=0.5', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'User-Agent': 'Mozilla/5.0 (X11; Linux i686; rv:24.0) Gecko/20140429 Firefox/24.0 Iceweasel/24.5.0', 'Cookie': 'kc-session=f903cc11c6f811e589f46d06fceec485; month-to-show="\\173\\012    \\"m\\": 2\\054\\012    \\"y\\": 2016\\012\\175"', 'Content_Length': '225'}
+
+INFO     2016-01-30 05:28:46,376 kindycal.py:37] '-----------------------------14841912591767163687971027465\r\nContent-Disposition: form-data; name="filename"; filename="xxx.txt"\r\nContent-Type: text/plain\r\n\r\nxxx\n\r\n-----------------------------14841912591767163687971027465--\r\n'
+
+
+
+INFO     2016-01-30 05:44:23,335 kindycal.py:37] {'Content-Type': 'multipart/form-data; boundary=-----------------------------14841912591767163687971027465', 'Content_Type': 'multipart/form-data; boundary=-----------------------------14841912591767163687971027465', 'Host': '192.168.0.3:8080', 'Content-Length': '225', 'X-Appengine-Country': 'ZZ', 'Cookie': 'kc-session=83d4ce47c71411e58e4d1513d253b538; Path=/', 'Content_Length': '225'}
+INFO     2016-01-30 05:44:23,338 kindycal.py:37] '-----------------------------14841912591767163687971027465\r\nContent-Disposition: form-data; name="filename"; filename="xxx.txt"\r\nContent-Type: text/plain\r\n\r\nxxx\n\r\n-----------------------------14841912591767163687971027465--\r\n'
+
+
+INFO     2016-01-30 05:36:46,739 kindycal.py:37] {'Content-Type': 'multipart/form-data; boundary=--e76d48a9843a14b8', 'Content_Type': 'multipart/form-data; boundary=--e76d48a9843a14b8', 'Host': '192.168.0.3:8080', 'Content-Length': '145', 'X-Appengine-Country': 'ZZ', 'Cookie': 'kc-session=73b7cf21c71311e5a0fd1513d253b538; Path=/', 'Content_Length': '145'}
+
+INFO     2016-01-30 05:33:37,792 kindycal.py:37] '--44de7b2477ba1ea2\r\nContent-Disposition: form-data; name="filename"; filename="xxx.txt"\r\nContent-Type: text/plain\r\n\r\nxxx\n\r\n--44de7b2477ba1ea2--\r\n'
+
+
 - @ndb.transactional
 - ref count File
   File

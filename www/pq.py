@@ -168,7 +168,7 @@ class Tag(Node):
         if len(self.classes)==0:
             del self.attrs['class']
         return self
-    def attr(self, a, val):
+    def attr(self, a, val=None):
         if not val is None:
             self.attrs[a]=val
         return self.attrs.get(a,'')
