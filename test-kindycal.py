@@ -60,6 +60,7 @@ class Staff:
                     })
             self.c.request('POST','/staff_login.html',params)
             r=self.c.getresponse()
+            assert r.status==302,(r.status,r.read())
             content=r.read()
             self.session=getSession(r.getheader('Set-Cookie'))
             assert not self.session is None, self.getheaders()
@@ -89,6 +90,17 @@ class Staff:
             assert url.startswith('/'),url
             headers['Cookie']='kc-session=%s'%self.session
             self.c.request('GET',url+'?'+urllib.urlencode(params),'',headers)
+            return self.c.getresponse()
+        except:
+            raise inContext(scope.description)
+        pass
+    def post(self,url,params={},headers={}):
+        'send HTTP POST to %(self)r page %(url)r with params %(params)r and headers %(headers)r'
+        scope=Scope(l1(Staff.post.__doc__)%vars())
+        try:
+            assert url.startswith('/'),url
+            headers['Cookie']='kc-session=%s'%self.session
+            self.c.request('POST',url,urllib.urlencode(params),headers)
             return self.c.getresponse()
         except:
             raise inContext(scope.description)
@@ -185,7 +197,7 @@ assert yyy2==yyy, (yyy2,yyy)
 
 prev_session=staff.session
 staff.logout()
-
+del staff
 
 staff=Staff(server,staff_password)
 
@@ -208,4 +220,33 @@ yyy3=result['result']['id']
 
 assert type(yyy3) is types.IntType, yyy3
 assert yyy3!=yyy, (yyy3,yyy)
+
+r=staff.post('/event',{
+        'params':toJson({
+                'id': 101,
+                'groups': [0],
+                'dates': [ { 'year':2016,'month':3,'day':13 } ],
+                'name':{
+                    'text':'event 101',
+                    'colour':'#000000'
+                    },
+                'description': {
+                    'html': 'event 101 <img src="uploaded_file?id=%(yyy3)s">'%vars()
+                    }
+                })
+        })
+assert r.status==200,(r.status,r.read())
+r.read()
+
+prev_session=staff.session
+staff.logout()
+
+staff=Staff(server,staff_password)
+
+assert prev_session!=staff.session, (prev_session,staff.session)
+
+r=staff.get('/uploaded_file',{'id':'%(yyy3)s'%vars()})
+assert r.status==200,r.status
+content=r.read()
+assert content=='yyy\n',content
 

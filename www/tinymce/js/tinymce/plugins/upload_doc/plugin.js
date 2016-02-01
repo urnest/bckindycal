@@ -10,7 +10,94 @@
 
 /*global tinymce:true */
 
-tinymce.PluginManager.add('link', function(editor) {
+tinymce.PluginManager.add('uploaded_doc', function(editor) {
+  var $d;
+  var selection, dom, selectedElm, anchorElm, onlyText;
+  function doUpload(){
+    function insertLink(data) {
+      var linkAttrs = {
+	href: data.href,
+	title: data.title
+      };
+      
+      if (anchorElm) {
+	editor.focus();
+	
+	if (onlyText && data.text != initialText) {
+	  if ("innerText" in anchorElm) {
+	    anchorElm.innerText = data.text;
+	  } else {
+	    anchorElm.textContent = data.text;
+	  }
+	}
+	
+	dom.setAttribs(anchorElm, linkAttrs);
+	
+	selection.select(anchorElm);
+	editor.undoManager.add();
+      } else {
+	if (onlyText) {
+	  editor.insertContent(dom.createHTML('a', linkAttrs, dom.encode(data.text)));
+	} else {
+	  editor.execCommand('mceInsertLink', false, linkAttrs);
+	}
+      }
+    }
+    
+    //REVISIT
+  };
+  function getDialog(){
+    if (!kc.defined($d)){
+      $d=$('<div>')
+	.append(
+	  $('<form action="uploaded_doc" enctype="multipart/form-data">')
+	    .append($('<input type="file" name="filename" class="job">')));
+      $d.dialog({
+	'autoOpen':false,
+	'button':[
+	  {
+	    'text':'OK',
+	    'click':function(){
+	      doUpload()
+		.then(function(){
+		  $d.dialog('close');
+		});
+	    }
+	  },
+	  {
+	    'text':'Cancel',
+	    'click':function(){
+	      $d.dialog('close');
+	    }
+	  }]});
+      $d.find('input[name="filename"]').change(function(){
+	if ($(this).value==''){
+	  //REVISIT
+	}
+	else{
+	  //REVISIT
+	}
+      });
+    }
+    return $d;
+  };
+  function isOnlyTextSelected() {
+    var html = selection.getContent();
+    
+    // Partial html and not a fully selected anchor element
+    if (/</.test(html) && (!/^<a [^>]+>[^<]+<\/a>$/.test(html) || html.indexOf('href=') == -1)) {
+      return false;
+    }
+    return true;
+  }
+  function uploadDoc(){
+    selection = editor.selection;
+    dom = editor.dom;
+    selectedElm = selection.getNode();
+    anchorElm = dom.getParent(selectedElm, 'a[href]');
+    onlyText = isOnlyTextSelected();
+  };
+
 	function createLinkList(callback) {
 		return function() {
 			var linkList = editor.settings.link_list;
@@ -254,6 +341,7 @@ tinymce.PluginManager.add('link', function(editor) {
 			};
 		}
 
+		var jquery_=$;
 		win = editor.windowManager.open({
 			title: 'Insert link',
 			data: data,
@@ -267,6 +355,22 @@ tinymce.PluginManager.add('link', function(editor) {
 					label: 'Url',
 					onchange: urlChange,
 					onkeyup: updateText
+				},
+				{
+					type: 'label',
+					text: ' or '
+				},
+				{
+					type: 'button', 
+					text: 'Upload...',
+					onclick: function(){
+						kc.uploadFile(jquery_)
+							.then(function(url){
+								win.find('#href').value(url);
+							})
+							.$dialog.closest('.ui-dialog').css('z-index',65539)
+							.closest('.ui-widget-overlay').css('z-index',65538);
+					}
 				},
 				textListCtrl,
 				linkTitleCtrl,
@@ -371,31 +475,13 @@ tinymce.PluginManager.add('link', function(editor) {
 		});
 	}
 
-	editor.addButton('link', {
-		icon: 'link',
-		tooltip: 'Insert/edit link',
-		shortcut: 'Meta+K',
-		onclick: createLinkList(showDialog),
-		stateSelector: 'a[href]'
-	});
-
-	editor.addButton('unlink', {
-		icon: 'unlink',
-		tooltip: 'Remove link',
-		cmd: 'unlink',
-		stateSelector: 'a[href]'
-	});
-
-	editor.addShortcut('Meta+K', '', createLinkList(showDialog));
-	editor.addCommand('mceLink', createLinkList(showDialog));
+	editor.addCommand('mceUploadDoc', uploadDoc);
 
 	this.showDialog = showDialog;
 
-	editor.addMenuItem('link', {
-		icon: 'link',
-		text: 'Insert/edit link',
-		shortcut: 'Meta+K',
-		onclick: createLinkList(showDialog),
+	editor.addMenuItem('upload_doc', {
+		text: 'Upload Document',
+		onclick: uploadDoc,
 		stateSelector: 'a[href]',
 		context: 'insert',
 		prependToContext: true
