@@ -73,7 +73,10 @@ input.kc-invalid-input,
 .shell {
     margin: 0 auto;
     position: relative;
-    width: 940px;
+    width: 90%;
+}
+table.month-of-events {
+    min-width: 940px;
 }
 .loginshell {
     margin: 0 auto;
