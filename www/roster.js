@@ -110,7 +110,8 @@ var addMe=function($from,job,groups){
     dialogClass:'kc-in-front-of-navbar',
     close:function(){
       setTimeout(function(){$dialog.dialog('destroy');},0);
-    }
+    },
+    width: "auto"
   }).show();
   $dialog.submit(function(){
     add($dialog.find('input[name="child_name"]').prop('value'),
@@ -199,7 +200,7 @@ var editVolunteer=function($from,job,groups,volunteer){
     plugins: [
       'advlist autolink lists link image charmap print preview anchor',
       'searchreplace visualblocks code fullscreen',
-      'insertdatetime media table contextmenu paste code'
+      'insertdatetime media table contextmenu paste code upload_doc'
     ],
     toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
   });
@@ -222,7 +223,6 @@ var jobRow=function($r,staff,job,c,groups,volunteer,refresh){
       var $d=$('<div>').html(job.description);
       $d.dialog({
 	title: job.name+' - Description',
-	modal: true,
 	buttons:[
 	  {
 	    text:'Close',
@@ -235,6 +235,7 @@ var jobRow=function($r,staff,job,c,groups,volunteer,refresh){
 	  $d.dialog('destroy');
 	}
       });
+      return false;
     });
   }
   $r.find('.frequency').text(frequencies[job.frequency]);

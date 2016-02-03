@@ -1,3 +1,7 @@
+- description dialog position on ipod
+- add me maintenance day too big
+  - fix width, but < 300 (which it was)
+
 - add admin password change page
 - edit_event/maintenance_day/public_holiday go back to edit_events
 x add admin menu item to navbar when admin (-> admin.html)

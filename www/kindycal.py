@@ -1393,7 +1393,10 @@ class uploaded_file(webapp2.RequestHandler):
                 mime_type=self.request.POST['filename'].type
                 data=self.request.get('filename')
                 id=saveFile(session,mime_type,data)
-                result=scope.result({'result':{'id':id}})
+                result=scope.result({
+                        'result':{
+                            'id':id,
+                            'originalFileName':self.request.POST['filename'].filename}})
                 pass
             pass
         except:
