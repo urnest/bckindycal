@@ -473,6 +473,7 @@ h1.event-name {
 	padding: 8px 10px 7px 0px;
 	margin-top: 2px;
 }
+.roster-maintenance-day-name,
 h1.maintenance-day-name {
 	font-size: 20px;
 	color: #333333;

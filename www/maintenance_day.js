@@ -28,7 +28,7 @@ $(document).ready(function(){
 	});
     };
     $dialog.dialog({
-      'title':'Maintenance Day',
+      'title':'Maintenance Job',
       'buttons':[
 	{
 	  text:'Cancel',

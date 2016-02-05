@@ -516,12 +516,31 @@ $(document).ready(function(){
     });
     $('div.maintenance-days').find('.Mday').remove();
     kc.each(maintenanceDays,function(i,m){
+      var today=new Date();
       var id=m.id;
       var $mday=$mday_t.clone();
       var $addme=$addMe_t.clone();
+      var yearToday=today.getYear()+1900;
+      var monthToday=today.getMonth()+1;//Date() numbers months 0..11
+      var dayToday=today.getDay();
+
+      if (!staff){
+	if (m.date.year != yearToday){
+	  return;
+	}
+	else if (m.date.year == yearToday){
+	  if (m.date.month < monthToday){
+	    return;
+	  }
+	  if ((m.date.month == monthToday) && (m.date.day < dayToday)){
+	    return;
+	  }
+	}
+      }
       $mday.find('.mdate a')
 	.text(kc.formatDate(m.date))
 	.attr('href',(staff?'edit_maintenance_day.html':'maintenance_day.html')+'?id='+m.id);
+      $mday.find('.roster-maintenance-day-name').text(m.name);
       var names=[];
       kc.each(m.volunteers,function(i,volunteer){
 	names.push(volunteer.parents_name);
@@ -562,7 +581,7 @@ $(document).ready(function(){
 	  return false;
 	};
 	$dialog.dialog({
-	  'title':'Maintenance Day',
+	  'title':'Maintenance Job',
 	  'buttons':[
 	    {
 	      text:'Cancel',

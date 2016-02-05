@@ -68,7 +68,7 @@ $(document).ready(function(){
     if ($('input#id').prop('value')=='0'){
       return false;
     }
-    if (!window.confirm('Delete Maintenance Day?')){
+    if (!window.confirm('Delete Maintenance Job?')){
       return false;
     }
     ++busyCount;
