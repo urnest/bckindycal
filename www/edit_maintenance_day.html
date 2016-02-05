@@ -78,22 +78,24 @@
 	
 	<div id="content" class="shell">
 	  
-	  <h2>Calendar - Maintenance Days</h2>
+	  <h2>Calendar - Maintenance Day etc</h2>
 	  <div>
             <form method="POST" action="maintenance_day">
               <input type="hidden" id="id" name="id" value="0">
-              <span class="admpnk">Name (appears on calendar):</span><br>
+              <span class="admpnk">Name (to show on calendar):</span><br>
               <input class="GroupName name" type="text" value="Maintenance Day 8am"><br>
 	      <span class="admpnk">Date:</span><br>
               <input class="date" type="text" value="2/5/2016">
 	      <br>
-              <span class="admpnk">Description:</span>
+              <span class="admpnk">Description (times/tasks/tools required etc):</span>
               <div class="kc-descbox kc-tinymce-div">
                 <div class="job-description">
                   <p>Odd jobs etc.</p>
                 </div>
               </div>    
-              <br>
+	      <br>
+              <span class="admpnk">Max. Volunteers Allowed:</span><br>
+              <input class="GroupName max-volunteers" type="text" value="25"><br>
               <span class="admpnk">Volunteers:</span>
               <table class="volunteer-table">
 		<tr>
@@ -110,8 +112,8 @@
 		  <td class="add-volunteer"><a href="#"><i class="fa fa-plus-square fa-fw"></i> ADD NAME</a></td>
 		</tr>
               </table><br><br>
-              <input type="submit" value="SAVE MAINT DAY" id="save-button" class="job">&nbsp;&nbsp;
-              <input type="submit" value="DELETE MAINT DAY" id="delete-button" class="del">
+              <input type="submit" value="SAVE MAINT JOB" id="save-button" class="job">&nbsp;&nbsp;
+              <input type="submit" value="DELETE MAINT JOB" id="delete-button" class="del">
             </form>
           </div>
 	</div>

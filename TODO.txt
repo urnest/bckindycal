@@ -1,3 +1,18 @@
+- add another name (edit_maintenance_day.html/js colspan=2)
+x hide past maintenance days
+- 2x checkbox
+x maint day title does not display
+- description dialog position on ipod
+- add me maintenance day too big
+  - fix width, but < 300 (which it was)
+x roster.html - change Maintenance Days to Maintenance (heading)
+  x add task name to display
+  x move addme to next line
+  x title of addme popups
+  x limit volunteers (hide addme when reached - 2 pages)
+- adjust maintenance_day.js to know maxVolunteers and hide addme button
+  once we get there
+
 - add admin password change page
 - edit_event/maintenance_day/public_holiday go back to edit_events
 x add admin menu item to navbar when admin (-> admin.html)

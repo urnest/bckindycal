@@ -797,6 +797,7 @@ maintenance_day_schema=jsonschema.Schema({
         'description' : {
             'html' : StringType
             },
+        'maxVolunteers': IntType,
         'volunteers':[volunteer_schema]
         })
 
@@ -840,6 +841,7 @@ class maintenance_day(webapp2.RequestHandler):
                 ancestor=root_key).fetch(1)
             result=fromJson(maintenance_day[0].data)
             if not 'name' in result: result['name']='Maintenance Day 8am'
+            if not 'maxVolunteers' in result: result['maxVolunteers']=25
             maintenance_day_schema.validate(result)
             pass
         return self.response.write(toJson({'result':result}))
@@ -852,6 +854,7 @@ class maintenance_day(webapp2.RequestHandler):
                 data=fromJson(self.request.get('params'))
                 assert not data is None
                 if not 'name' in data: data['name']='Maintenance Day 8am'
+                if not 'maxVolunteers' in data: data['maxVolunteers']=25
                 maintenance_day_schema.validate(data)
                 if data['id']==0: data['id']=nextMaintenanceDayId()
                 maintenance_day=MaintenanceDay(parent=root_key,
@@ -1003,6 +1006,7 @@ class month_maintenance_days(webapp2.RequestHandler):
                         ancestor=root_key).fetch(10000)]
                 for data in maintenance_days:
                     if not 'name' in data: data['name']='Maintenance Day 8am'
+                    if not 'maxVolunteers' in data: data['maxVolunteers']=25
                     pass
                 log(maintenance_days)
                 month_maintenance_days_schema.validate(maintenance_days)
@@ -1052,6 +1056,7 @@ class maintenance_day_page(webapp2.RequestHandler):
                           ancestor=root_key).fetch(1)
         maintenance_day=fromJson(maintenance_day[0].data)
         if not 'name' in maintenance_day: maintenance_day['name']='Maintenance Day 8am'
+        if not 'maxVolunteers' in maintenance_day: maintenance_day['maxVolunteers']=25
         maintenance_day_schema.validate(maintenance_day)
         page=pq.loadFile('maintenance_day.html')
         page.find(pq.attrEquals('id','id')).attr('value',str(id))
@@ -1062,6 +1067,10 @@ class maintenance_day_page(webapp2.RequestHandler):
             pq.parse(maintenance_day['description']['html']))
         volunteer_table=page.find(pq.hasClass('volunteers-table'))
         vrt=volunteer_table.find(pq.hasClass('volunteer-row')).remove().first()
+        if len(maintenance_day['volunteers'])>=maintenance_day['maxVolunteers']:
+            full=pq.parse('(FULL)').replace(
+                page.find(pq.tagName('a')).filter(pq.hasClass('add-volunteer')))
+            pass
         for v in maintenance_day['volunteers']:
             vr=vrt.clone()
             vr.find(pq.hasClass('volunteer-child-name')).text(
@@ -1111,6 +1120,8 @@ class add_maintenance_day_volunteer(webapp2.RequestHandler):
                     MaintenanceDay.id==id,
                     ancestor=root_key).fetch(1)[0]
                 data=fromJson(maintenance_day.data)
+                if not 'name' in data: data['name']='Maintenance Day 8am'
+                if not 'maxVolunteers' in data: data['maxVolunteers']=25
                 data['volunteers'].append({
                     'childs_name':childs_name,
                     'parents_name':parents_name,
@@ -2085,7 +2096,10 @@ class all_maintenance_days(webapp2.RequestHandler):
                 result=[fromJson(_.data) for _ in MaintenanceDay.query(ancestor=root_key).fetch(1000)]
                 cmpDate=lambda x, y: cmp( (x['year'],x['month'],x['day']),
                                           (y['year'],y['month'],y['day']))
-                                          
+                for data in result:
+                    if not 'name' in data: data['name']='Maintenance Day 8am'
+                    if not 'maxVolunteers' in data: data['maxVolunteers']=25
+                    pass
                 result.sort(lambda x,y: cmpDate(x['date'],y['date']))
                 all_maintenance_days_schema.validate(result)
                 result={'result':result}
