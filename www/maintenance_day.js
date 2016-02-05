@@ -1,5 +1,7 @@
 $(document).ready(function(){
   var $vrt=$('.vr-template').remove().first().removeClass('vr-template');
+  var mdate=$('.mdate').first().text();
+  var maintenanceDayName=$('.maintenance-day-name').first().text();
   $('.add-volunteer').click(function(){
     var id=$('input#id').prop('value');
     var $dialog=$('<div><p>Your Name: <input type="text" name="parent_name"></p><p>Your Child\'s Name: <input type="text" name="child_name"></p></div>');
@@ -28,7 +30,8 @@ $(document).ready(function(){
 	});
     };
     $dialog.dialog({
-      'title':'Maintenance Job',
+      'width':'250px',
+      'title':mdate+' '+maintenanceDayName,
       'buttons':[
 	{
 	  text:'Cancel',

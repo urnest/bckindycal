@@ -53,6 +53,7 @@ var promptForName=function(){
     result.then_=f;
   };
   $dialog.dialog({
+    'width':'250px',
     'title':'TWYC - Add Your Name',
     'buttons':[
       {

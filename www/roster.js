@@ -17,6 +17,7 @@ var promptForName=function(){
     result.then_=f;
   };
   $dialog.dialog({
+    'width':'250px',
     'title':'TWYC',
     'buttons':[
       {
@@ -93,6 +94,7 @@ var addMe=function($from,job,groups){
 	});
   };
   $dialog.dialog({
+    'width':'250px',
     'title':'Your Details',
     'buttons':[
       {
@@ -172,6 +174,7 @@ var editVolunteer=function($from,job,groups,volunteer){
       });
   };
   $dialog.dialog({
+    'width':'250px',
     'title':'Edit Volunteer',
     'buttons':[
       {
@@ -550,62 +553,68 @@ $(document).ready(function(){
       }
       $mday.find('.mname').text(kc.join(', ',names));
       $('div.maintenance-days').append($mday);
-      $mday.find('.mday-addme').html($addme);
-      $addme.click(function(){
-	var $dialog=$('<div><p>Your Name: <input type="text" name="parent_name"></p><p>Your Child\'s Name: <input type="text" name="child_name"></p></div>');
-	var add=function(childs_name,parents_name){
-	  if (parents_name==''){
-	    $dialog.find('input[name="parent_name"]').addClass('invalid-input');
-	    return false;
-	  }
-	  if (childs_name==''){
-	    $dialog.find('input[name="child_name"]').addClass('invalid-input');
-	    return false;
-	  }
-	  $dialog.find('input').removeClass('invalid-input');
-	  kc.postToServer('add_maintenance_day_volunteer',{
-	    id:id,
-	    childs_name:childs_name,
-	    parents_name:parents_name
-	  })
-	    .then(function(){
-	      $dialog.dialog('close');
-	      m.volunteers.push({
-		parents_name:parents_name,
-		childs_name:childs_name,
-		attended:false,
-		note:'<p></p>'
-	      });
-	      refresh();
-	    });
-	  return false;
-	};
-	$dialog.dialog({
-	  'title':'Maintenance Job',
-	  'buttons':[
-	    {
-	      text:'Cancel',
-	      click:function(){ 
-		$dialog.dialog('close');
-		return false;
-	      }
-	    },
-	    {
-	      text:'OK',
-	      click:function(){ 
-		add($dialog.find('input[name="child_name"]').prop('value'),
-		    $dialog.find('input[name="parent_name"]').prop('value')); 
-		return false;
-	      }
+      if (m.volunteers.length < m.maxVolunteers){
+	$mday.find('.mday-addme').html($addme);
+	$addme.click(function(){
+	  var $dialog=$('<div><p>Your Name: <input type="text" name="parent_name"></p><p>Your Child\'s Name: <input type="text" name="child_name"></p></div>');
+	  var add=function(childs_name,parents_name){
+	    if (parents_name==''){
+	      $dialog.find('input[name="parent_name"]').addClass('invalid-input');
+	      return false;
 	    }
-	  ],
-	  close: function(){
-	    $dialog.dialog('destroy');
-	  }
+	    if (childs_name==''){
+	      $dialog.find('input[name="child_name"]').addClass('invalid-input');
+	      return false;
+	    }
+	    $dialog.find('input').removeClass('invalid-input');
+	    kc.postToServer('add_maintenance_day_volunteer',{
+	      id:id,
+	      childs_name:childs_name,
+	      parents_name:parents_name
+	    })
+	      .then(function(){
+		$dialog.dialog('close');
+		m.volunteers.push({
+		  parents_name:parents_name,
+		  childs_name:childs_name,
+		  attended:false,
+		  note:'<p></p>'
+		});
+		refresh();
+	      });
+	    return false;
+	  };
+	  $dialog.dialog({
+	    'width':'250px',//for ipod/small iphone etc
+	    'title':kc.formatDate(m.date)+' '+m.name,
+	    'buttons':[
+	      {
+		text:'Cancel',
+		click:function(){ 
+		  $dialog.dialog('close');
+		  return false;
+		}
+	      },
+	      {
+		text:'OK',
+		click:function(){ 
+		  add($dialog.find('input[name="child_name"]').prop('value'),
+		      $dialog.find('input[name="parent_name"]').prop('value')); 
+		  return false;
+		}
+	      }
+	    ],
+	    close: function(){
+	      $dialog.dialog('destroy');
+	    }
+	  });
+	  return false;
+	  
 	});
-	return false;
-	
-      });
+      }
+      else{
+	$mday.find('.mday-addme').text('(FULL)');
+      }
     });
     rendering.done();
   };
