@@ -46,6 +46,7 @@ $(document).ready(function(){
     kc.postToServer('maintenance_day',{
       params:kc.json.encode({
 	id:parseInt($('input#id').prop('value')),
+	name:$('input.name').first().prop('value'),
 	date:date,
 	description:{html:description},
 	volunteers:volunteers
