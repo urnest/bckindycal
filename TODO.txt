@@ -1,3 +1,4 @@
+- add another name (edit_maintenance_day.html/js colspan=2)
 x hide past maintenance days
 - 2x checkbox
 x maint day title does not display
