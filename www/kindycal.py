@@ -872,7 +872,7 @@ volunteer_schema=jsonschema.Schema({
         'childs_name':StringType,
         'parents_name':StringType,
         'attended':BooleanType,
-        'note':StringType,
+        'note':StringType,#html
         })
 maintenance_day_schema=jsonschema.Schema({
         'id': IntType, #0 for new MaintenanceDay
@@ -1792,7 +1792,7 @@ roster_job_schema=jsonschema.Schema({
         'id': IntType,
         'name': StringType,
         'per': jsonschema.OneOf('group','unit','kindy-wide'),
-        'description': StringType,
+        'description': StringType,#html
         'frequency': jsonschema.OneOf('as_required',
                                       'week',
                                       'term',

@@ -1,6 +1,16 @@
+- hide past maintenance days
+- 2x checkbox
+x maint day title does not display
 - description dialog position on ipod
 - add me maintenance day too big
   - fix width, but < 300 (which it was)
+- roster.html - change Maintenance Days to Maintenance (heading)
+  - add task name to display
+  - move addme to next line
+  - limit volunteers (hide addme when reached - 2 pages)
+  - title of addme popups
+/ maintenance day -> maintenance job
+/ maint day -> maint job
 
 - add admin password change page
 - edit_event/maintenance_day/public_holiday go back to edit_events
@@ -133,20 +143,14 @@ x time with your child
 - fair rosters
 
 - upload document/image
-  - logout (return to loginLevel login page)
-  - rewrite mce dialogs as jquery ui dialogs with image:
-         url ____   
-         or file ____
-         Next
-         
-         preview Change
-         size
-         title
-         OK
-    ... link:
-         url ____ Upload...
-         text (default to uploaded file name)
-         OK (must have text)
+  x logout (return to loginLevel login page)
+  - volunteer note
+  - maintenance_day description, volunteers notes
+  - roster_job description, instance volunteers
+    - addRosterJobVolunteer
+    - updateRosterJob
+    - updateVolunteer
+    - deleteRosterJobVolunteer
 
 An upload looks like:
 Accept	text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
