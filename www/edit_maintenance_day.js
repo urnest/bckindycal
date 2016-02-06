@@ -21,6 +21,12 @@ $(document).ready(function(){
       $('input.date').addClass('invalid-input');
       return false;
     }
+    var maxVolunteers=parseInt($('input.max-volunteers').first().prop('value'));
+    if (isNaN(parseInt(maxVolunteers))||
+	maxVolunteers==0){
+      $('input.max-volunteers').first().addClass('invalid-input');
+      return false;
+    }
     date={
       year:parseInt(d[2]),
       month:parseInt(d[1]),
@@ -46,8 +52,10 @@ $(document).ready(function(){
     kc.postToServer('maintenance_day',{
       params:kc.json.encode({
 	id:parseInt($('input#id').prop('value')),
+	name:$('input.name').first().prop('value'),
 	date:date,
 	description:{html:description},
+	maxVolunteers:maxVolunteers,
 	volunteers:volunteers
       })
     })
@@ -67,7 +75,7 @@ $(document).ready(function(){
     if ($('input#id').prop('value')=='0'){
       return false;
     }
-    if (!window.confirm('Delete Maintenance Day?')){
+    if (!window.confirm('Delete Maintenance Job?')){
       return false;
     }
     ++busyCount;
@@ -138,6 +146,7 @@ $(document).ready(function(){
       $('input.date').datepicker({
 	dateFormat: 'dd/mm/yy'
       });
+      $('input.max-volunteers').prop('value',maintenance_day.maxVolunteers);
       var $volunteerRow_t=$('tr.volunteer-row').remove().first();
       var addVolunteer=function(child_name,parent_name,attended,note){
 	var $volunteerRow=$volunteerRow_t.clone();

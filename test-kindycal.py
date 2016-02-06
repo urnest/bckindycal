@@ -25,17 +25,24 @@ def fromJson(x):
 
 import types
 
+def assert_equal(a,b):
+    assert a==b,(a,b)
+    pass
+def assert_in(field,dictionary):
+    assert field in dictionary,(field,dictionary)
+    pass
+
 class Scope:
     def __init__(self,description):
         self.description=description
-        self.result=None
+        self.result_=None
         print '+ '+self.description
         pass
     def __del__(self):
-        print '- '+self.description+' = '+repr(self.result)
+        print '- '+self.description+' = '+repr(self.result_)
         pass
     def result(self,result):
-        self.result=result
+        self.result_=result
         return result
     pass
 
@@ -139,7 +146,58 @@ class Staff:
         except:
             raise inContext(scope.description)
         pass
-    
+
+    def uploadFile(self,fileName,mime_type,content,headers={}):
+        'post %(fileName)s of type %(mime_type)s and given content to /uploaded_file, returning resulting id'
+        scope=Scope(l1(Staff.__doc__)%vars())
+        try:
+            r=staff.postFile('/uploaded_file','filename',fileName,mime_type,content,headers)
+            result=fromJson(r.read())
+            assert 'result' in result, toJson(result).encode('utf8')
+            assert 'id' in result['result']
+            xxx=result['result']['id']
+            assert type(xxx) is types.IntType, xxx
+            assert xxx != 0, xxx
+            return xxx
+        except:
+            raise inContext(scope.description)
+        pass
+
+    def verifyFileRefcount(self,uploadedFileId,expectedCount):
+        'verify that %(self)s has %(expectedCount)s as uploaded_file %(uploadedFileId)s refcount'
+        scope=Scope(l1(Staff.verifyFileRefcount.__doc__)%vars())
+        try:
+            r=self.get('/uploaded_file_refcount',{'id':uploadedFileId})
+            assert r.status==200,r.status
+            content=fromJson(r.read())
+            assert 'refcount' in content,content
+            assert content['refcount']==expectedCount,(content,expectedCount)
+        except:
+            raise inContext(scope.description)
+        pass
+
+    def verifyUploadedFile(self,uploadedFileId,mime_type,content):
+        'verify that %(self)s uploaded_file %(uploadedFileId)s has type %(mime_type)s and content %(content)r'
+        scope=Scope(l1(Staff.verifyUploadedFile.__doc__)%vars())
+        try:
+            r=staff.get('/uploaded_file',{'id':'%(uploadedFileId)s'%vars()})
+            assert_equal(r.status,200)
+            assert_equal(r.getheader('Content-Type'),'text/plain')
+            assert_equal(r.read(),content)
+        except:
+            raise inContext(scope.description)
+        pass
+    def postJSON(self,url,params,headers={}):
+        'post %(params)r as json encoded "params" to %(url)s'
+        'return json-decode response'
+        scope=Scope(l1(Staff.postJSON.__doc__)%vars())
+        try:
+            r=self.post(url,{'params':toJson(params)},headers)
+            assert_equal(r.status,200)
+            return scope.result(fromJson(r.read()))
+        except:
+            raise inContext(scope.description)
+        pass
     def __str__(self):
         return 'Staff session %(session)r'%self.__dict__
     pass
@@ -148,52 +206,22 @@ server,staff_password=sys.argv[1:]
 
 staff=Staff(server,staff_password)
 
-
-r=staff.postFile('/uploaded_file','filename','xxx.txt','text/plain','xxx\n')
-
-result=fromJson(r.read())
-
-assert 'result' in result, toJson(result).encode('utf8')
-assert 'id' in result['result']
-
-xxx=result['result']['id']
-
-assert type(xxx) is types.IntType, xxx
-assert xxx != 0, xxx
+xxx=staff.uploadFile('xxx.txt','text/plain','xxx\n')
+staff.verifyFileRefcount(xxx,1)
 
 r=staff.get('/uploaded_file',{'id':str(xxx)})
-content=r.read()
-assert content=='xxx\n'
+assert_equal(r.read(),'xxx\n')
 
-r=staff.postFile('/uploaded_file','filename','yyy.txt','text/plain','yyy\n')
-
-result=fromJson(r.read())
-
-assert 'result' in result, toJson(result).encode('utf8')
-assert 'id' in result['result']
-
-yyy=result['result']['id']
-
-assert type(yyy) is types.IntType, yyy
-assert yyy != 0, yyy
+yyy=staff.uploadFile('yyy.txt','text/plain','yyy\n')
+staff.verifyFileRefcount(yyy,1)
 
 r=staff.get('/uploaded_file',{'id':str(yyy)})
-content=r.read()
-assert content=='yyy\n'
+assert_equal(r.read(),'yyy\n')
 
 assert xxx != yyy, (xxx,yyy)
 
-r=staff.postFile('/uploaded_file','filename','yyy2.txt','text/plain','yyy\n')
-
-result=fromJson(r.read())
-
-assert 'result' in result, toJson(result).encode('utf8')
-assert 'id' in result['result']
-
-yyy2=result['result']['id']
-
-assert type(yyy2) is types.IntType, yyy2
-assert yyy2==yyy, (yyy2,yyy)
+assert_equal(staff.uploadFile('yyy2.txt','text/plain','yyy\n'),yyy)
+staff.verifyFileRefcount(yyy,1)
 
 prev_session=staff.session
 staff.logout()
@@ -203,40 +231,55 @@ staff=Staff(server,staff_password)
 
 assert prev_session!=staff.session, (prev_session,staff.session)
 
+staff.verifyFileRefcount(xxx,0)
+staff.verifyFileRefcount(yyy,0)
+
 r=staff.get('/uploaded_file',{'id':str(yyy)})
-assert r.status==404, r.status
-content=r.read()
-assert content=='',content
+assert_equal(r.status,404)
+assert_equal(r.read(),'')
 
+yyy3=staff.uploadFile('yyy3.txt','text/plain','yyy\n')
+staff.verifyFileRefcount(yyy3,1)
 
-r=staff.postFile('/uploaded_file','filename','yyy3.txt','text/plain','yyy\n')
+assert_in('result',staff.postJSON('/event',{
+            'id': 101,
+            'groups': [0],
+            'dates': [ { 'year':2016,'month':3,'day':13 } ],
+            'name':{
+                'text':'event 101',
+                'colour':'#000000'
+                },
+            'description': {
+                'html': 'event 101 <img src="uploaded_file?id=%(yyy3)s">'%vars()
+                }
+            }))
 
-result=fromJson(r.read())
+staff.verifyFileRefcount(yyy3,2)
 
-assert 'result' in result, toJson(result).encode('utf8')
-assert 'id' in result['result']
+mf1=staff.uploadFile('mf1.txt','text/plain','mf1\n')
+staff.verifyFileRefcount(mf1,1)
 
-yyy3=result['result']['id']
+mf2=staff.uploadFile('mf2.txt','text/plain','mf2\n')
+staff.verifyFileRefcount(mf2,1)
 
-assert type(yyy3) is types.IntType, yyy3
-assert yyy3!=yyy, (yyy3,yyy)
+assert_in('result',staff.postJSON('/maintenance_day',{
+                'id':102,
+                'name':'md1',
+                'date':{'year':2016,'month':3,'day':23},
+                'groups':[3],
+                'description':{'html':'<a href="uploaded_file?id=%(mf1)s">mf1</a>'%vars()},
+                'maxVolunteers':2,
+                'volunteers':[{
+                        'childs_name':'fred jr',
+                        'parents_name':'fred',
+                        'attended':True,
+                        'note':'<a href="uploaded_file?id=%(mf2)s">mf2</a>'%vars()
+                        }]
+                }))
 
-r=staff.post('/event',{
-        'params':toJson({
-                'id': 101,
-                'groups': [0],
-                'dates': [ { 'year':2016,'month':3,'day':13 } ],
-                'name':{
-                    'text':'event 101',
-                    'colour':'#000000'
-                    },
-                'description': {
-                    'html': 'event 101 <img src="uploaded_file?id=%(yyy3)s">'%vars()
-                    }
-                })
-        })
-assert r.status==200,(r.status,r.read())
-r.read()
+staff.verifyFileRefcount(yyy3,2)
+staff.verifyFileRefcount(mf1,2)
+staff.verifyFileRefcount(mf2,2)
 
 prev_session=staff.session
 staff.logout()
@@ -245,8 +288,183 @@ staff=Staff(server,staff_password)
 
 assert prev_session!=staff.session, (prev_session,staff.session)
 
-r=staff.get('/uploaded_file',{'id':'%(yyy3)s'%vars()})
-assert r.status==200,r.status
-content=r.read()
-assert content=='yyy\n',content
+staff.verifyFileRefcount(yyy3,1)
+staff.verifyFileRefcount(mf1,1)
+staff.verifyFileRefcount(mf2,1)
 
+staff.verifyUploadedFile(yyy3,'text/plain','yyy\n')
+staff.verifyUploadedFile(mf1,'text/plain','mf1\n')
+staff.verifyUploadedFile(mf2,'text/plain','mf2\n')
+
+assert_in('result',staff.postJSON(
+        '/maintenance_day',
+        {
+            'id':102,
+            'name':'md1',
+            'date':{'year':2016,'month':3,'day':23},
+            'groups':[3],
+            'description':{'html':'<a href="uploaded_file?id=%(mf1)s">mf1</a>'%vars()},
+            'maxVolunteers':2,
+            'volunteers':[{
+                    'childs_name':'fred jr',
+                    'parents_name':'fred',
+                    'attended':True,
+                    'note':'none'%vars()
+                    }]
+            }))
+             
+staff.verifyFileRefcount(yyy3,1)
+staff.verifyFileRefcount(mf1,1)
+staff.verifyFileRefcount(mf2,0)
+
+staff.verifyUploadedFile(mf1,'text/plain','mf1\n')
+
+rj1=staff.postJSON('/roster_job',{
+        'id':0,
+        'name':'Chicken Feeding',
+        'per':'unit',
+        'description':'chicken feeding as per <a href="uploaded_file?id=%(mf1)s">mf1.txt</a>'%vars(),
+        'frequency':'as_required',
+        'volunteers_required':3})['result']
+
+staff.verifyFileRefcount(mf1,2)
+
+assert_equal(fromJson(staff.get('/roster_job',{'id':rj1}).read())['result'],{
+        'id':rj1,
+        'name':'Chicken Feeding',
+        'per':'unit',
+        'description':'chicken feeding as per <a href="uploaded_file?id=%(mf1)s">mf1.txt</a>'%vars(),
+        'frequency':'as_required',
+        'volunteers_required':3})
+
+mf3=staff.uploadFile('mf3.jpg','image/jpeg','mf3')
+staff.verifyFileRefcount(mf3,1)
+
+assert_in('result',staff.postJSON('/roster_job',{
+        'id':rj1,
+        'name':'Chicken Feeding',
+        'per':'unit',
+        'description':'chicken feeding as like <img src="uploaded_file?id=%(mf3)s">'%vars(),
+        'frequency':'as_required',
+        'volunteers_required':3}))
+
+staff.verifyFileRefcount(yyy3,1)
+staff.verifyFileRefcount(mf1,1)
+staff.verifyFileRefcount(mf2,0)
+staff.verifyFileRefcount(mf3,2)
+
+assert_equal(staff.postJSON('/add_roster_job_volunteer',{
+            'id':rj1,
+            'groups':[1,2],
+            'parents_name':'jock',
+            'childs_name':'jock jr'})['result']['added'],True)
+
+assert_in('result',staff.postJSON('/update_roster_job_volunteer',{
+            'id':rj1,
+            'groups':[1,2],
+            'volunteer':{
+                'childs_name':'jock jr',
+                'parents_name':'jock',
+                'attended':True,
+                'note':''
+                },
+            'new_volunteer':{
+                'childs_name':'jock jr',
+                'parents_name':'jock',
+                'attended':True,
+                'note':'saw <img src="uploaded_file?id=%(mf3)s">'%vars()
+                }}))
+
+assert_equal(staff.postJSON('/add_roster_job_volunteer',{
+            'id':rj1,
+            'groups':[1,2],
+            'parents_name':'fred',
+            'childs_name':'fred jr'})['result']['added'],True)
+
+assert_in('result',staff.postJSON('/update_roster_job_volunteer',{
+            'id':rj1,
+            'groups':[1,2],
+            'volunteer':{
+                'childs_name':'fred jr',
+                'parents_name':'fred',
+                'attended':True,
+                'note':''
+                },
+            'new_volunteer':{
+                'childs_name':'fred jr',
+                'parents_name':'fred',
+                'attended':True,
+                'note':'saw <img src="uploaded_file?id=%(yyy3)s">'%vars()
+                }}))
+
+staff.verifyFileRefcount(yyy3,2)
+staff.verifyFileRefcount(mf1,1)
+staff.verifyFileRefcount(mf2,0)
+staff.verifyFileRefcount(mf3,2)
+
+assert_in('result',staff.postJSON('/delete_roster_job_volunteer',{
+            'id':rj1,
+            'groups':[1,2],
+            'childs_name':'fred jr',
+            }))
+
+staff.verifyFileRefcount(yyy3,1)
+staff.verifyFileRefcount(mf1,1)
+staff.verifyFileRefcount(mf2,0)
+staff.verifyFileRefcount(mf3,2)
+
+assert_in('result',staff.postJSON('/roster_job',{
+        'id':rj1,
+        'name':'Chicken Feeding',
+        'per':'unit',
+        'description':'chicken feeding',
+        'frequency':'as_required',
+        'volunteers_required':3}))
+
+staff.verifyFileRefcount(yyy3,1)
+staff.verifyFileRefcount(mf1,1)
+staff.verifyFileRefcount(mf2,0)
+staff.verifyFileRefcount(mf3,2)
+
+rj2=staff.postJSON('/roster_job',{
+        'id':0,
+        'name':'Chicken Feeding 3',
+        'per':'unit',
+        'description':'chicken feeding as per <a href="uploaded_file?id=%(mf3)s">mf3.txt</a>'%vars(),
+        'frequency':'as_required',
+        'volunteers_required':3})['result']
+
+staff.verifyFileRefcount(yyy3,1)
+staff.verifyFileRefcount(mf1,1)
+staff.verifyFileRefcount(mf2,0)
+staff.verifyFileRefcount(mf3,3)
+
+assert_in('result',staff.postJSON('/delete_roster_job',{'id':rj1}))
+
+staff.verifyFileRefcount(yyy3,1)
+staff.verifyFileRefcount(mf1,1)
+staff.verifyFileRefcount(mf2,0)
+staff.verifyFileRefcount(mf3,2)
+
+assert_in('result',staff.postJSON('/delete_maintenance_day',{'id':102}))
+assert_in('result',staff.postJSON('/delete_roster_job',{'id':rj2}))
+
+staff.verifyFileRefcount(yyy3,1)
+staff.verifyFileRefcount(mf1,0)
+staff.verifyFileRefcount(mf2,0)
+staff.verifyFileRefcount(mf3,1)
+
+assert_in('result',staff.postJSON('/delete_event',{'id':101}))
+
+staff.verifyFileRefcount(yyy3,0)
+staff.verifyFileRefcount(mf1,0)
+staff.verifyFileRefcount(mf2,0)
+staff.verifyFileRefcount(mf3,1)
+
+staff.logout()
+staff=Staff(server,staff_password)
+staff.verifyFileRefcount(yyy3,0)
+staff.verifyFileRefcount(mf1,0)
+staff.verifyFileRefcount(mf2,0)
+staff.verifyFileRefcount(mf3,0)
+staff.logout()

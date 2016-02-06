@@ -1,19 +1,21 @@
-- hide past maintenance days
-- 2x checkbox
-x maint day title does not display
-- description dialog position on ipod
-- add me maintenance day too big
-  - fix width, but < 300 (which it was)
-- roster.html - change Maintenance Days to Maintenance (heading)
-  - add task name to display
-  - move addme to next line
-  - limit volunteers (hide addme when reached - 2 pages)
-  - title of addme popups
-/ maintenance day -> maintenance job
-/ maint day -> maint job
-
+- family information report
+- add another name (edit_maintenance_day.html/js colspan=2)
+- re-add calendar group selector
+- make groups cookie persistent till 2/1 next year
+- adjust maintenance_day.js to know maxVolunteers and hide addme button
+  once we get there
 - add admin password change page
-- edit_event/maintenance_day/public_holiday go back to edit_events
+x hide past maintenance days
+x maint day title does not display
+x description dialog position on ipod
+x add me maintenance day too big
+  x fix width, but < 300 (which it was)
+x roster.html - change Maintenance Days to Maintenance (heading)
+  x add task name to display
+  x move addme to next line
+  x title of addme popups
+  x limit volunteers (hide addme when reached - 2 pages)
+x edit_event/maintenance_day/public_holiday go back to edit_events
 x add admin menu item to navbar when admin (-> admin.html)
 x add admin menu item to navbar when staff (-> staff.html)
 
@@ -56,7 +58,15 @@ x groups
   x StringType as dict key
   x embed Schema
 
-- events.html
+- add HTML type to schema and promote all string things that are really
+  html to HTML type, validation accepts String that can be parsed by pq
+
+- then write a getAllHTML(x,schema) that traverses x according to schema
+  and returns list of values of all HTML elements
+
+- then use that to make getting uploaded_file refs generic
+
+x events.html
   x show group(s) selector
     x get/set cookie
     x generate options all,1,2,3,4,1+2,3+4,1+3,2+4
@@ -102,8 +112,8 @@ x event.html
   x calc weeks
   x calc events
 
-- edit_event.html
-  - edit_event.js
+x edit_event.html
+  x edit_event.js
     x fetch event (for non-zero id passed in)
     x mce
     ~ name colour
@@ -122,16 +132,16 @@ x maintenance days separate and allow add names (you can
   x only one date per maintenance day
   x view allows add volunteer only
 
-- allow edit maintenance day name
+x allow edit maintenance day name
   x kindycal.py schema
   x kindycal.py maintenance_day_page
   x edit_maintenance_day.html
   x events.js
   x edit_maintenance_day.js
 
-~ nav bar (make it mobile style always)
+x nav bar
 x start on events page
-- login pages use referer to go to requested page after login
+x login pages use referer to go to requested page after login
 x return to previous month after edit/view event etc (via cookie?)
 x new event etc init date from month cookie
 
@@ -139,18 +149,19 @@ x View Events for: All Groups
 x grey out next/prev-months days
 
 x time with your child
-- roster jobs
+x roster jobs
 - fair rosters
 
-- upload document/image
+x upload document/image
   x logout (return to loginLevel login page)
-  - volunteer note
-  - maintenance_day description, volunteers notes
-  - roster_job description, instance volunteers
-    - addRosterJobVolunteer
-    - updateRosterJob
-    - updateVolunteer
-    - deleteRosterJobVolunteer
+  x maintenance_day description, volunteers notes
+  x roster_job description, instance volunteers
+    x createRosterJob
+    x deleteRosterJob
+    x updateRosterJob
+    x addRosterJobVolunteer
+    x updateVolunteer
+    x deleteRosterJobVolunteer
 
 An upload looks like:
 Accept	text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
@@ -189,16 +200,6 @@ INFO     2016-01-30 05:36:46,739 kindycal.py:37] {'Content-Type': 'multipart/for
 INFO     2016-01-30 05:33:37,792 kindycal.py:37] '--44de7b2477ba1ea2\r\nContent-Disposition: form-data; name="filename"; filename="xxx.txt"\r\nContent-Type: text/plain\r\n\r\nxxx\n\r\n--44de7b2477ba1ea2--\r\n'
 
 
-- @ndb.transactional
-- ref count File
-  File
-    hash : IntegerProperty
-    id : IntegerProperty
-    mime_type
-    data
-    ref_count
-- family information
-
 - hash passwords
 
 x fix + button after adding new date (use before rather than append)
@@ -213,3 +214,13 @@ x fix + button after adding new date (use before rather than append)
   /usr/local/google_appengine/dev_appserver.py --host 192.168.0.3 --datastore_path=~/kindycal-data --blobstore_path=~/kindycal-blob ~/kindycal/www
 
   git push https://github.com/urnest/bckindycal
+
+
+-------------------
+to run test-kindycal.py:
+
+- start server with empty database, eg:
+/usr/local/google_appengine/dev_appserver.py --host 192.168.0.3  --clear_datastore True www
+
+- then ./test-kindycal.py 192.168.0.3:8080 password
+(password is the staff password, which defaults to just password)
