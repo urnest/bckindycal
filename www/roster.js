@@ -526,7 +526,7 @@ $(document).ready(function(){
       var $addme=$addMe_t.clone();
       var yearToday=today.getYear()+1900;
       var monthToday=today.getMonth()+1;//Date() numbers months 0..11
-      var dayToday=today.getDay();
+      var dayToday=today.getDate();
 
       if (!staff){
 	if (m.date.year != yearToday){
