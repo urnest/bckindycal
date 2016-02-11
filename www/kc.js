@@ -25,10 +25,33 @@
     }
     else return x;
   };
+  // date (like {year:2016,month:12,day:31}) falls before today
+  kc.dateHasPast=function(date){
+    var today=new Date();
+    var yearToday=today.getYear()+1900;
+    var monthToday=today.getMonth()+1;//Date() numbers months 0..11
+    var dayOfMonthToday=today.getDate();
+    if (date.year < yearToday){
+      return true;
+    }
+    if (date.year > yearToday){
+      return false;
+    }
+    if (date.month < monthToday){
+      return true;
+    }
+    if (date.month > monthToday){
+      return false;
+    }
+    if (date.day < dayOfMonthToday){
+      return true;
+    }
+    return false;
+  };
 
   kc.defined=function(x){
     return !(x==undefined);
-  }
+  };
 
   // iterate over x:
   // - where x is array, call f(i, x[i]) for i in 0..x.length
@@ -62,7 +85,14 @@
   kc.formatDate=function(date){
     return kc.join('/',[date.day,date.month,date.year]);
   };
-
+  kc.parseDate=function(date){
+    var c=date.split('/');
+    return {
+      day:parseInt(c[0]),
+      month:parseInt(c[1]),
+      year:parseInt(c[2])
+    };
+  };
   // Get background of (first of) $item, as a css dictionary
   kc.getBackground=(function(){
     var result=function($item) {

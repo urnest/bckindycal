@@ -1387,6 +1387,8 @@ class maintenance_day_page(webapp2.RequestHandler):
         maintenance_day_schema.validate(maintenance_day)
         page=pq.loadFile('maintenance_day.html')
         page.find(pq.attrEquals('id','id')).attr('value',str(id))
+        page.find(pq.attrEquals('id','max-volunteers')).attr('value',str(
+            maintenance_day['maxVolunteers']))
         page.find(pq.hasClass('maintenance-day-name')).text(maintenance_day['name'])
         d=formatDate(maintenance_day['date'])
         page.find(pq.hasClass('mdate')).text(d)
@@ -2243,7 +2245,7 @@ class import_data_page(webapp2.RequestHandler):
 class import_data(webapp2.RequestHandler):
     def post(self):
         session=getSession(self.request.cookies.get('kc-session',''))
-        if session.loginLevel not in ['staff','admin']:
+        if session.loginLevel not in ['admin']:
             result={'error':'You are not logged in.'}
         else:
             log(self.request.POST.keys())
