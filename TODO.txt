@@ -5,6 +5,9 @@
 - adjust maintenance_day.js to know maxVolunteers and hide addme button
   once we get there
 - add admin password change page
+- hide past twycs
+- no addme on past maintenance days/roster jobs
+
 x hide past maintenance days
 x maint day title does not display
 x description dialog position on ipod
