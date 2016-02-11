@@ -289,7 +289,7 @@ tinymce.PluginManager.add('image', function(editor) {
 					text: 'Upload...',
 					onclick: function(){
 						kc.uploadFile(jquery_)
-							.then(function(url){
+					    .then(function(url,originalFileName){
 								win.find('#src').value(url);
 							})
 							.$dialog.closest('.ui-dialog').css('z-index',65539)

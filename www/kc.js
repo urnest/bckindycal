@@ -751,9 +751,10 @@
   kc.showError=function(e){
     alert(''+e);
   };
-  kc.uploadFile=function(jquery_){
+  kc.uploadFile=function(jquery_,title){
+    title=title||"Select File";
     var result={
-      then_: function(url){},
+      then_: function(url,originalFileName){},
       error_:function(e){
 	alert(e);
       },
@@ -772,14 +773,17 @@
       result.always_=always;
       return result;
     }
-    var $=jquery_||$;
-    var $dialog=$('<form action="" method="POST" enctype="multipart/form-data"><p>File: <input id="filename" type="file" name="filename"></p></form>');
+    var $=jquery_||jQuery;
+    var $dialog=$('<form action="" method="POST" enctype="multipart/form-data"><p>Select File: <input id="filename" type="file" name="filename"></p></form>');
     $dialog.dialog({
+      title:title,
       modal: true,
-      buttons:{
-	'OK': function(){
+      buttons:[{
+	text:'OK',
+	"class": 'kc-ok-button',
+	click: function(){
           $.ajaxFileUpload({
-            url:'session_file',
+            url:'uploaded_file',
             secureuri:false,
             fileElementId:'filename',
             dataType: 'text',
@@ -790,7 +794,8 @@
                 result.error_(data.error);
               }
 	      else {
-                result.then_('session_file?id='+data.result.id);
+                result.then_('uploaded_file?id='+data.result.id,
+			     data.result.originalFileName);
                 $dialog.dialog('close');
               }
             },
@@ -799,14 +804,24 @@
               result.error_(e);
             }
           });
-	},
-	'Cancel':function(){
+	}
+      },{
+	text:'Cancel',
+	"class": 'kc-cancel-button',
+	click:function(){
 	  $dialog.dialog('close');
 	  result.then_();
 	}
+      }],
+      close:function(){
+	$dialog.dialog('destroy');
       }
     });
     $dialog.dialog('open');
+    //REVISIT: disable ok button
+    $dialog.find('input#id').change(function(){
+      $dialog.parent('div.ui-dialog').find('.kc-ok-button');//enable
+    });
     result.$dialog=$dialog;
     return result;
   };

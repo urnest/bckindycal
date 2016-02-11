@@ -39,8 +39,8 @@ class ParseFailed(Xn):
         return 'failed to parse html at %(pos)s because\n%(cause)s'%self.__dict__
     pass
 
-entities=htmlentitydefs.entitydefs
-reverseentities=dict((_[1],u'&'+_[0]+';') for _ in entities.items())
+entities=htmlentitydefs.name2codepoint
+reverseentities=htmlentitydefs.codepoint2name
 
 def encodeEntities(s):
     if s is None: return u''
@@ -168,7 +168,7 @@ class Tag(Node):
         if len(self.classes)==0:
             del self.attrs['class']
         return self
-    def attr(self, a, val):
+    def attr(self, a, val=None):
         if not val is None:
             self.attrs[a]=val
         return self.attrs.get(a,'')
@@ -195,6 +195,14 @@ class Tag(Node):
         for c in self.children:
             c.clone(result)
         return result
+    def text(self):
+        if self.tagName=='br':
+            return u'\n'
+        if self.tagName=='p':
+            return u''.join([_.text() for _ in self.children])+u'\n'
+        if self.tagName=='li':
+            return u'\n'
+        return u''.join([_.text() for _ in self.children])
     pass
 
 class Data(Node):
@@ -217,6 +225,8 @@ class Data(Node):
     def clone(self, newParent):
         result=Data(self.data, newParent, self.pos)
         return result
+    def text(self):
+        return unicode(self)
     pass
 
 class EntityRef(Node):
@@ -230,10 +240,14 @@ class EntityRef(Node):
     def __unicode__(self):
         return u'&%(name)s;' % self.__dict__
     def __repr__(self):
-        return 'entity ref at %(pos)s' % self.__dict__
+        return 'entity ref %(name)r at %(pos)s' % self.__dict__
     def clone(self, newParent):
         result=EntityRef(self.name, newParent, self.pos)
         return result
+    def text(self):
+        if not self.name in entities:
+            raise Xn('unknown entity %(name)s'%self.__dict__)
+        return unichr(entities[self.name])
     pass
 
 class CharRef(Node):
@@ -251,6 +265,8 @@ class CharRef(Node):
     def clone(self, newParent):
         result=CharRef(self.name, newParent, self.pos)
         return result
+    def text(self):
+        assert 'text() not implemented for %(self)r' % vars()
     pass
 
 class Comment(Node):
@@ -268,6 +284,8 @@ class Comment(Node):
     def clone(self, newParent):
         result=Comment(self.comment, newParent, self.pos)
         return result
+    def text(self):
+        return u''
     pass
 
 class Decl(Node):
@@ -285,6 +303,8 @@ class Decl(Node):
     def clone(self, newParent):
         result=Decl(self.decl, newParent, self.pos)
         return result
+    def text(self):
+        return u''
     pass
 
 class PI(Node):
@@ -302,6 +322,8 @@ class PI(Node):
     def clone(self, newParent):
         result=PI(self.pi, newParent, self.pos)
         return result
+    def text(self):
+        return u''
     pass
 
 class Parser(HTMLParser.HTMLParser):
@@ -365,7 +387,11 @@ def filter(node, predicate):
         
 class Selection:
     def __init__(self, nodeList):
-        self.nodeList=nodeList
+        if isinstance(nodeList,Node):
+            self.nodeList=[nodeList,]
+        else:
+            self.nodeList=nodeList[:]
+            pass
         return
     def find(self, predicate):
         '''find all children of our nodes that match predicate'''
@@ -391,8 +417,11 @@ class Selection:
             for c in n.children:
                 c.parent=n
         return self
-    def text(self, s):
+    def text(self, s=None):
         '''replace our first node's children with the specified text string'''
+        '''or return unicode concatenation of text content of children'''
+        if s is None:
+            return u''.join([_.text() for _ in self.nodeList])
         if type(s) is types.StringType:
             s=unicode(s,'utf-8','strict')
         for n in self.nodeList:
@@ -452,6 +481,9 @@ class Selection:
     def first(self):
         '''return Selection containing first of our nodes'''
         return Selection(self.nodeList[0:1])
+    def children(self):
+        '''return Selection containing children of our nodes'''
+        return Selection(sum([_.children for _ in self.nodeList],[]))
     def clone(self):
         '''return Selection containing a copy of our nodes'''
         return Selection([_.clone(None) for _ in self.nodeList])
@@ -466,6 +498,8 @@ class Selection:
             n.removeClass(name)
         return self
     def attr(self, name, value=None):
+        '''attr('src') lists the values of the src attributes of each of our nodes'''
+        """attr('src','fred.html') sets the src attribute of each of our nodes to 'html'"""
         if value is None:
             return [_.attr(name, value) for _ in self.nodeList]
         [_.attr(name, value) for _ in self.nodeList]
@@ -480,6 +514,9 @@ class Selection:
         return self.nodeList[key]
     def __getslice__(self, i, j):
         return Selection(self.nodeList[i:j])
+    def __add__(self, b):
+        assert isinstance(b,Selection), repr(b)
+        return Selection(self.nodeList+b.nodeList)
     pass
 
 # basic predicates
@@ -489,6 +526,8 @@ def tagName(t):
     return lambda node: isinstance(node, Tag) and node.tagName==t
 def attrEquals(attr,value):
     return lambda node: isinstance(node, Tag) and node.attrEquals(attr,value)
+def isEntityRef(name):
+    return lambda node: isinstance(node, EntityRef) and node.name==name
 
 def parse(s, origin='unknown',encoding='utf-8'):
     '''parse HTML string "%(origin)s" assuming it has %(encoding)r encoding (per python unicode() function), returns a Selection'''
@@ -610,39 +649,63 @@ def test4():
     a=parse('<head></head>')
     parse(encodeEntities(script)).appendTo(a)
     assert_equal(str(a), '<head>'+script+'</head>')
+    pass
 
 def test5():
     s=parse('<p>fred</p>')
     s.text('jock')
     assert_equal(unicode(s),u'<p>jock</p>')
+    pass
 
 def test6():
     s=parse('<p>fred</p>')
     s.text(u'30x40”')
     assert_equal(unicode(s),u'<p>30x40”</p>')
+    pass
 
 def test7():
     s=parse('<p>fred</p>')
     s.text('30x40”')
     assert_equal(unicode(s),u'<p>30x40”</p>')
+    pass
 
 def test8():
-    s=parse('<ul><li class="a">1<li class="b">2</ul>')
-    parse('<li>3').addAfter(s.find(hasClass('b')))
-    assert_equal(unicode(s),u'<ul><li class="a">1<li class="b">2<li>3</ul>')
-    
+    s=parse('<html><p>fred</p><p>jock</p></html>')
+    s=s.children()
+    assert len(s)==2, unicode(s).encode('utf-8')
+    assert_equal(unicode(s.first()),u'<p>fred</p>')
+    pass
+
 def test9():
+    s=parse('<td><a href="fred">jock</a> and fred</td>')
+    assert_equal(s.text(), u'jock and fred')
+    pass
+
+def test10():
+    s=parse('<td><a href="fred">jock</a>&nbsp;and fred</td>')
+    assert_equal(s.text(), u'jock\xa0and fred')
+    s1=parse('<td><a href="fred">jock</a>&nbsp;')
+    s2=parse('and fred</td>')
+    assert_equal((s1+s2).text(), u'jock\xa0and fred')
+    pass
+
+def test11():
+    s=parse('<a href="fred">John&nbsp;Walker</a>')
+    s.find(isEntityRef('nbsp')).remove()
+    assert str(s)=='<a href="fred">JohnWalker</a>',s.text()
+    pass
+
+def test12():
     s=parse('<ul><li class="a">1<li class="b">2</ul>')
     parse('<li>1.5').addBefore(s.find(hasClass('b')))
     assert_equal(unicode(s),u'<ul><li class="a">1<li>1.5<li class="b">2</ul>')
     
-def test10():
+def test13():
     s=parse('<ul><li class="a">1<li class="b">2</ul>')
     parse('<li>0').addBefore(s.find(hasClass('a')))
     assert_equal(unicode(s),u'<ul><li>0<li class="a">1<li class="b">2</ul>')
-    
+
 if __name__=='__main__':
-    try:
         test1()
         test2()
         test3()
@@ -653,6 +716,6 @@ if __name__=='__main__':
         test8()
         test9()
         test10()
-    except:
-        print >>sys.stderr, sys.exc_info()[1]
-        sys.exit(1)
+        test11()
+        test12()
+        test13()

@@ -170,7 +170,7 @@ var editVolunteer=function($from,job,groups,volunteer){
 	volunteer.childs_name=childs_name;
 	volunteer.attended=attended;
 	volunteer.note=note;
-	$dialog.dialog('destroy');
+	$dialog.dialog('close');
 	result.then_();
       });
   };
@@ -203,7 +203,7 @@ var editVolunteer=function($from,job,groups,volunteer){
     plugins: [
       'advlist autolink lists link image charmap print preview anchor',
       'searchreplace visualblocks code fullscreen',
-      'insertdatetime media table contextmenu paste code'
+      'insertdatetime media table contextmenu paste code upload_doc'
     ],
     toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
   });

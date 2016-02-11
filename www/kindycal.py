@@ -8,6 +8,7 @@ import datetime
 import uuid
 import stuff
 import logging
+import zlib
 
 from google.appengine.ext import ndb
 
@@ -35,6 +36,21 @@ def makePageBodyInvisible(page):
 def log(s):
     return logging.info(s)
 
+class Scope:
+    def __init__(self,description):
+        self.description=description
+        self.result_=None
+        log('+ '+self.description)
+        pass
+    def __del__(self):
+        log('- '+self.description+' = '+repr(self.result_))
+        pass
+    def result(self,result):
+        self.result_=result
+        return result
+    pass
+
+
 root_key=ndb.Key('KC', 'KC')
 
 class Session(ndb.Model):
@@ -42,7 +58,7 @@ class Session(ndb.Model):
     touched=ndb.DateTimeProperty(indexed=True,repeated=False,auto_now_add=True)
     # login levels are 'parent','staff','admin', or '' if not logged in
     loginLevel=ndb.StringProperty(indexed=False,repeated=False,default='')
-    nextFileId=ndb.IntegerProperty(indexed=False,default=1)
+    sessionFiles=ndb.IntegerProperty(indexed=False,repeated=True)
     pass
 
 class Password(ndb.Model):
@@ -79,18 +95,22 @@ def setPassword(level,new_password):
         raise inContext(l1(setPassword.__doc__)%vars())
     pass
 
+@ndb.transactional
+def deleteSession(x):
+    scope=Scope('delete session %(x)r'%vars())
+    for id in x.sessionFiles:
+        log('deref uploaded file %(id)s'%vars())
+        deref_uploaded_file(id)
+        pass
+    x.key.delete()
+    
 def expireOldSessions():
     q=Session.query(
         Session.touched < datetime.datetime.now()-datetime.timedelta(days=1),
         ancestor=root_key)
     for x in q.fetch(10000):
         log('expire session %(x)s'%vars())
-        for i in SessionFile.query(
-            SessionFile.sid==x.sid,
-            ancestor=root_key).fetch(100000):
-            i.key.delete()
-            pass
-        x.key.delete()
+        deleteSession(x)
     pass
 
 def getSession(id):
@@ -561,6 +581,187 @@ class groups_to_show(webapp2.RequestHandler):
         return self.response.write(toJson(result).encode('utf-8'))
     pass
 
+class UploadedFileIdCounter(ndb.Model):
+    """Counter to assign ids to UploadedFiles."""
+    nextUploadedFileId = ndb.IntegerProperty()
+
+@ndb.transactional
+def nextUploadedFileId():
+    q=UploadedFileIdCounter.query(ancestor=root_key)
+    x=q.fetch(1)
+    if len(x)==0:
+        x=UploadedFileIdCounter(parent=root_key)
+        x.nextUploadedFileId=100
+    else:
+        x=x[0]
+    result=x.nextUploadedFileId
+    x.nextUploadedFileId=x.nextUploadedFileId+1
+    x.put()
+    return result
+
+
+class UploadedFile(ndb.Model):
+    id=ndb.IntegerProperty(indexed=True)
+    mime_type=ndb.StringProperty(indexed=False,repeated=False) #eg image/jpeg
+    data=ndb.BlobProperty(indexed=False,repeated=False)#file data
+    data_hash=ndb.IntegerProperty(indexed=True)
+    ref_count=ndb.IntegerProperty(indexed=False)
+    pass
+
+@ndb.transactional
+def saveFile(session,mime_type,data):
+    'save file as an UploadedFile in session %(session)r, returning id'
+    'post: session has a reference to id'
+    try:
+        h=zlib.adler32(data)
+        c=[_ for _ in UploadedFile.query(UploadedFile.data_hash==h,
+                                         ancestor=root_key).fetch(100000)
+           if _.data==data and _.mime_type==mime_type]
+        if len(c):
+            assert len(c)==1,c
+            c=c[0]
+            if not c.id in session.sessionFiles:
+                c.ref_count=c.ref_count+1
+                session.sessionFiles.append(c.id)
+                session.put()
+                pass
+        else:
+            c=UploadedFile(parent=root_key,
+                           id=nextUploadedFileId(),
+                           data_hash=h,
+                           mime_type=mime_type,
+                           data=data,
+                           ref_count=1)
+            assert not c.id in session.sessionFiles
+            session.sessionFiles.append(c.id)
+            session.put()
+            pass
+        c.put()
+        return c.id
+    except:
+        raise inContext(l1(saveFile.__doc__)%vars())
+    pass
+
+@ndb.transactional
+def deref_uploaded_file(id):
+    'dereference UploadedFile %(id)r'
+    try:
+        c=UploadedFile.query(UploadedFile.id==id,
+                             ancestor=root_key).fetch(2)
+        assert len(c)==1,c
+        c=c[0]
+        c.ref_count=c.ref_count-1
+        if c.ref_count==0:
+            c.key.delete()
+        else:
+            c.put()
+            pass
+    except:
+        raise inContext(l1(deref_uploaded_file.__doc__)%vars())
+    pass
+
+@ndb.transactional
+def ref_uploaded_file(id):
+    'reference UploadedFile %(id)r'
+    try:
+        c=UploadedFile.query(UploadedFile.id==id,
+                             ancestor=root_key).fetch(2)
+        assert len(c)==1,c
+        c=c[0]
+        assert c.ref_count>0
+        c.ref_count=c.ref_count+1
+        c.put()
+        pass
+    except:
+        raise inContext(l1(ref_uploaded_file.__doc__)%vars())
+    pass
+
+def updateUploadedFiles(oldFileIds,newFileIds):
+    'update UploadedFiles for a page that had uploaded file ids %(oldFileIds)s and now has uploaded file ids %(newFileIds)s '
+    'ie drop references to files that are no longer referenced, add new references'
+    scope=Scope(l1(updateUploadedFiles.__doc__)%vars())
+    try:
+        o=set(oldFileIds)
+        n=set(newFileIds)
+        for id in n-o:
+            ref_uploaded_file(id)
+            pass
+        for id in o-n:
+            deref_uploaded_file(id)
+            pass
+    except:
+        raise inContext(scope.description)
+    pass
+
+class uploaded_file(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+            self.response.write(toJson(result))
+        else:
+            assert self.request.get('id')
+            id=int(self.request.get('id'))
+            f=UploadedFile.query(
+                UploadedFile.id==id,
+                ancestor=root_key).fetch(1)
+            if len(f)==0:
+                return self.error(404)
+            f=f[0]
+            self.response.headers['Content-Type'] = \
+                f.mime_type.encode('ascii','ignore')
+            self.response.write(f.data)
+            pass
+        pass
+    def post(self):
+        'uploaded_file POST'
+        scope=Scope(l1(uploaded_file.post.__doc__)%vars())
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                assert 'filename' in self.request.POST,self.request.POST
+                mime_type=self.request.POST['filename'].type
+                data=self.request.get('filename')
+                id=saveFile(session,mime_type,data)
+                result=scope.result({
+                        'result':{
+                            'id':id,
+                            'originalFileName':self.request.POST['filename'].filename}})
+                pass
+            pass
+        except:
+            result=scope.result({'error':str(inContext(scope.description))})
+            
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+class uploaded_file_refcount(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+            self.response.write(toJson(result))
+        else:
+            assert self.request.get('id')
+            id=int(self.request.get('id'))
+            f=UploadedFile.query(
+                UploadedFile.id==id,
+                ancestor=root_key).fetch(2)
+            if len(f)==0:
+                result=0
+            else:
+                assert len(f)==1, len(f)
+                result=f[0].ref_count
+                pass
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.write(toJson({'refcount':result}))
+            pass
+        pass
+    pass
+
 class EventIdCounter(ndb.Model):
     """Counter to assign ids to events."""
     nextEventId = ndb.IntegerProperty()
@@ -604,6 +805,21 @@ class Event(ndb.Model):
     months=ndb.IntegerProperty(indexed=True,repeated=True)
     pass
 
+@ndb.transactional
+def deleteEvent(id):
+    'delete event with id %(id)s'
+    scope=Scope(l1(deleteEvent.__doc__)%vars())
+    try:
+        for x in Event.query(Event.id==id,ancestor=root_key).fetch(1):
+            xdata=fromJson(x.data)
+            for f in getUploadedFileRefsFromHTML(xdata['description']['html']):
+                deref_uploaded_file(f)
+                pass
+            x.key.delete()
+    except:
+        raise inContext(scope.description)
+    pass
+
 class delete_event(webapp2.RequestHandler):
     def post(self):
         try:
@@ -612,14 +828,73 @@ class delete_event(webapp2.RequestHandler):
                 result={'error':'You are not logged in.'}
             else:
                 data=fromJson(self.request.get('params'))
-                assert not data is None
-                for x in Event.query(Event.id==data['id'],ancestor=root_key).fetch(1): x.key.delete()
+                assert 'id' in data, data.keys()
+                deleteEvent(data['id'])
                 self.response.write(toJson({'result':'OK'}))
                 return
         except:
             result={'error':str(inContext('delete event'))}
             pass
         return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+@ndb.transactional
+def createEvent(eventId,data):
+    'create event from %(data)r'
+    scope=Scope(l1(createEvent.__doc__)%vars())
+    try:
+        event_schema.validate(data)
+        assert data['id']==0
+        data['id']=eventId
+        event=Event(parent=root_key,
+                    id=data['id'],
+                    months=[_['year']*100+_['month'] \
+                                for _ in data['dates']],
+                    data=toJson(data))
+        event.put()
+        updateUploadedFiles(
+            [],
+            getUploadedFileRefsFromHTML(
+                data['description']['html']))
+        return data
+    except:
+        raise inContext(scope.description)
+    pass
+
+@ndb.transactional
+def updateEvent(data):
+    'update event %(data)r'
+    scope=Scope(l1(updateEvent.__doc__)%vars())
+    try:
+        event_schema.validate(data)
+        assert not data['id']==0
+        x=Event.query(Event.id==data['id'],ancestor=root_key).fetch(1)
+        if not len(x):
+            scope2=Scope('re-creating deleted event')
+            event=Event(parent=root_key,
+                        id=data['id'],
+                        months=[_['year']*100+_['month'] \
+                                    for _ in data['dates']],
+                        data=toJson(data))
+            event.put()
+            updateUploadedFiles([],getUploadedFileRefsFromHTML(
+                    data['description']['html']))
+        else:
+            scop2=Scope('updating event')
+            event=x[0]
+            updateUploadedFiles(
+                getUploadedFileRefsFromHTML(
+                    fromJson(event.data)['description']['html']),
+                getUploadedFileRefsFromHTML(
+                    data['description']['html']))
+            event.data=toJson(data)
+            event.months=[_['year']*100+_['month'] \
+                              for _ in data['dates']]
+            event.put()
+            pass
+        return data
+    except:
+        raise inContext(scope.description)
     pass
 
 class event(webapp2.RequestHandler):
@@ -642,17 +917,11 @@ class event(webapp2.RequestHandler):
             else:
                 data=fromJson(self.request.get('params'))
                 event_schema.validate(data)
-                if data['id']==0: data['id']=nextEventId()
-                event=Event(parent=root_key,
-                            id=data['id'],
-                            months=[_['year']*100+_['month'] \
-                                    for _ in data['dates']],
-                            data=toJson(data))
-                old_images=set()
-                for x in Event.query(Event.id==event.id,ancestor=root_key).fetch(1): 
-                    x.key.delete()
-                event.put()
-                result=fromJson(event.data)
+                if data['id']==0:
+                    result=createEvent(nextEventId(),data)
+                else:
+                    result=updateEvent(data)
+                    pass
                 event_schema.validate(result)
                 result={'result':result}
                 pass
@@ -787,8 +1056,9 @@ volunteer_schema=jsonschema.Schema({
         'childs_name':StringType,
         'parents_name':StringType,
         'attended':BooleanType,
-        'note':StringType,
+        'note':StringType,#html
         })
+
 maintenance_day_schema=jsonschema.Schema({
         'id': IntType, #0 for new MaintenanceDay
         'name': StringType,
@@ -810,6 +1080,23 @@ class MaintenanceDay(ndb.Model):
     months=ndb.IntegerProperty(indexed=True,repeated=True)
     pass
 
+@ndb.transactional
+def deleteMaintenanceDay(id):
+    'delete maintenance day with id %(id)r'
+    scope=Scope(l1(deleteMaintenanceDay.__doc__)%vars())
+    try:
+        for x in MaintenanceDay.query(MaintenanceDay.id==id,
+                                      ancestor=root_key).fetch(1):
+            xdata=fromJson(x.data)
+            oldUploadedFileRefs=getUploadedFileRefsFromHTML(xdata['description']['html'])|\
+                getVolunteeersUploadedFileRefs(xdata['volunteers'])
+            updateUploadedFiles(oldUploadedFileRefs,[])
+            x.key.delete()
+            pass
+    except:
+        raise inContext(scope.description)
+    pass
+
 class delete_maintenance_day(webapp2.RequestHandler):
     def post(self):
         try:
@@ -818,16 +1105,69 @@ class delete_maintenance_day(webapp2.RequestHandler):
                 result={'error':'You are not logged in.'}
             else:
                 data=fromJson(self.request.get('params'))
-                assert not data is None
-                for x in MaintenanceDay.query(
-                    MaintenanceDay.id==data['id'],
-                    ancestor=root_key).fetch(1): x.key.delete()
+                assert not data is None,data
+                assert 'id' in data,repr(data)
+                deleteMaintenanceDay(data['id'])
                 self.response.write(toJson({'result':'OK'}))
                 return
         except:
             result={'error':str(inContext('delete maintenance_day'))}
             pass
         return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+def getUploadedFileRefsFromHTML(html):
+    'get set of UploadedFile ids referred to in %(html)r (as image sources or link targets)'
+    try:
+        page=pq.parse(html)
+        i=[int(_.attr('src').split('=')[1]) for _ in page.find(pq.tagName('img'))
+           if _.attr('src').startswith('uploaded_file?id=')]
+        a=[int(_.attr('href').split('=')[1]) for _ in page.find(pq.tagName('a'))
+           if _.attr('href').startswith('uploaded_file?id=')]
+        return set(i+a)
+    except:
+        raise inContext(l1(getUploadedFileRefsFromHTML.__doc__)%vars())
+    pass
+
+volunteers_schema=jsonschema.Schema([volunteer_schema])
+def getVolunteeersUploadedFileRefs(volunteers):
+    volunteers_schema.validate(volunteers)
+    result=set()
+    for v in volunteers:
+        result|=getUploadedFileRefsFromHTML(v['note'])
+        pass
+    return result
+
+@ndb.transactional
+def updateMaintenanceDay(data):
+    'insert/update maintenance day %(data)r'
+    scope=Scope(l1(updateMaintenanceDay.__doc__)%vars())
+    try:
+        if not 'name' in data: data['name']='Maintenance Day 8am'
+        if not 'maxVolunteers' in data: data['maxVolunteers']=25
+        maintenance_day_schema.validate(data)
+        maintenance_day=MaintenanceDay(parent=root_key,
+                                       id=data['id'],
+                                       months=[_['year']*100+_['month'] \
+                                                   for _ in [data['date']]],
+                                       data=toJson(data))
+        oldUploadedFileRefs=set()
+        for x in MaintenanceDay.query(MaintenanceDay.id==maintenance_day.id,
+                                      ancestor=root_key).fetch(1):
+            xdata=fromJson(x.data)
+            oldUploadedFileRefs|=getUploadedFileRefsFromHTML(xdata['description']['html'])|\
+                getVolunteeersUploadedFileRefs(xdata['volunteers'])
+            x.key.delete()
+            pass
+        newUploadedFileRefs=getUploadedFileRefsFromHTML(data['description']['html'])|\
+            getVolunteeersUploadedFileRefs(data['volunteers'])
+        maintenance_day.put()
+        updateUploadedFiles(oldUploadedFileRefs,newUploadedFileRefs)
+        result=fromJson(maintenance_day.data)
+        maintenance_day_schema.validate(result)
+        return result
+    except:
+        raise inContext(scope.description)
     pass
 
 class maintenance_day(webapp2.RequestHandler):
@@ -852,21 +1192,8 @@ class maintenance_day(webapp2.RequestHandler):
                 result={'error':'You are not logged in.'}
             else:
                 data=fromJson(self.request.get('params'))
-                assert not data is None
-                if not 'name' in data: data['name']='Maintenance Day 8am'
-                if not 'maxVolunteers' in data: data['maxVolunteers']=25
-                maintenance_day_schema.validate(data)
                 if data['id']==0: data['id']=nextMaintenanceDayId()
-                maintenance_day=MaintenanceDay(parent=root_key,
-                            id=data['id'],
-                            months=[_['year']*100+_['month'] \
-                                    for _ in [data['date']]],
-                            data=toJson(data))
-                for x in MaintenanceDay.query(MaintenanceDay.id==maintenance_day.id,ancestor=root_key).fetch(1): x.key.delete()
-                maintenance_day.put()
-                result=fromJson(maintenance_day.data)
-                maintenance_day_schema.validate(result)
-                result={'result':result}
+                result={'result':updateMaintenanceDay(data)}
                 pass
             pass
         except:
@@ -1162,146 +1489,6 @@ class get_month_to_show(webapp2.RequestHandler):
         pass
     pass
 
-class SessionFile(ndb.Model):
-    sid=ndb.StringProperty(indexed=True)
-    id=ndb.IntegerProperty(indexed=True)
-    mime_type=ndb.StringProperty(indexed=False,repeated=False,default='') #eg image/jpeg
-    data=ndb.BlobProperty(indexed=False,repeated=False)#file data
-    pass
-
-class session_file(webapp2.RequestHandler):
-    def get(self):
-        session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel:
-            result={'error':'You are not logged in.'}
-            self.response.write(toJson(result))
-        else:
-            assert self.request.get('id')
-            id=int(self.request.get('id'))
-            f=SessionFile.query(
-                SessionFile.sid==session.sid and SessionFile.id==id,
-                ancestor=root_key).fetch(1)[0]
-            self.response.headers['Content-Type'] = \
-                f.mime_type.encode('ascii','ignore')
-            self.response.write(f.data)
-            pass
-        pass
-    def post(self):
-        try:
-            session=getSession(self.request.cookies.get('kc-session',''))
-            if session.loginLevel not in ['staff','admin']:
-                result={'error':'You are not logged in.'}
-            else:
-                log(self.request.POST.keys())
-                data=self.request.get('filename')
-                mime_type=self.request.POST['filename'].type
-                id=session.nextFileId
-                session.nextFileId=session.nextFileId+1
-                session.put()
-                f=SessionFile(parent=root_key,
-                              sid=session.sid,
-                              id=id,
-                              mime_type=mime_type,
-                              data=data)
-                f.put()
-                result={'result':{'id':id}}
-                pass
-            pass
-        except:
-            result={'error':str(inContext('post maintenance_day'))}
-            pass
-        return self.response.write(toJson(result).encode('utf-8'))
-    pass
-
-
-class UploadedFileIdCounter(ndb.Model):
-    """Counter to assign ids to UploadedFiles."""
-    nextUploadedFileId = ndb.IntegerProperty()
-
-@ndb.transactional
-def nextUploadedFileId():
-    q=UploadedFileIdCounter.query(ancestor=root_key)
-    x=q.fetch(1)
-    if len(x)==0:
-        x=UploadedFileIdCounter(parent=root_key)
-        x.nextUploadedFileId=100
-    else:
-        x=x[0]
-    result=x.nextUploadedFileId
-    x.nextUploadedFileId=x.nextUploadedFileId+1
-    x.put()
-    return result
-
-
-class UploadedFile(ndb.Model):
-    id=ndb.IntegerProperty(indexed=True)
-    hash=ndb.StringProperty(indexed=True)
-    mime_type=ndb.StringProperty(indexed=False,repeated=False) #eg image/jpeg
-    data=ndb.BlobProperty(indexed=False,repeated=False)#file data
-    ref_count=ndb.IntegerProperty(indexed=False)
-    pass
-
-class uploaded_file(webapp2.RequestHandler):
-    def get(self):
-        session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel:
-            result={'error':'You are not logged in.'}
-            self.response.write(toJson(result))
-        else:
-            assert self.request.get('id')
-            id=int(self.request.get('id'))
-            f=UploadedFile.query(
-                UploadedFile.id==id,
-                ancestor=root_key).fetch(1)[0]
-            self.response.headers['Content-Type'] = \
-                f.mime_type.encode('ascii','ignore')
-            self.response.write(f.data)
-            pass
-        pass
-
-@ndb.transactional
-def saveFile(mime_type,data):
-    'save file as an UploadedFile, returning id'
-    'post: caller has a reference to id (see deref_uploaded_file)'
-    try:
-        h='%x'%(hash(data)&0xFFFFFFFF)
-        c=[_ for _ in UploadedFile.query(UploadedFile.hash==h,
-                                         ancestor=root_key).fetch(100000)
-           if _.data==data and _.mime_type==mime_type]
-        if len(c):
-            assert len(c)==c,c
-            c[0].ref_count=c[0].ref_count+1
-            c[0].put()
-            return c.id
-        c=UploadedFile(parent=root_key,
-                       id=nextUploadedFileId(),
-                       hash=h,
-                       mime_type=mime_type,
-                       data=data,
-                       ref_count=1)
-        c.put()
-        return c.id
-    except:
-        raise inContext(l1(saveFile.__doc__)%vars())
-    pass
-
-@ndb.transactional
-def deref_uploaded_file(id):
-    'dereference UploadedFile %(id)r'
-    try:
-        c=UploadedFile.query(UploadedFile.id==id,
-                             ancestor=root_key).fetch(2)
-        assert len(c)==1,c
-        c.ref_count=c.ref_count-1
-        if c.ref_count==0:
-            c.key.delete()
-        else:
-            c.put()
-            pass
-    except:
-        raise inContext(l1(deref_uploaded_file.__doc__)%vars())
-    pass
-
 twyc_schema=jsonschema.Schema({
         'date' : {'year':IntType,'month':IntType,'day':IntType},
         'group': IntType,
@@ -1493,6 +1680,502 @@ class redirect_to_events_page(webapp2.RequestHandler):
         return webapp2.redirect('events.html')
     pass
 
+roster_job_instance_schema=jsonschema.Schema({
+        'groups':[IntType], # eg [0,1] for unit 1 "per-unit" task
+                            #    [0,1,2,3] for "kindy-wide" task
+        'volunteers':[ volunteer_schema ]})
+
+roster_job_schema=jsonschema.Schema({
+        'id': IntType,
+        'name': StringType,
+        'per': jsonschema.OneOf('group','unit','kindy-wide'),
+        'description': StringType,#html
+        'frequency': jsonschema.OneOf('as_required',
+                                      'week',
+                                      'term',
+                                      'year'),
+        'volunteers_required': IntType,
+        'instances':[roster_job_instance_schema]})
+
+def getRosterJobUploadedFileRefs(data):
+    'get ids of uploaded file refs from roster job data %(data)r'
+    try:
+        roster_job_schema.validate(data)
+        result=getUploadedFileRefsFromHTML(data['description'])
+        for i in data['instances']:
+            result |= getVolunteeersUploadedFileRefs(i['volunteers'])
+            pass
+        return result
+    except:
+        raise inContext(l1(getRosterJobUploadedFileRefs.__doc__)%vars())
+    pass
+
+def updateRosterJobUploadedFileIds(oldData,newData):
+    updateUploadedFiles(getRosterJobUploadedFileRefs(oldData),
+                        getRosterJobUploadedFileRefs(newData))
+    pass
+
+class roster_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            log('not logged in')
+            return webapp2.redirect('login.html')
+        if session.loginLevel in ['staff','admin']:
+            return webapp2.redirect('edit_roster.html')
+        page=pq.loadFile('roster.html')
+        page.find(pq.hasClass('staff-only')).remove()
+        page.find(pq.hasClass('admin-only')).remove()
+        if session.loginLevel in ['admin','staff']:
+            addAdminNavButtonToPage(page,session.loginLevel)
+            pass
+        addScriptToPageHead('roster.js',page)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+
+class edit_roster_job_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['staff','admin']:
+            log('not logged in as staff or admin')
+            return webapp2.redirect('staff_login.html')
+        page=pq.loadFile('edit_roster_job.html')
+        page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
+        addScriptToPageHead('edit_roster_job.js',page)
+        addAdminNavButtonToPage(page,session.loginLevel)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+class RosterJobIdCounter(ndb.Model):
+    """Counter to assign ids to Roster Jobs."""
+    nextRosterJobId = ndb.IntegerProperty()
+
+nextRosterJobIdKey=ndb.Key('nextRosterJobId','nextRosterJobId')
+
+@ndb.transactional
+def nextRosterJobId():
+    q=RosterJobIdCounter.query(ancestor=root_key)
+    x=q.fetch(1)
+    if len(x)==0:
+        x=RosterJobIdCounter(parent=root_key)
+        x.nextRosterJobId=100
+    else:
+        x=x[0]
+    result=x.nextRosterJobId
+    x.nextRosterJobId=x.nextRosterJobId+1
+    x.put()
+    return result
+
+class RosterJob(ndb.Model):
+    # data is json encoded roster_job_schema-conformant
+    data=ndb.StringProperty(indexed=False,repeated=False)
+    # id from data['id']
+    id=ndb.IntegerProperty(indexed=True,repeated=False)
+    pass
+
+def deleteRosterJob(id):
+    'delete roster job with id %(id)r'
+    scope=Scope(l1(deleteRosterJob.__doc__)%vars())
+    try:
+        for x in RosterJob.query(RosterJob.id==id,
+                                 ancestor=root_key).fetch(1):
+            updateUploadedFiles(getRosterJobUploadedFileRefs(fromJson(x.data)),[])
+            x.key.delete()
+            pass
+    except:
+        raise inContext(scope.description)
+    pass
+
+class delete_roster_job(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                data=fromJson(self.request.get('params'))
+                assert not data is None
+                assert 'id' in data,repr(data)
+                deleteRosterJob(data['id'])
+                self.response.write(toJson({'result':'OK'}))
+                return
+        except:
+            result={'error':str(inContext('delete roster_job'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+@ndb.transactional
+def updateRosterJob(json_data):
+    'update roster job %(json_data)r keeping any existing volunteers'
+    scope=Scope(l1(updateRosterJob.__doc__)%vars())
+    try:
+        data=fromJson(json_data)
+        assert not 'instances' in data
+        id=int(data['id'])
+        if id>0:
+            job=RosterJob.query(RosterJob.id==id,
+                                ancestor=root_key).fetch(1)[0]
+            xdata=fromJson(job.data)
+            oldUploadedFileRefs=getRosterJobUploadedFileRefs(xdata)
+            existing_instances=xdata['instances']
+            jsonschema.Schema([roster_job_instance_schema]).validate(
+                existing_instances)
+        else:
+            assert id==0
+            id=nextRosterJobId()
+            data['id']=id
+            job=RosterJob(parent=root_key,id=id)
+            existing_instances=[]
+            oldUploadedFileRefs=set()
+            pass
+        new_data=dict(data.items()+[('instances',existing_instances)])
+        roster_job_schema.validate(new_data)
+        newUploadedFileRefs=getRosterJobUploadedFileRefs(new_data)
+        job.data=toJson(new_data)
+        job.put()
+        updateUploadedFiles(oldUploadedFileRefs,newUploadedFileRefs)
+        return new_data['id']
+    except:
+        raise inContext(l1(updateRosterJob.__doc__)%vars())
+    pass
+
+class roster_job(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+        else:
+            roster_job=RosterJob.query(
+                RosterJob.id==int(self.request.get('id')),
+                ancestor=root_key).fetch(1)
+            if len(roster_job)==0:
+                return self.error(404)
+            result=fromJson(roster_job[0].data)
+            roster_job_schema.validate(result)
+            del(result['instances'])
+            pass
+        return self.response.write(toJson({'result':result}))
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                id_=updateRosterJob(self.request.get('params'))
+                result={'result':id_}
+                pass
+            pass
+        except:
+            result={'error':str(inContext('post roster_job'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+class roster_jobs(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            result={'error':'You are not logged in.'}
+        else:
+            roster_jobs=RosterJob.query(ancestor=root_key).fetch(10000)
+            result={'result':[fromJson(_.data) for _ in roster_jobs]}
+            pass
+        return self.response.write(toJson(result))
+    pass
+
+class edit_roster_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff']:
+            log('not logged in')
+            return webapp2.redirect('staff.html?from=events.html')
+        if fetchTerms() is None:
+            log('terms not defined')
+            return webapp2.redirect('edit_terms.html')
+        if fetchGroups() is None:
+            log('groups not defined')
+            return webapp2.redirect('edit_groups.html')
+        page=pq.loadFile('roster.html')
+        page.find(pq.hasClass('parent-only')).remove()
+        if not session.loginLevel in ['staff','admin']:
+            page.find(pq.hasClass('staff-only')).remove()
+            pass
+        if not session.loginLevel in ['admin']:
+            page.find(pq.hasClass('admin-only')).remove()
+            pass
+        page.find(pq.tagName('body')).addClass(session.loginLevel)
+        addAdminNavButtonToPage(page,session.loginLevel)
+        addScriptToPageHead('roster.js',page)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+@ndb.transactional
+def addRosterJobVolunteer(id,groups,parents_name,childs_name):
+    'add %(parents_name)r (parent of %(childs_name)r as groups %(groups)r volunteer for job %(id)s'
+    scope=Scope(l1(addRosterJobVolunteer.__doc__)%vars())
+    try:
+        roster_job=RosterJob.query(
+            RosterJob.id==id,
+            ancestor=root_key).fetch(1)[0]
+        data=fromJson(roster_job.data)
+        instances=dict(
+            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
+        log('groups %(groups)s'%vars())
+        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
+        instance=instances.setdefault(tuple(groups),[])
+        added=False
+        if len(instance)>=data['volunteers_required']:
+            log('already have %s volunteers of %s - cannot add more'%(
+                    len(instance),data['volunteers_required']))
+        elif len([_ for _ in instance 
+                  if _['parents_name']==parents_name and _['childs_name']==childs_name]):
+            log('%(parents_name)r is already in %(instance)r'%vars())
+            added=True #in a sense
+        else:
+            instance.append({
+                    'parents_name':parents_name,
+                    'childs_name':childs_name,
+                    'attended':False,
+                    'note':''
+                    })
+            data['instances']=[ {'groups':list(_[0]),
+                                 'volunteers':_[1]} for _ in instances.items() ]
+            roster_job_schema.validate(data)
+            roster_job.data=toJson(data)
+            roster_job.put()
+            added=True
+            pass
+        result={
+            'added':added,
+            'instances':data['instances']
+            }
+        return scope.result(result)
+    except:
+        raise inContext(l1(addRosterJobVolunteer.__doc__)%vars())
+    pass
+
+class add_roster_job_volunteer(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                result=addRosterJobVolunteer(**params)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('add roster job volunteer'))}))
+            pass
+        pass
+    pass
+
+@ndb.transactional
+def updateVolunteerAttended(id,groups,volunteer,new_attended):
+    'record %(new_attended)s as attendance of %(volunteer)r as groups %(groups)r volunteer for job %(id)s'
+    scope=Scope(l1(updateVolunteerAttended.__doc__)%vars())
+    try:
+        roster_job=RosterJob.query(
+            RosterJob.id==id,
+            ancestor=root_key).fetch(1)[0]
+        data=fromJson(roster_job.data)
+        instances=dict(
+            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
+        log('groups %(groups)s'%vars())
+        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
+        instance=instances.get(tuple(groups))
+        indices=[_[0] for _ in enumerate(instance) 
+                 if _[1]['childs_name']==volunteer['childs_name'] and
+                    _[1]['parents_name']==volunteer['parents_name']]
+        for i in indices:
+            instance[i]['attended']=new_attended
+            pass
+        roster_job_schema.validate(data)
+        roster_job.data=toJson(data)
+        roster_job.put()
+        result='OK'
+        return scope.result(result)
+    except:
+        raise inContext(l1(updateVolunteerAttended.__doc__)%vars())
+    pass
+
+class update_roster_job_volunteer_attended(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                result=updateVolunteerAttended(**params)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('update_volunteer_attended'))}))
+            pass
+        pass
+    pass
+
+@ndb.transactional
+def updateVolunteer(id,groups,volunteer,new_volunteer):
+    'update %(volunteer)s as a groups %(groups)r volunteer for job %(id)s to %(new_volunteer)s'
+    scope=Scope(l1(updateVolunteer.__doc__)%vars())
+    try:
+        roster_job=RosterJob.query(
+            RosterJob.id==id,
+            ancestor=root_key).fetch(1)[0]
+        data=fromJson(roster_job.data)
+        log('data was %(data)r'%vars())
+        oldUploadedFileRefs=getRosterJobUploadedFileRefs(data)
+        instances=dict(
+            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
+        log('groups %(groups)s'%vars())
+        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
+        instance=instances.get(tuple(groups))
+        log('selected instance %(instance)r'%vars())
+        indices=[_[0] for _ in enumerate(instance) 
+                 if _[1]['childs_name']==volunteer['childs_name'] and
+                    _[1]['parents_name']==volunteer['parents_name']]
+        log('matched indices %(indices)r'%vars())
+        for i in indices:
+            instance[i]=new_volunteer
+            pass
+        roster_job_schema.validate(data)
+        roster_job.data=toJson(data)
+        newUploadedFileRefs=getRosterJobUploadedFileRefs(data)
+        roster_job.put()
+        updateUploadedFiles(oldUploadedFileRefs,newUploadedFileRefs)
+        return scope.result(data)
+    except:
+        raise inContext(l1(updateVolunteer.__doc__)%vars())
+    pass
+
+class update_roster_job_volunteer(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                result=updateVolunteer(**params)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('update_volunteer'))}))
+            pass
+        pass
+    pass
+
+@ndb.transactional
+def deleteRosterJobVolunteer(id,groups,childs_name):
+    'delete parent of %(childs_name)r as groups %(groups)r volunteer for job %(id)s'
+    scope=Scope(l1(deleteRosterJobVolunteer.__doc__)%vars())
+    try:
+        roster_job=RosterJob.query(
+            RosterJob.id==id,
+            ancestor=root_key).fetch(1)[0]
+        data=fromJson(roster_job.data)
+        oldUploadedFileRefs=getRosterJobUploadedFileRefs(data)
+        instances=dict(
+            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
+        log('groups %(groups)s'%vars())
+        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
+        if tuple(groups) in instances:
+            log('found groups instance')
+            volunteers=instances.get(tuple(groups))
+            childs_names=dict( (_[1]['childs_name'],_[0]) for _ in enumerate(volunteers))
+            log('childs_names %(childs_names)r')
+            if childs_name in childs_names:
+                index=childs_names[childs_name]
+                log('found childs_name (index %(index)s)'%vars())
+                del(volunteers[index])
+                roster_job_schema.validate(data)
+                roster_job.data=toJson(data)
+                newUploadedFileRefs=getRosterJobUploadedFileRefs(data)
+                roster_job.put()
+                updateUploadedFiles(oldUploadedFileRefs,newUploadedFileRefs)
+                log('job now %(data)r'%vars())
+                pass
+            pass
+        result=data['instances']
+        return scope.result(result)
+    except:
+        raise inContext(scope.description)
+    pass
+
+class delete_roster_job_volunteer(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                result=deleteRosterJobVolunteer(**params)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('delete_roster_job_volunteer'))}))
+            pass
+        pass
+    pass
+
+all_maintenance_days_schema=jsonschema.Schema([
+        maintenance_day_schema])
+
+class all_maintenance_days(webapp2.RequestHandler):
+    def get(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                result=[fromJson(_.data) for _ in MaintenanceDay.query(ancestor=root_key).fetch(1000)]
+                cmpDate=lambda x, y: cmp( (x['year'],x['month'],x['day']),
+                                          (y['year'],y['month'],y['day']))
+                for data in result:
+                    if not 'name' in data: data['name']='Maintenance Day 8am'
+                    if not 'maxVolunteers' in data: data['maxVolunteers']=25
+                    pass
+                result.sort(lambda x,y: cmpDate(x['date'],y['date']))
+                all_maintenance_days_schema.validate(result)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('all_maintenance_days'))}))
+            pass
+        pass
+    pass
+
+class logout(webapp2.RequestHandler):
+    def get(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                deleteSession(session)
+                result={'result':'OK'}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('all_maintenance_days'))}))
+            pass
+        pass
+    pass
+            
 class export_data(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
@@ -1678,439 +2361,6 @@ class import_data(webapp2.RequestHandler):
         pass
     pass
 
-roster_job_instance_schema=jsonschema.Schema({
-        'groups':[IntType], # eg [0,1] for unit 1 "per-unit" task
-                            #    [0,1,2,3] for "kindy-wide" task
-        'volunteers':[ volunteer_schema ]})
-
-roster_job_schema=jsonschema.Schema({
-        'id': IntType,
-        'name': StringType,
-        'per': jsonschema.OneOf('group','unit','kindy-wide'),
-        'description': StringType,
-        'frequency': jsonschema.OneOf('as_required',
-                                      'week',
-                                      'term',
-                                      'year'),
-        'volunteers_required': IntType,
-        'instances':[roster_job_instance_schema]})
-
-class roster_page(webapp2.RequestHandler):
-    def get(self):
-        session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel:
-            log('not logged in')
-            return webapp2.redirect('login.html')
-        if session.loginLevel in ['staff','admin']:
-            return webapp2.redirect('edit_roster.html')
-        page=pq.loadFile('roster.html')
-        page.find(pq.hasClass('staff-only')).remove()
-        page.find(pq.hasClass('admin-only')).remove()
-        if session.loginLevel in ['admin','staff']:
-            addAdminNavButtonToPage(page,session.loginLevel)
-            pass
-        addScriptToPageHead('roster.js',page)
-        makePageBodyInvisible(page)
-        self.response.write(unicode(page).encode('utf-8'))
-    pass
-
-
-class edit_roster_job_page(webapp2.RequestHandler):
-    def get(self):
-        session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel in ['staff','admin']:
-            log('not logged in as staff or admin')
-            return webapp2.redirect('staff_login.html')
-        page=pq.loadFile('edit_roster_job.html')
-        page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
-        addScriptToPageHead('edit_roster_job.js',page)
-        addAdminNavButtonToPage(page,session.loginLevel)
-        makePageBodyInvisible(page)
-        self.response.write(unicode(page).encode('utf-8'))
-    pass
-
-class RosterJobIdCounter(ndb.Model):
-    """Counter to assign ids to Roster Jobs."""
-    nextRosterJobId = ndb.IntegerProperty()
-
-nextRosterJobIdKey=ndb.Key('nextRosterJobId','nextRosterJobId')
-
-@ndb.transactional
-def nextRosterJobId():
-    q=RosterJobIdCounter.query(ancestor=root_key)
-    x=q.fetch(1)
-    if len(x)==0:
-        x=RosterJobIdCounter(parent=root_key)
-        x.nextRosterJobId=100
-    else:
-        x=x[0]
-    result=x.nextRosterJobId
-    x.nextRosterJobId=x.nextRosterJobId+1
-    x.put()
-    return result
-
-class RosterJob(ndb.Model):
-    # data is json encoded roster_job_schema-conformant
-    data=ndb.StringProperty(indexed=False,repeated=False)
-    # id from data['id']
-    id=ndb.IntegerProperty(indexed=True,repeated=False)
-    pass
-
-class delete_roster_job(webapp2.RequestHandler):
-    def post(self):
-        try:
-            session=getSession(self.request.cookies.get('kc-session',''))
-            if session.loginLevel not in ['staff','admin']:
-                result={'error':'You are not logged in.'}
-            else:
-                data=fromJson(self.request.get('params'))
-                assert not data is None
-                for x in RosterJob.query(
-                    RosterJob.id==data['id'],
-                    ancestor=root_key).fetch(1): x.key.delete()
-                self.response.write(toJson({'result':'OK'}))
-                return
-        except:
-            result={'error':str(inContext('delete roster_job'))}
-            pass
-        return self.response.write(toJson(result).encode('utf-8'))
-    pass
-
-@ndb.transactional
-def updateRosterJob(json_data):
-    'update roster job %(json_data)r keeping any existing volunteers'
-    try:
-        data=fromJson(json_data)
-        assert not 'volunteers' in data
-        roster_job_schema.validate(data)
-        id=int(data['id'])
-        if id>0:
-            job=RosterJob.query(RosterJob.id==id,
-                                ancestor=root_key).fetch(1)[0]
-            existing_instances=fromJson(job.data)['instances']
-            jsonschema.Schema([roster_job_instance_schema]).validate(
-                existing_instances)
-        else:
-            assert id==0
-            id=nextRosterJobId()
-            data['id']=id
-            job=RosterJob(parent=root_key,id=id)
-            existing_instances=[]
-            pass
-        new_data=dict(data.items()+[('instances',existing_instances)])
-        roster_job_schema.validate(new_data)
-        job.data=toJson(new_data)
-        job.put()
-    except:
-        raise inContext(l1(updateRosterJob.__doc__)%vars())
-    pass
-
-class roster_job(webapp2.RequestHandler):
-    def get(self):
-        session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel:
-            result={'error':'You are not logged in.'}
-        else:
-            roster_job=RosterJob.query(
-                RosterJob.id==int(self.request.get('id')),
-                ancestor=root_key).fetch(1)
-            result=fromJson(roster_job[0].data)
-            roster_job_schema.validate(result)
-            del(result['instances'])
-            pass
-        return self.response.write(toJson({'result':result}))
-    def post(self):
-        try:
-            session=getSession(self.request.cookies.get('kc-session',''))
-            if session.loginLevel not in ['staff','admin']:
-                result={'error':'You are not logged in.'}
-            else:
-                updateRosterJob(self.request.get('params'))
-                result={'result':'OK'}
-                pass
-            pass
-        except:
-            result={'error':str(inContext('post roster_job'))}
-            pass
-        return self.response.write(toJson(result).encode('utf-8'))
-    pass
-
-class roster_jobs(webapp2.RequestHandler):
-    def get(self):
-        session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel:
-            result={'error':'You are not logged in.'}
-        else:
-            roster_jobs=RosterJob.query(ancestor=root_key).fetch(10000)
-            result={'result':[fromJson(_.data) for _ in roster_jobs]}
-            pass
-        return self.response.write(toJson(result))
-    pass
-
-class edit_roster_page(webapp2.RequestHandler):
-    def get(self):
-        session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel in ['admin','staff']:
-            log('not logged in')
-            return webapp2.redirect('staff.html?from=events.html')
-        if fetchTerms() is None:
-            log('terms not defined')
-            return webapp2.redirect('edit_terms.html')
-        if fetchGroups() is None:
-            log('groups not defined')
-            return webapp2.redirect('edit_groups.html')
-        page=pq.loadFile('roster.html')
-        page.find(pq.hasClass('parent-only')).remove()
-        if not session.loginLevel in ['staff','admin']:
-            page.find(pq.hasClass('staff-only')).remove()
-            pass
-        if not session.loginLevel in ['admin']:
-            page.find(pq.hasClass('admin-only')).remove()
-            pass
-        page.find(pq.tagName('body')).addClass(session.loginLevel)
-        addAdminNavButtonToPage(page,session.loginLevel)
-        addScriptToPageHead('roster.js',page)
-        makePageBodyInvisible(page)
-        self.response.write(unicode(page).encode('utf-8'))
-    pass
-
-@ndb.transactional
-def addRosterJobVolunteer(id,groups,parents_name,childs_name):
-    'add %(parents_name)r (parent of %(childs_name)r as groups %(groups)r volunteer for job %(id)s'
-    try:
-        log(l1(addRosterJobVolunteer.__doc__)%vars())
-        roster_job=RosterJob.query(
-            RosterJob.id==id,
-            ancestor=root_key).fetch(1)[0]
-        data=fromJson(roster_job.data)
-        instances=dict(
-            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
-        log('groups %(groups)s'%vars())
-        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
-        instance=instances.setdefault(tuple(groups),[])
-        added=False
-        if len(instance)>=data['volunteers_required']:
-            log('already have %s volunteers of %s - cannot add more'%(
-                    len(instance),data['volunteers_required']))
-        elif len([_ for _ in instance 
-                  if _['parents_name']==parents_name and _['childs_name']==childs_name]):
-            log('%(parents_name)r is already in %(instance)r'%vars())
-            added=True #in a sense
-        else:
-            instance.append({
-                    'parents_name':parents_name,
-                    'childs_name':childs_name,
-                    'attended':False,
-                    'note':''
-                    })
-            data['instances']=[ {'groups':list(_[0]),
-                                 'volunteers':_[1]} for _ in instances.items() ]
-            roster_job_schema.validate(data)
-            roster_job.data=toJson(data)
-            roster_job.put()
-            added=True
-            pass
-        result={
-            'added':added,
-            'instances':data['instances']
-            }
-        return result
-    except:
-        raise inContext(l1(addRosterJobVolunteer.__doc__)%vars())
-    pass
-
-class add_roster_job_volunteer(webapp2.RequestHandler):
-    def post(self):
-        try:
-            session=getSession(self.request.cookies.get('kc-session',''))
-            if not session.loginLevel:
-                result={'error':'You are not logged in.'}
-            else:
-                params=fromJson(self.request.get('params'))
-                result=addRosterJobVolunteer(**params)
-                result={'result':result}
-                pass
-            self.response.write(toJson(result))
-        except:
-            self.response.write(toJson({'error':str(inContext('add roster job volunteer'))}))
-            pass
-        pass
-    pass
-
-@ndb.transactional
-def updateVolunteerAttended(id,groups,volunteer,new_attended):
-    'record %(new_attended)s as attendance of %(volunteer)r as groups %(groups)r volunteer for job %(id)s'
-    try:
-        log(l1(updateVolunteerAttended.__doc__)%vars())
-        roster_job=RosterJob.query(
-            RosterJob.id==id,
-            ancestor=root_key).fetch(1)[0]
-        data=fromJson(roster_job.data)
-        instances=dict(
-            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
-        log('groups %(groups)s'%vars())
-        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
-        instance=instances.get(tuple(groups))
-        indices=[_[0] for _ in enumerate(instance) 
-                 if _[1]['childs_name']==volunteer['childs_name'] and
-                    _[1]['parents_name']==volunteer['parents_name']]
-        for i in indices:
-            instance[i]['attended']=new_attended
-            pass
-        roster_job_schema.validate(data)
-        roster_job.data=toJson(data)
-        roster_job.put()
-        result='OK'
-        return result
-    except:
-        raise inContext(l1(updateVolunteerAttended.__doc__)%vars())
-    pass
-
-class update_roster_job_volunteer_attended(webapp2.RequestHandler):
-    def post(self):
-        try:
-            session=getSession(self.request.cookies.get('kc-session',''))
-            if not session.loginLevel:
-                result={'error':'You are not logged in.'}
-            else:
-                params=fromJson(self.request.get('params'))
-                result=updateVolunteerAttended(**params)
-                result={'result':result}
-                pass
-            self.response.write(toJson(result))
-        except:
-            self.response.write(toJson({'error':str(inContext('update_volunteer_attended'))}))
-            pass
-        pass
-    pass
-
-@ndb.transactional
-def updateVolunteer(id,groups,volunteer,new_volunteer):
-    'update %(volunteer)s as a groups %(groups)r volunteer for job %(id)s to %(new_volunteer)s'
-    try:
-        log(l1(updateVolunteer.__doc__)%vars())
-        roster_job=RosterJob.query(
-            RosterJob.id==id,
-            ancestor=root_key).fetch(1)[0]
-        data=fromJson(roster_job.data)
-        instances=dict(
-            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
-        log('groups %(groups)s'%vars())
-        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
-        instance=instances.get(tuple(groups))
-        indices=[_[0] for _ in enumerate(instance) 
-                 if _[1]['childs_name']==volunteer['childs_name'] and
-                    _[1]['parents_name']==volunteer['parents_name']]
-        for i in indices:
-            instance[i]=new_volunteer
-            pass
-        roster_job_schema.validate(data)
-        roster_job.data=toJson(data)
-        roster_job.put()
-        result='OK'
-        return result
-    except:
-        raise inContext(l1(updateVolunteer.__doc__)%vars())
-    pass
-
-class update_roster_job_volunteer(webapp2.RequestHandler):
-    def post(self):
-        try:
-            session=getSession(self.request.cookies.get('kc-session',''))
-            if not session.loginLevel:
-                result={'error':'You are not logged in.'}
-            else:
-                params=fromJson(self.request.get('params'))
-                result=updateVolunteer(**params)
-                result={'result':result}
-                pass
-            self.response.write(toJson(result))
-        except:
-            self.response.write(toJson({'error':str(inContext('update_volunteer'))}))
-            pass
-        pass
-    pass
-
-@ndb.transactional
-def deleteRosterJobVolunteer(id,groups,childs_name):
-    'delete parent of %(childs_name)r as groups %(groups)r volunteer for job %(id)s'
-    try:
-        log(l1(deleteRosterJobVolunteer.__doc__)%vars())
-        roster_job=RosterJob.query(
-            RosterJob.id==id,
-            ancestor=root_key).fetch(1)[0]
-        data=fromJson(roster_job.data)
-        instances=dict(
-            [(tuple(_['groups']),_['volunteers']) for _ in data['instances']])
-        log('groups %(groups)s'%vars())
-        assert [ _ for _ in groups if 0<=_ and _<4 ]==groups, groups
-        if tuple(groups) in instances:
-            log('found groups instance')
-            instance=instances.get(tuple(groups))
-            childs_names=dict( (_[1]['childs_name'],_[0]) for _ in enumerate(instance))
-            log('childs_names %(childs_names)r')
-            if childs_name in childs_names:
-                index=childs_names[childs_name]
-                log('found childs_name (index %(index)s)'%vars())
-                del(instance[index])
-                roster_job_schema.validate(data)
-                roster_job.data=toJson(data)
-                roster_job.put()
-                log('job now %(data)r'%vars())
-                pass
-            pass
-        result=data['instances']
-        return result
-    except:
-        raise inContext(l1(deleteRosterJobVolunteer.__doc__)%vars())
-    pass
-
-class delete_roster_job_volunteer(webapp2.RequestHandler):
-    def post(self):
-        try:
-            session=getSession(self.request.cookies.get('kc-session',''))
-            if not session.loginLevel:
-                result={'error':'You are not logged in.'}
-            else:
-                params=fromJson(self.request.get('params'))
-                result=deleteRosterJobVolunteer(**params)
-                result={'result':result}
-                pass
-            self.response.write(toJson(result))
-        except:
-            self.response.write(toJson({'error':str(inContext('delete_roster_job_volunteer'))}))
-            pass
-        pass
-    pass
-
-all_maintenance_days_schema=jsonschema.Schema([
-        maintenance_day_schema])
-
-class all_maintenance_days(webapp2.RequestHandler):
-    def get(self):
-        try:
-            session=getSession(self.request.cookies.get('kc-session',''))
-            if not session.loginLevel:
-                result={'error':'You are not logged in.'}
-            else:
-                result=[fromJson(_.data) for _ in MaintenanceDay.query(ancestor=root_key).fetch(1000)]
-                cmpDate=lambda x, y: cmp( (x['year'],x['month'],x['day']),
-                                          (y['year'],y['month'],y['day']))
-                for data in result:
-                    if not 'name' in data: data['name']='Maintenance Day 8am'
-                    if not 'maxVolunteers' in data: data['maxVolunteers']=25
-                    pass
-                result.sort(lambda x,y: cmpDate(x['date'],y['date']))
-                all_maintenance_days_schema.validate(result)
-                result={'result':result}
-                pass
-            self.response.write(toJson(result))
-        except:
-            self.response.write(toJson({'error':str(inContext('all_maintenance_days'))}))
-            pass
-        pass
-    pass
-        
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
@@ -2168,10 +2418,11 @@ application = webapp2.WSGIApplication([
     ('/delete_maintenance_day',delete_maintenance_day),
     ('/delete_public_holiday',delete_public_holiday),
     ('/remember_month',remember_month),
-    ('/session_file',session_file),
     ('/export_data.txt',export_data),
     ('/import_data',import_data),
     ('/update_roster_job_volunteer_attended',update_roster_job_volunteer_attended),
     ('/update_roster_job_volunteer',update_roster_job_volunteer),
     ('/uploaded_file',uploaded_file),
+    ('/uploaded_file_refcount',uploaded_file_refcount),
+    ('/logout',logout),
 ], debug=True)
