@@ -1,13 +1,13 @@
 - ical
 - family information report
-- add another name (edit_maintenance_day.html/js colspan=2)
+x add another name (edit_maintenance_day.html/js colspan=2)
 - re-add calendar group selector
 - make groups cookie persistent till 2/1 next year
 x adjust maintenance_day.js to know maxVolunteers and hide addme button
   once we get there
-- hide addme when past:
-  maintenance_day.js
-  twyc.js
+x hide addme when past:
+  x maintenance_day.js
+  x twyc.js
 - add admin password change page
 x hide past maintenance days
 x maint day title does not display

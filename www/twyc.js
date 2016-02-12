@@ -122,12 +122,12 @@ $(document).ready(function(){
       monthToShow=result;
       proceed();
     })
+  var staff=$('body').hasClass('staff')||$('body').hasClass('admin');
   var proceed=function(){
     if (kc.defined(groups)&&
 	kc.defined(terms)&&
 	kc.defined(groupsToShow)&&
 	kc.defined(monthToShow)){
-      var staff=$('body').hasClass('staff')||$('body').hasClass('admin');
       groupsToShowOptions=[];
       if (staff){
 	groupsToShowOptions.push({text:'All',groups:[0,1,2,3]});
@@ -288,6 +288,11 @@ $(document).ready(function(){
 	kc.each(dateDays,function(day,$day){
 	  kc.each(groupsToShow,function(i,group){
 	    var s,$twyc_add,$twyc;
+	    var date={
+	      year:monthToShow.y,
+	      month:monthToShow.m,
+	      day:parseInt(day)
+	    };
 	    if (!$day.hasClass(groupClasses[group]) ||
 		$day.hasClass('public-holiday')){
 	      return;
@@ -296,7 +301,9 @@ $(document).ready(function(){
 	    $twyc_add=$twyc_add_t.clone();
 	    $twyc=$twyc_t.clone();
 	    $day.append($twyc.hide());
-	    $day.append($twyc_add.show());
+	    if (!kc.dateHasPast(date)||staff){
+	      $day.append($twyc_add.show());
+	    }
 	    $twyc.find('.twyc-delete').click(function(){
 	      var name=$twyc.find('.parent-name').text();
 	      if (!window.confirm('Remove '+name+"?")){
@@ -304,11 +311,7 @@ $(document).ready(function(){
 	      }
 	      kc.postToServer('delete_twyc',{
 		params:kc.json.encode({
-		  date:{
-		    year:monthToShow.y,
-		    month:monthToShow.m,
-		    day:parseInt(day)
-		  },
+		  date:date,
 		  group:group,
 		  parent:name
 		})
@@ -353,7 +356,9 @@ $(document).ready(function(){
 	      var parent=twycs_by_day[day][group][0];
 	      $twyc.find('.twyc-label').text(s);
 	      $twyc.find('.parent-name').text(parent);
-	      $twyc.show();
+	      if (!kc.dateHasPast(date)||staff){
+		$twyc.show();
+	      }
 	      $twyc_add.hide();
 	    }
 	  });
