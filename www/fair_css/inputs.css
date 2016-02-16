@@ -1,0 +1,88 @@
+/* ==================== Inputs & Forms ==================== */
+
+.module_cont {
+	margin-top:7px;
+}
+.module_feedback_form {
+	text-align:left;
+}
+.module_feedback_form input[type=text],
+.module_feedback_form textarea,
+input[type=text],
+textarea {
+	margin-bottom:5px;
+	width: 100%;
+}
+.module_feedback_form .feedback_reset,
+.module_feedback_form .feedback_go {
+	display:inline-block;
+	margin:0 1px 0 0;
+    	padding:10px 17.5px 10px 17.5px;
+
+}
+#reset2:hover, #mailsubmit:hover {
+	font-weight:bold;
+}
+.ajaxanswer {
+	display:inline-block;
+}
+.feedback_form {
+	margin-bottom: 30px;
+}
+input[type="button"],
+input[type="reset"],
+input[type="submit"],
+input[type="radio"],
+input[type="checkbox"] {
+  cursor: pointer;
+}
+input[type="text"],
+textarea {
+	display:block;
+	border:1px solid #eaeaea !important;
+	color:#444444;
+	font-size:13px;
+	line-height:16px;
+	padding:10px 15px;
+	border:none;
+}
+textarea {
+	resize: none;
+	height:106px;
+}
+input[type="button"], input[type="reset"], input[type="submit"] {
+	border: none;
+	border-radius: 3px;
+	background: #515151;
+	box-shadow: inset 0 -3px 0 #393939!important;
+	font-size: 13px;
+	text-transform: uppercase;
+	color: #ffffff;
+}
+input[type="button"]:hover,
+input[type="reset"]:hover,
+input[type="submit"]:hover {
+	box-shadow:inset 0 -3px 0 #8cc700, inset -800px -300px 0 #666666 !important;
+}
+input.btn_search {
+	margin-top:5px;
+	display:block;
+	float:none;
+	text-align:center;
+	background:#dddddd;
+	color:#444444;
+	padding:0;
+	width:100%;
+	box-shadow:inset 0 -3px 0 #b1b1b1!important;
+	margin-bottom:10px;
+}
+input.btn_search:hover {
+	box-shadow:inset 0 -3px 0 #b1b1b1, inset -800px -300px 0 rgba(255,255,255,0.4)!important;
+}
+#rostersubmit {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 13px;
+	font-weight: 400;
+	margin-left: 0px;
+	padding:10px 17.5px 10px 17.5px;
+}

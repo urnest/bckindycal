@@ -2,7 +2,14 @@ $(document).ready(function(){
   var $vrt=$('.vr-template').remove().first().removeClass('vr-template');
   var mdate=$('.mdate').first().text();
   var maintenanceDayName=$('.maintenance-day-name').first().text();
-  $('.add-volunteer').click(function(){
+  var $addVolunteerButton=$('.add-volunteer');
+  var maxVolunteers=parseInt($('input#max-volunteers').prop('value'));
+  var date=kc.parseDate($('.mdate').first().text());
+  if ($('.volunteer-row').length>=maxVolunteers ||
+      kc.dateHasPast(date)){
+    $addVolunteerButton.hide();
+  }
+  $addVolunteerButton.click(function(){
     var id=$('input#id').prop('value');
     var $dialog=$('<div><p>Your Name: <input type="text" name="parent_name"></p><p>Your Child\'s Name: <input type="text" name="child_name"></p></div>');
     var add=function(childs_name,parents_name){
@@ -27,6 +34,9 @@ $(document).ready(function(){
 	  $('table.volunteers-table').append($vr);
 	  $vr.show();
 	  $dialog.dialog('close');
+	  if ($('.volunteer-row').length>=maxVolunteers){
+	    $addVolunteerButton.hide();
+	  }
 	});
     };
     $dialog.dialog({

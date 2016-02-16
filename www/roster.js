@@ -525,20 +525,10 @@ $(document).ready(function(){
       var $mday=$mday_t.clone();
       var $addme=$addMe_t.clone();
       var yearToday=today.getYear()+1900;
-      var monthToday=today.getMonth()+1;//Date() numbers months 0..11
-      var dayToday=today.getDate();
 
       if (!staff){
-	if (m.date.year != yearToday){
+	if (kc.dateHasPast(m.date) || m.date.year > yearToday){
 	  return;
-	}
-	else if (m.date.year == yearToday){
-	  if (m.date.month < monthToday){
-	    return;
-	  }
-	  if ((m.date.month == monthToday) && (m.date.day < dayToday)){
-	    return;
-	  }
 	}
       }
       $mday.find('.mdate a')

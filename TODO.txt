@@ -1,9 +1,26 @@
+- .ics https://tools.ietf.org/html/rfc2445
+
+BEGIN:VCALENDAR\r\n
+VERSION:2.0
+PRODID:https://bckindycal-1197.appspot.com
+BEGIN:VEVENT
+UID:https://bckindycal-1197.appspot.com/event.html?id=1001
+DTSTAMP:19970901T1300Z
+DTSTART:19971102
+SUMMARY:Our Blissful Anniversary
+DESCRIPTION:https://bckindycal-1197.appspot.com/event.html?id=1001
+END:VEVENT
+END:VCALENDAR
+
 - family information report
-- add another name (edit_maintenance_day.html/js colspan=2)
+x add another name (edit_maintenance_day.html/js colspan=2)
 - re-add calendar group selector
 - make groups cookie persistent till 2/1 next year
-- adjust maintenance_day.js to know maxVolunteers and hide addme button
+x adjust maintenance_day.js to know maxVolunteers and hide addme button
   once we get there
+x hide addme when past:
+  x maintenance_day.js
+  x twyc.js
 - add admin password change page
 - hide past twycs
 - no addme on past maintenance days/roster jobs
@@ -154,6 +171,29 @@ x grey out next/prev-months days
 x time with your child
 x roster jobs
 - fair rosters
+  - bring in rss-carnival/stall:
+    guestbook.py -> fair.py
+    StallPage
+      x index.html (used as template)
+xju@xjutv:~/rss-carnival$ cp index3.html ~/kindycal/www/fair_index.html
+xju@xjutv:~/rss-carnival$ cp admin.html ~/kindycal/www/fair_admin.html
+xju@xjutv:~/rss-carnival$ cp -R css ~/kindycal/www/fair_css
+xju@xjutv:~/rss-carnival$ cp -R images ~/kindycal/www/fair_images
+xju@xjutv:~/rss-carnival$ cp -R fonts ~/kindycal/www/fair_fonts
+      x adjusted css/ refs
+      x adjusted js/ refs
+      x adjust images/ refs in
+        x fair_index.html
+        x fair_admin.html
+        x fair.py
+        x fair_css/*
+          note some links in their go nowhere!
+      x adjust fonts/ refs in
+        x fair_index.html
+        x fair_admin.html
+        x fair.py
+        x fair_css/*
+
 
 x upload document/image
   x logout (return to loginLevel login page)
