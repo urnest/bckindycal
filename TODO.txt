@@ -1,4 +1,17 @@
-- ical
+- .ics https://tools.ietf.org/html/rfc2445
+
+BEGIN:VCALENDAR\r\n
+VERSION:2.0
+PRODID:https://bckindycal-1197.appspot.com
+BEGIN:VEVENT
+UID:https://bckindycal-1197.appspot.com/event.html?id=1001
+DTSTAMP:19970901T1300Z
+DTSTART:19971102
+SUMMARY:Our Blissful Anniversary
+DESCRIPTION:https://bckindycal-1197.appspot.com/event.html?id=1001
+END:VEVENT
+END:VCALENDAR
+
 - family information report
 x add another name (edit_maintenance_day.html/js colspan=2)
 - re-add calendar group selector
