@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css">
+#bg {
+  position: fixed; 
+  top: 0; 
+  left: 0;	
+  /* Maintain bg aspect ratio */
+  min-width: 100%;
+  min-height: 100%;
+  z-index:-10;
+}
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #FFFFFF;
+	margin: 0px;
+	background-color: #000000;
+}
+form		{padding-top:15px;}
+					
+input, textarea, select {
+	margin: 3px 0px;
+	background: #222222;
+	color: #FFFFFF;
+	padding: 3px;
+	border: solid #555555 1px;
+}
+.helper_table td {
+    border: 1px;
+  }
+.main_table td {
+    border: 1px;
+    cellpadding: 6px;
+  }
+.table_headings {
+    font-weight: bold;
+  }
+.suppress {
+    display: none;
+}
+div.form-background {
+    background-color: #ffffff;
+    padding-top: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-left: 20px;
+    margin: 0px;
+    display: inline-block;
+}
+.box-bg {
+	background-color: #ffffff transparent;
+	background: rgba(255, 255, 255, 0.8);
+	border: 1px solid #cccccc;
+    border-radius: 15px;
+    color: #333333;
+    display: inline-block;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 13px;
+    margin-bottom: 5px;
+    margin-left: 0;
+    margin-top: 0;
+    padding: 0.7% 2%;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+	box-sizing: border-box;
+}
+.stall_name {
+    color: #000000;
+	font-weight: 700;
+}
+textarea.comment {
+	width:300px;
+	border: solid #185ca8 3px;
+	background-color: #efefef;
+	text-align: center;
+	font-size: 10px;
+}
+textarea.commentp {
+	width:320px;
+	border: solid #185ca8 3px;
+	background-color: #E6E6E6;
+	text-align: center;
+}
+.time {
+	color: #185ca8;
+	line-height: 1.42857;
+	font-size: 14px;
+	font-weight: bold;
+	border-bottom: 2px solid #cccccc;
+	line-height: 30px;
+}
+.timehd {
+	color: #185ca8;
+	line-height: 1.42857;
+	font-size: 14px;
+	font-weight: bold;
+	border-bottom: 2px solid #cccccc;
+	line-height: 30px;
+	background: #E6E6E6;
+}
+.timered {
+	color: #ea1233;
+	line-height: 1.42857;
+	font-size: 14px;
+	font-weight: bold;
+	border-bottom: 2px solid #cccccc;
+	line-height: 30px;
+}
+.blue {
+	color: #185ca8;
+	font-size: 14px;
+}
+section#settings P {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 12px;
+	color: #333333;
+}
+h4.blue {
+	color: #185ca8;
+	font-size: 18px;
+}
+hr.bw {
+	color: #999999 2px soldi;
+	border-width: 2px;
+}
+h1	{
+	color: #41ad48;
+}
+.helper_table td.rec {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 12px;
+	color: #000000;
+	background: #FFFFFF;
+	padding:10px;
+	font-weight:700;
+	border-bottom: #dfedcd solid 5px;
+	vertical-align: top;	
+}
+    </style>
+    <title>Rainworth State School Rainbow Carnival Fair Fete</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href="fair_css/inputs.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="fair_css/rssrc1.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="fair_css/font-awesome.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="fair_css/font-awesome.min.css" rel="stylesheet" type="text/css" media="all" />
+    
+    <script src="jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery.form.js"></script>
+    <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
+    
+    <!-- SMOOTH SCROLL -->
+    <script>
+    $(function() {
+      $('a[href*=#]:not([href=#])').click(function() {
+        if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+          var target = $(this.hash);
+          target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+          if (target.length) {
+            $('html,body').animate({
+              scrollTop: target.offset().top
+            }, 1000);
+            return false;
+          }
+        }
+      });
+	// Sticky Navbar Affix
+  	$('#navbar').affix({
+    	offset: {
+      	top: 0,
+     }
+  	});
+    });
+    </script>
+    <!-- End of SMOOTH SCROLL -->
+    <script>
+      $(function(){
+        var $emails=$('section#emails');
+        $emails.find('input.separate-by-space').click(function(){
+          var t=$emails.find('textarea').text();
+          t=t.replace(',',' ');
+          t=t.replace(';',' ');
+          t=t.replace('\n',' ');
+          $emails.find('textarea').text(t);
+        }).click();
+        $emails.find('input.separate-by-comma').click(function(){
+          var t=$emails.find('textarea').text();
+          t=t.replace(' ',',');
+          t=t.replace(';',',');
+          t=t.replace('\n',',');
+          $emails.find('textarea').text(t);
+        });
+        $emails.find('input.separate-by-semicolon').click(function(){
+          var t=$emails.find('textarea').text();
+          t=t.replace(' ',';');
+          t=t.replace(',',';');
+          t=t.replace('\n',';');
+          $emails.find('textarea').text(t);
+        });
+        $emails.find('input.separate-by-newline').click(function(){
+          var t=$emails.find('textarea').text();
+          t=t.replace(' ','\n');
+          t=t.replace(',','\n');
+          t=t.replace(';','\n');
+          $emails.find('textarea').text(t);
+        });
+        var $mobiles=$('section#mobiles');
+        $mobiles.find('input.separate-by-space').click(function(){
+          var t=$mobiles.find('textarea').text();
+          t=t.replace(',',' ');
+          t=t.replace(';',' ');
+          t=t.replace('\n',' ');
+          $mobiles.find('textarea').text(t);
+        }).click();
+        $mobiles.find('input.separate-by-comma').click(function(){
+          var t=$mobiles.find('textarea').text();
+          t=t.replace(' ',',');
+          t=t.replace(';',',');
+          t=t.replace('\n',',');
+          $mobiles.find('textarea').text(t);
+        });
+        $mobiles.find('input.separate-by-semicolon').click(function(){
+          var t=$mobiles.find('textarea').text();
+          t=t.replace(' ',';');
+          t=t.replace(',',';');
+          t=t.replace('\n',';');
+          $mobiles.find('textarea').text(t);
+        });
+        $mobiles.find('input.separate-by-newline').click(function(){
+          var t=$mobiles.find('textarea').text();
+          t=t.replace(' ','\n');
+          t=t.replace(',','\n');
+          t=t.replace(';','\n');
+          $mobiles.find('textarea').text(t);
+        });
+      
+      });
+    </script>
+  </head>
+  <body>
+    <img src="fair_images/bg-admin.jpg" id="bg">
+    <div id="page">
+      <header id="header" class="site-header">
+	<nav id="navbar" class="site-navbar navbar navbar-static-top affix-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <i class="fa fa-bars"></i>
+              </button>
+              <h1 class="navbar-brand"><a href="index.html"><img class="logo" src="fair_images/rc-logo.png" width="182" alt="Rainworth Rainbow Carnival Logo" /></a>ADMIN</h1>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-collapse-1">
+              <ul id="navigation" class="nav navbar-nav navbar-right">
+                <li><a href="admin">STALLS</a></li>
+                <li><a href="#settings">PREFS</a></li>
+                <li><a href="#roster">ROSTER</a></li>
+                <li><a href="#emails">EMAILS</a></li>
+                <li><a href="#mobiles">MOBILES</a></li>
+                <li><a href="adminlogout">LOGOUT</a></li>                                 
+              </ul>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <main id="main" class="site-main">
+	<section id="settings" class="section section-center section-cta">
+	  <h1 class="hd stall_name">Gourmet Stall</h1>
+	  <div class="white-box">
+	    <h2>ROSTER PREFERENCES</h2>
+	    <div class="holder">
+	      <form method="post" action="adminsave">	
+		<h4 class="blue">VOLUNTEERS PER SHIFT</h4>
+		<p class="blue">Based on 1 hour shifts</p>
+		<table class="helpers_required" align="center">
+		  <tr>
+		    <td  class="timehd" width="100">TIME</td><td colspan="11" class="timehd">PEOPLE REQUIRED &nbsp;</td>
+		  </tr>
+		  <tr>
+		    <td>&nbsp;</td><td class="timered" width="20">0</td><td class="timered" width="20">1</td><td class="timered" width="20">2</td><td class="timered" width="20">3</td><td class="timered" width="20">4</td><td class="timered" width="20">5</td><td class="timered" width="20">6</td><td class="timered" width="20">7</td><td class="timered" width="20">8</td><td class="timered" width="20">9</td><td class="timered" width="20">10</td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">8am</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_8" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">9am</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_9" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">10am</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_10" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">11am</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_11" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">12noon</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_12" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">1pm</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_13" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">2pm</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_14" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">3pm</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_15" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">4pm</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_16" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">5pm</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_17" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">6pm</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_18" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">7pm</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_19" value="10"></input>
+		    </td>
+		  </tr>
+		  <tr>
+		    <td class="hour time">8pm</td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="0"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="1"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="2"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="3"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="4"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="5"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="6"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="7"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="8"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="9"></input>
+		    </td>
+		    <td class="time">
+		      <input type="radio" name="helpers_20" value="10"></input>
+		    </td>
+		  </tr>
+		</table><br><span class="line"></span><br/>
+		<h4 class="blue">ROSTER COMMENT</h4>
+		<p class="blue">This comment appears above your stall roster<br/>eg Please bring your own apron.</p> 
+		<p align=center><textarea rows="5" cols="60" name="roster_instructions" class="roster_instructions commentp" type="text"></textarea></p>
+		<br/><span class="line"></span><br/>
+		<h4 class="blue">DETAILS ABOUT VOLUNTEERS</h4>
+		<p class="blue">Volunteers must enter their name. <br/>Would you like any other information about them?<br/>Only name appears on the public roster.</p>
+		<h4 class="blue"><input type="checkbox" name="ask_for_email"> Email Address</h4>
+		<h4 class="blue">&nbsp;<input type="checkbox" name="ask_for_phone"> Mobile Number</h4>
+		<br/><br/>
+		<input class="save" type="submit" value=" SAVE "><br/><br/>
+	      </form>
+	    </div>
+	  </div>
+	</section>
+	<div class="white-box">
+	  <section id="roster" class="section section-center section-cta">
+	    <h2>CURRENT ROSTER</h2><p class="blue">This admin version shows name + email and phone if they have been selected in preferences (above).<br>The public version shows name only.</p><br/>
+	    <!-- filled in by guestbook.py class admin -->
+	  </section>
+	</div>
+	<span class="line"></span>
+	<div class="aq-box">
+	  <section id="emails" class="section section-center section-cta">
+	    <h2>LIST OF ALL EMAIL ADDRESSES ON THE ROSTER </h2><p class="blue">(FOR COPY AND PASTING INTO AN EMAIL TO VOLUNTEERS)</p>
+	    <p class="blue">Choose how you want the list of addresses to be separated.</p>
+	    <form>
+	      <p>Separate by:<br/>
+		<input name="separator" type="radio" class="separate-by-space" checked="checked"> Space
+		<input name="separator" type="radio" class="separate-by-comma"> Comma
+		<input name="separator" type="radio" class="separate-by-semicolon"> Semicolon
+		<input name="separator" type="radio" class="separate-by-newline"> Newline</p>
+	    </form>
+	    <div style="display:inline-block"><textarea class="comment"></textarea></div>
+	    <!-- populated by guestbook.py class admin -->
+	  </section>
+	</div>
+	<span class="line"></span>
+	<div class="aq-box">
+	  <section id="mobiles" class="section section-center section-cta">
+	    <h2>LIST OF ALL MOBILE NUMBERS ON THE ROSTER </h2><p class="blue">(FOR COPY AND PASTING INTO YOUR PHONE TO SEND MESSAGE TO VOLUNTEERS)</p>
+	    <p class="blue">Choose how you want the list of numbers to be separated.</p>
+	    <form>
+	      <p>Separate by:<br/>
+		<input name="separator" type="radio" class="separate-by-space" checked="checked"> Space
+		<input name="separator" type="radio" class="separate-by-comma"> Comma
+		<input name="separator" type="radio" class="separate-by-semicolon"> Semicolon
+		<input name="separator" type="radio" class="separate-by-newline"> New line</p>
+	    </form>
+	    <div style="display:inline-block"><textarea class="comment"></textarea></div>
+	    <!-- populated by guestbook.py class admin -->
+	  </section>
+	</div>
+	<span class="line"></span>
+      </main>
+    </div>  
+    <br><br>
+    <div id="fixed"></div><br>       
+    <div class="scroll-to-top" data-spy="affix" data-offset-top="200"><a href="#page" class="smooth-scroll"><i class="fa fa-arrow-up"></i></a></div>  
+  </body>
+</html>

@@ -168,6 +168,29 @@ x grey out next/prev-months days
 x time with your child
 x roster jobs
 - fair rosters
+  - bring in rss-carnival/stall:
+    guestbook.py -> fair.py
+    StallPage
+      x index.html (used as template)
+xju@xjutv:~/rss-carnival$ cp index3.html ~/kindycal/www/fair_index.html
+xju@xjutv:~/rss-carnival$ cp admin.html ~/kindycal/www/fair_admin.html
+xju@xjutv:~/rss-carnival$ cp -R css ~/kindycal/www/fair_css
+xju@xjutv:~/rss-carnival$ cp -R images ~/kindycal/www/fair_images
+xju@xjutv:~/rss-carnival$ cp -R fonts ~/kindycal/www/fair_fonts
+      x adjusted css/ refs
+      x adjusted js/ refs
+      x adjust images/ refs in
+        x fair_index.html
+        x fair_admin.html
+        x fair.py
+        x fair_css/*
+          note some links in their go nowhere!
+      x adjust fonts/ refs in
+        x fair_index.html
+        x fair_admin.html
+        x fair.py
+        x fair_css/*
+
 
 x upload document/image
   x logout (return to loginLevel login page)

@@ -18,6 +18,15 @@ handlers:
 - url: /images
   static_dir: images
 
+- url: /fair_images
+  static_dir: fair_images
+
+- url: /fair_css
+  static_dir: fair_css
+
+- url: /fair_fonts
+  static_dir: fair_fonts
+
 - url: /tinymce
   static_dir: tinymce
   

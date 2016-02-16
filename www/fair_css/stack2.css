@@ -1,0 +1,289 @@
+/*
+	All columns stacked to 2 columns
+*/
+
+.p4 {
+	border: 0px solid #069;
+}
+
+.f2.stack .one,
+.p2.stack .one {
+	width:50%;
+	margin-bottom:0px;
+	float:left;
+}
+.f2.stack .two,
+.p2.stack .two {
+	width:50%;
+	margin-left:50%;
+}
+
+
+.f4.stack .one,
+.p4.stack .one {
+	width:50%;
+	float:left;
+	margin-left:0px;
+}
+.f4.stack .one-two,
+.p4.stack .one-two {
+	width:50%;
+	float:left;
+	margin-left:0px;
+}
+.f4.stack .one-three,
+.p4.stack .one-three {
+	width:50%;
+	float:left;
+	margin-left:0px;
+}
+.f4.stack .two,
+.p4.stack .two {
+	width:50%;
+	float:none;
+	margin-left:50%;
+}
+
+.f4.stack .two-four,
+.p4.stack .two-four {
+	width:50%;
+	float:none;
+	margin-left:50%;
+}
+.f4.stack .three,
+.p4.stack .three {
+	width:50%;
+	float:left;
+	margin-left:0px;
+	clear:both;
+}
+.f4.stack .three-four,
+.p4.stack .three-four {
+	width:50%;
+	float:none;
+	margin-left:50%;
+}
+.f4.stack .four,
+.p4.stack .four {
+	width:50%;
+	float:left;
+	margin-left:0%;
+}
+
+
+.f6.stack .one,
+.p6.stack .one {
+	width:50%;
+	float:left;
+	margin-left:0px;
+}
+.f6.stack .one-two,
+.p6.stack .one-two {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f6.stack .one-three,
+.p6.stack .one-three {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f6.stack .one-four,
+.p6.stack .one-four {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f6.stack .one-five,
+.p6.stack .one-five {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f6.stack .two,
+.p6.stack .two {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f6.stack .two-three,
+.p6.stack .two-three {
+	width:49%;
+	float:none;
+	margin-left:0px;
+}
+
+.f6.stack .two-six,
+.p6.stack .two-six {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f6.stack .three,
+.p6.stack .three {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f6.stack .three-four,
+.p6.stack .three-four {
+	width:49%;
+	float:none;
+	margin-left:0px;
+}
+
+.f6.stack .three-six,
+.p6.stack .three-six {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f6.stack .four,
+.p6.stack .four {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+
+.f6.stack .four-six,
+.p6.stack .four-six {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f6.stack .five,
+.p6.stack .five {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f6.stack .five-six,
+.p6.stack .five-six {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f6.stack .six,
+.p6.stack .six {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+
+
+.f8.stack .one,
+.p8.stack .one {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f8.stack .one-two,
+.p8.stack .one-two {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f8.stack .one-three,
+.p8.stack .one-three {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f8.stack .one-four,
+.p8.stack .one-four {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f8.stack .one-five,
+.p8.stack .one-five {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f8.stack .one-six,
+.p8.stack .one-six {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f8.stack .one-seven,
+.p8.stack .one-seven {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f8.stack .two,
+.p8.stack .two {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+
+.f8.stack .three-eight,
+.p8.stack .three-eight {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f8.stack .four,
+.p8.stack .four {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+
+.f8.stack .four-eight,
+.p8.stack .four-eight {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f8.stack .five,
+.p8.stack .five {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+
+.f8.stack .five-eight,
+.p8.stack .five-eight {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f8.stack .six,
+.p8.stack .six {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+
+.f8.stack .six-eight,
+.p8.stack .six-eight {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f8.stack .seven,
+.p8.stack .seven {
+	width:49%;
+	float:left;
+	margin-left:0px;
+}
+.f8.stack .seven-eight,
+.p8.stack .seven-eight {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+.f8.stack .eight,
+.p8.stack .eight {
+	width:49%;
+	float:none;
+	margin-left:51%;
+}
+
+
+

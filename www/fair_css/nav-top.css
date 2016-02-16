@@ -1,0 +1,498 @@
+-------------------------------------------------------------
+CSS Structure:
+
+01. Desktop Wrapper + Header
+02. Desktop Navigation
+03. Mobile Wrapper + Header
+04. Mobile Toggle Menu
+05. Mobile Navigation
+06. Retina Support (mobile toggle icon + desktop down arrow)
+-------------------------------------------------------------
+*/
+
+/* 01. Desktop Wrapper + Header -------------------------- */
+
+.wrapper {
+	padding-top:80px;
+	z-index:0;
+}
+.wrapper-push {
+	margin-right:0%;
+	z-index:0;
+}
+.fixed {
+	position:fixed!important;
+	width:100%;
+}
+.header {
+	width:100%;
+	margin:0px;
+	padding:0px;
+	min-height:49px;
+	padding-top:0px;
+	position:absolute;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #dbdee2;
+	background-color:rgba(255,255,255,0.9); /* Change this to background-color:#fff; to make solid white */
+	-o-transition:.3s;
+	-ms-transition:.3s;
+	-moz-transition:.3s;
+	-webkit-transition:.3s;
+	transition:.3s;
+	z-index:1;
+}
+/* animate header on scrolling */
+.sticky {
+	width:100%;
+	padding:0px;
+	height:60px;
+	padding-top:10px;
+	-o-transition:.3s;
+	-ms-transition:.3s;
+	-moz-transition:.3s;
+	-webkit-transition:.3s;
+	transition:.3s;
+}
+.sticky nav {
+	margin-right:10px;
+}
+.sticky ul.nav-buttons li {
+	border-right-width: 0px;
+}
+.stuck {
+	margin:0 auto;
+	width:100%;
+	height:auto;
+	position:fixed!important;
+	top:0;
+	left:0;
+	right:0;
+	-o-transition:.3s;
+	-ms-transition:.3s;
+	-moz-transition:.3s;
+	-webkit-transition:.3s;
+	transition:.3s;
+	opacity: 1.0;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #dbdee2;
+}
+.stuck.header {
+	padding-top:0px;
+	min-height:50px;
+}
+.stuck .logo {
+	padding-left:10px;
+}
+.stuck nav {
+	margin-right:0px;
+}
+.stuck ul.nav-buttons li {
+	border-right-width: 1px;
+}
+/* End: animate header on scrolling */
+
+.logo {
+	float:left;
+	padding-left:20px;
+	font-size:20px;
+	line-height:50px;
+	-o-transition:.3s;
+	-ms-transition:.3s;
+	-moz-transition:.3s;
+	-webkit-transition:.3s;
+	transition:.3s;
+}
+.logo span {
+	color:#f1844d;
+	font-weight:normal;
+}
+.logo a {
+}
+
+/* 02. Desktop Navigation -------------------------- */
+
+a {
+	color:#878c91;
+}
+a:hover {
+	color:#81868b;
+}
+a.selected {
+	color:#81868b;
+	background-color:#f8f8f9;
+}
+ul.nav-buttons li a.selected,
+ul.nav-buttons ul a.selected {
+	background-color:#f8f8f9;
+}
+.navclosed,
+.navclicked {
+	display:none;
+}
+nav {
+	z-index:2;
+	height:49px;
+	margin-right:0px;
+	-o-transition:.3s;
+	-ms-transition:.3s;
+	-moz-transition:.3s;
+	-webkit-transition:.3s;
+	transition:.3s;
+}
+ul.nav-buttons {
+	margin:0px;
+	padding:0px;
+	z-index:2;
+	list-style:none;
+	float:right;
+}
+ul.nav-buttons li {
+	margin:0px;
+	padding:0px;
+	float:left;
+	position:relative;
+}
+ul.nav-buttons li a {
+	font-size:15px;
+	margin:0px;
+	padding-left:10px;
+	padding-right:10px;
+	line-height:51px;
+	display:block;
+	text-decoration:none;
+}
+ul.nav-buttons li a.buy {
+	background-color:#f1844d;
+	color:#fff;
+}
+ul.nav-buttons li a:hover {
+	font-size:15px;
+	text-decoration:none;
+	opacity: 1.0;
+}
+ul.nav-buttons li a.selected
+{
+	font-size:15px;
+	text-decoration:none;
+	opacity: 1.0;
+}
+ul.nav-buttons li a.dropdown
+{
+	font-size:15px;
+	padding-left:34px;
+	text-decoration:none;
+	opacity: 1.0;
+	background-image: url(../fair_images/navgrey.png);
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+ul.nav-buttons li a.dropdown:hover,
+ul.nav-buttons li:hover a.dropdown
+{
+	background-color:#ebeced;
+}
+
+/* Drop Down Menu */
+ul.nav-buttons ul {
+	list-style:none;
+	position:absolute;
+	padding:0px;
+	padding-top:1px;
+	width:auto;
+	height:auto;
+	left:-9999px; /* Hide off-screen when not needed (this is more accessible than display:none;) */
+}
+ul.nav-buttons ul li {
+	float:none;
+	height:50px;
+	border:0px;
+}
+ul.nav-buttons ul a {
+	width:190px;
+	display:block;
+	margin:0px;
+	padding-left:10px;
+	background-color:#ebeced;
+}
+ul.nav-buttons ul a:hover {
+	background-color:#f8f8f9;
+}
+ul.nav-buttons li:hover ul {
+	left:0; /* Display the dropdown on hover */
+}
+
+/* 03. Mobile Wrapper + Header -------------------------- */
+
+/* Browsers from 0 up to 767 iPhone Portrait + Landscape (iPad Portrait width is 768) */
+@media screen and (min-width: 0px) and (max-width: 767px) {
+
+.wrapper {
+/*	right:0px;
+	padding-top:80px;
+	width:100%;
+	*/
+/*	transition-property: right; Timers for sliding in the wrapper, when closing the navigation 
+	-moz-transition-duration: 0.8s;
+	-webkit-transition-duration: 0.8s;
+	-o-transition-duration: 0.8s;
+	transition-duration: 0.8s;
+	-moz-transition-timing-function: ease;
+	-webkit-transition-timing-function: ease;
+	-o-transition-timing-function: ease;
+	transition-timing-function:ease;
+	-o-transition:.8s;
+	-ms-transition:.8s;
+	-moz-transition:.8s;
+	-webkit-transition:.8s;
+	transition:.8s; */
+	-o-transition:.8s;
+	-ms-transition:.8s;
+	-moz-transition:.8s;
+	-webkit-transition:.8s;
+	transition:.8s;
+	width:100%;
+	position:relative;
+	opacity:1;
+	z-index:0;
+}
+.wrapper-push {
+/*	right:270px;
+	position:absolute;
+	transition-property: right;  Timers for sliding out the wrapper, when opening the navigation 
+	-moz-transition-duration: 0.8s;
+	-webkit-transition-duration: 0.8s;
+	-o-transition-duration: 0.8s;
+	transition-duration: 0.8s;
+	-moz-transition-timing-function: ease;
+	-webkit-transition-timing-function: ease;
+	-o-transition-timing-function: ease;
+	transition-timing-function:ease;
+	 /* Change this to 1 to keep the wrapper 100% visibility */
+/*	 */
+	-o-transition:.8s;
+	-ms-transition:.8s;
+	-moz-transition:.8s;
+	-webkit-transition:.8s;
+	transition:.8s;
+	width:100%;
+	position:relative;
+	opacity:0.3;
+	z-index:0;
+}
+.header {
+	min-height:50px;
+	z-index:2;
+}
+.sticky {
+	border-top-width: 0px;
+}
+.stuck {
+	height:50px;
+}
+.logo {
+	font-size:16px;
+	padding-top:1px;
+}
+.sticky nav,
+.stuck nav {
+	margin-top:0px;
+}
+
+/* 04. Mobile Toggle Menu -------------------------- */
+
+.navclosed {
+	z-index:3;
+	color:#fff;
+	margin:0px;
+	padding:0px;
+	display:block;
+	background-image: url(../fair_images/nav.png);
+	background-repeat: no-repeat;
+	background-position: left top;
+	width:50px;
+	height:50px;
+	float:right;
+	transition-property: right; /* Timers for returning the X (close button) back to it's original position */
+	-moz-transition-duration: 0.8s;
+	-webkit-transition-duration: 0.8s;
+	-o-transition-duration: 0.8s;
+	transition-duration: 0.8s;
+	-moz-transition-timing-function: ease;
+	-webkit-transition-timing-function: ease;
+	-o-transition-timing-function: ease;
+	transition-timing-function:ease;
+}
+.navclosed.slide + nav { /* Nav Closed */
+	display:block;
+	overflow: hidden;
+	padding-top:0px;
+	max-height:0;
+	padding-bottom:0;
+	margin-bottom:0;
+	height:auto;
+	position:relative;
+	-moz-transition-duration: 0.8s;  /* Timers for closing the navigation panel */
+	-webkit-transition-duration: 0.8s;
+	-o-transition-duration: 0.8s;
+	transition-duration: 0.8s;
+	-moz-transition-timing-function: ease;
+	-webkit-transition-timing-function: ease;
+	-o-transition-timing-function: ease;
+	transition-timing-function: ease;
+	z-index:4;
+}
+.navclosed a {
+	color:transparent;
+	margin:0px;
+	padding:0px;
+	width:50px;
+	height:50px;
+	display:block;
+}
+.navclicked.slide + nav { /* Nav Clicked */
+	margin-top:0px;
+	height:auto;
+	position:relative;
+	-moz-transition-duration: 0.8s; /* Timers for sliding out the navigation panel */
+	-webkit-transition-duration: 0.8s;
+	-o-transition-duration: 0.8s;
+	transition-duration: 0.8s;
+	-moz-transition-timing-function: ease;
+	-webkit-transition-timing-function: ease;
+	-o-transition-timing-function: ease;
+	transition-timing-function: ease;
+	max-height:999px;
+	overflow: hidden;
+	z-index:4;
+}
+.header.fixed .navclicked.slide + nav, /* Nav Clicked for Fixed and Sticky. Make sure scroll bars happen */
+.header.sticky .navclicked.slide + nav,
+.header.stuck .navclicked.slide + nav {
+	margin-top:51px;
+	height:90%!important;
+	height: calc(100% - 50px)!important;
+	position:fixed;
+	overflow:auto;
+}
+.header.fixed .navclosed.slide + nav, /* Nav Clicked for Fixed and Sticky. Make sure scroll bars happen */
+.header.sticky .navclosed.slide + nav,
+.header.stuck .navclosed.slide + nav {
+	margin-top:51px;
+	height:90%!important;
+	height: calc(100% - 50px)!important;
+	position:fixed;
+	overflow:auto;
+}
+.navclicked {
+	color:#fff;
+	margin:0px;
+	padding:0px;
+	background-image: url(../fair_images/nav.png);
+	background-repeat: no-repeat;
+	background-position: right -50px;
+	z-index:3;
+	width:100%;
+	height:50px;
+	float:right;
+	position:absolute;
+}
+.navclicked a {
+	color:transparent;
+	margin:0px;
+	padding:0px;
+	width:50px;
+	height:300px;
+	display:block;
+}
+
+/* 05. Mobile Navigation -------------------------- */
+
+nav {
+	display:none;
+	z-index:2;
+	width:100%;
+	height:auto;
+	background-color:#ebeced;
+	position:absolute;
+}
+ul.nav-buttons {
+	float:none;
+	width:100%;
+	height:auto;
+	overflow-x:hidden;
+	overflow-y:auto;
+	padding:0px;
+	position:static;
+}
+ul.nav-buttons li {
+	width:100%;
+	height:auto;
+	margin-right:0px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #ccced1;
+	float:left;
+}
+ul.nav-buttons li a {
+	display:block;
+	width:100%;
+}
+
+/* Drop Down Menu */
+ul.nav-buttons li a.dropdown {
+	padding-left:36px !important;
+	background-color:#ebeced;
+	background-image: url(../fair_images/navgrey.png);
+	background-repeat: no-repeat;
+	background-position: 0px center;
+	background-size:40px;
+	-moz-background-size:40px;
+}
+ul.nav-buttons ul {
+	position:relative;
+	left:0px;
+}
+ul.nav-buttons ul li {
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #fff;
+}
+
+}
+
+/* 06. Retina Support (mobile toggle icon + desktop down arrow) -------------------------- */
+
+/* Change images to higher res versions, if screen resolution is high, such as Retina on Apple devices. */
+@media
+screen and (-webkit-min-device-pixel-ratio: 1.5),
+screen and (-moz-min-device-pixel-ratio: 1.5),
+screen and (min-device-pixel-ratio: 1.5) { 
+
+.navclosed {
+	background-image: url(../fair_images/nav2x.png);
+	background-repeat: no-repeat;
+	background-position: right top;	
+	background-size:50px;
+	-moz-background-size:50px;
+}
+.navclicked {
+	background-image: url(../fair_images/nav2x.png);
+	background-repeat: no-repeat;
+	background-position: right -50px;
+	background-size:50px;
+	-moz-background-size:50px;
+}
+ul.nav-buttons li a.dropdown,
+ul.nav-buttons li a.dropdown:hover,
+ul.nav-buttons li:hover a.dropdown
+{
+	background-image: url(../fair_images/navgrey2x.png);
+	background-repeat: no-repeat;
+	background-position: left center;
+	background-size:40px;
+	-moz-background-size:40px;
+}
+
+}
