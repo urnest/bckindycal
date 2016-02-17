@@ -2178,6 +2178,8 @@ class roster_bychild(webapp2.RequestHandler):
         data={}
         x=[fromJson(_.data) for _ in MaintenanceDay.query(ancestor=root_key).fetch(1000)]
         for maintenance_day in x:
+            if not 'name' in maintenance_day: maintenance_day['name']='Maintenance Day 8am'
+            if not 'maxVolunteers' in maintenance_day: maintenance_day['maxVolunteers']=25
             for v in maintenance_day['volunteers']:
                 data.setdefault(normaliseChildsName(v['childs_name']),[]).append(
                     (maintenance_day['name']+' '+formatDate(maintenance_day['date']),
