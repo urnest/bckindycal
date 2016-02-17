@@ -172,6 +172,9 @@ class Tag(Node):
         if not val is None:
             self.attrs[a]=val
         return self.attrs.get(a,'')
+    def removeAttr(self, a):
+        if a in self.attrs: del self.attrs[a]
+        return
     def attrEquals(self, a, val):
         return self.attrs.get(a,None)==val
     def indexOf(self, child):
@@ -503,6 +506,11 @@ class Selection:
         if value is None:
             return [_.attr(name, value) for _ in self.nodeList]
         [_.attr(name, value) for _ in self.nodeList]
+        return self
+    def removeAttr(self, name):
+        '''attr('src') lists the values of the src attributes of each of our nodes'''
+        """attr('src','fred.html') sets the src attribute of each of our nodes to 'html'"""
+        [_.removeAttr(name) for _ in self.nodeList]
         return self
     def __str__(self):
         return ''.join([str(_) for _ in self.nodeList])

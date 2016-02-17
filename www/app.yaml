@@ -99,6 +99,9 @@ handlers:
 - url: /maintenance_day.html$
   script: kindycal.application
 
+- url: /roster_bychild.html$
+  script: kindycal.application
+
 - url: /(..*\.html)$
   static_files: \1
   upload: ..*\.html

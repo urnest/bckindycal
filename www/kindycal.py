@@ -2164,6 +2164,74 @@ class all_maintenance_days(webapp2.RequestHandler):
         pass
     pass
 
+def normaliseChildsName(x):
+    y=x.split()
+    z=[_[0].upper()+_[1:] for _ in y]
+    return ' '.join(z)
+
+class roster_bychild(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff']:
+            log('not logged in')
+            return webapp2.redirect('staff.html?from=events.html')
+        data={}
+        x=[fromJson(_.data) for _ in MaintenanceDay.query(ancestor=root_key).fetch(1000)]
+        for maintenance_day in x:
+            for v in maintenance_day['volunteers']:
+                data.setdefault(normaliseChildsName(v['childs_name']),[]).append(
+                    (maintenance_day['name']+' '+formatDate(maintenance_day['date']),
+                     v['parents_name'],
+                     v['attended'],
+                     v['note'],
+                     maintenance_day['id']))
+                pass
+            pass
+        x=[fromJson(_.data) for _ in RosterJob.query(ancestor=root_key).fetch(10000)]
+        for roster_job in x:
+            for instance in roster_job['instances']:
+                for v in instance['volunteers']:
+                    data.setdefault(normaliseChildsName(v['childs_name']),[]).append(
+                        (roster_job['name'],
+                         v['parents_name'],
+                         v['attended'],
+                         v['note'],
+                         maintenance_day['id']))
+                    pass
+                pass
+            pass
+        data=data.items()
+        data.sort()
+        page=pq.loadFile('roster_bychild.html')
+        table=page.find(pq.hasClass('roster-jobs-table'))
+        rowt=table.find(pq.tagName('tr')).filter(pq.hasClass('jobs')).remove().first()
+        for childs_name,jobs in data:
+            log('%(childs_name)s %(jobs)r'%vars())
+            t2=rowt.clone()
+            t2.find(pq.hasClass('volunteer-child-name')).text(childs_name)
+            for job_name,parents_name,attended,note,id in jobs:
+                t2.find(pq.hasClass('name')).find(pq.tagName('a'))\
+                    .text(job_name)\
+                    .attr('href','edit_maintenance_day.html?id=%(id)s'%vars())
+                t2.find(pq.hasClass('volunteer-parent-name'))\
+                    .text(parents_name)
+                checkbox=t2.find(pq.hasClass('volunteer-attended')).find(pq.tagName('input'))
+                checkbox.attr('disabled','disabled')
+                if attended:
+                    checkbox.attr('checked','checked')
+                else:
+                    checkbox.removeAttr('checked')
+                    pass
+                t2.find(pq.hasClass('volunteer-note')).html(pq.parse(note))
+                t2.appendTo(table)
+                t2=rowt.clone()
+                t2.find(pq.hasClass('volunteer-child-name')).text('')
+                pass
+            pass
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+    pass
+
 class logout(webapp2.RequestHandler):
     def get(self):
         try:
@@ -2419,6 +2487,7 @@ application = webapp2.WSGIApplication([
     ('/public_holiday',public_holiday),
     ('/roster_job',roster_job),
     ('/roster_jobs',roster_jobs),
+    ('/roster_bychild.html',roster_bychild),
     ('/delete_event',delete_event),
     ('/delete_maintenance_day',delete_maintenance_day),
     ('/delete_public_holiday',delete_public_holiday),
