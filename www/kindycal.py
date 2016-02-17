@@ -2197,7 +2197,7 @@ class roster_bychild(webapp2.RequestHandler):
                         (roster_job['name'],
                          v['parents_name'],
                          v['attended'],
-                         v['note'],
+                         v.get('note',''),
                          maintenance_day['id']))
                     pass
                 pass
