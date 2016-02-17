@@ -5749,11 +5749,11 @@ p.stall	{
 	line-height: 1.5;
 }
 p.stallhead {
-	color: #39a7ca;	
+	color: #939;	
     display: inline-block;
     float: left;
     font-size: 15px;
-    font-weight: bold;
+    font-weight: 300;
     line-height: 1.1;
     margin: 0.3em 10px 0;
     padding-right: 0.5em;

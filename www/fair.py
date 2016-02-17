@@ -18,175 +18,174 @@ def fromJson(x):
 
 
 stalls={
-#AdultBottles corresponds to a href="stall?stall_name=AdultBottles" in fair_index.html
-'AdultBottles':{
+#Art corresponds to a href="stall?stall_name=Art" in fair_index.html
+'Art':{
         #name is the name for display
-        'name':'Adult Bottles',
+        'name':"Children's Art",
         'email':{
-            'name':'Kate Barry & Phil McKee',
-            'address':'kbarrydes@powerup.com.au'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'Auction':{
-        'name':'Auction - Year 5',
+        'name':'Auction',
         'email':{
-            'name':'Paul Condren',
-            'address':'paul2action@gmail.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'Bar':{
-        'name':'Bar - Year 6',
+        'name':'Drinks (Bar)',
         'email':{
-            'name':'Jenny McGrath',
-            'address':'jenmcgrath23@bigpond.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'Books':{
-        'name':'Books - Year 4',
+        'name':'Books',
         'email':{
-            'name':'Sonia Vaughan',
-            'address':'sonia.l.vaughan@gmail.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'BurgerServers':{
-        'name':'BBQ - Yr 3 - Servers',
+        'name':'BBQ',
         'email':{
-            'name':'Daman Langguth',
-            'address':'damanlangguth@gmail.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'BurgerBurners':{
-        'name':'BBQ - Yr 3 - BBQ Cooks',
+        'name':'BBQ - Cooks',
         'email':{
-            'name':'Daman Langguth',
-            'address':'damanlangguth@gmail.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'Cakes':{
         'name':'Cakes',
         'email':{
-            'name':'Andre Peltola',
-            'address':'apeltola@curtis.net.au'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'Coffee':{
-        'name':'Coffee Shop - Year 2',
+        'name':'Coffee Shop',
         'email':{
-            #REVISIT: can mailto do multiple addresses
-            'name':'Sarah & Jamie Fraser',
-            'address':'jameswestfraser@optusnet.com.au'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'Drinks':{
-        'name':'Drinks',
+        'name':'Drinks (Soft)',
         'email':{
-            'name':'Charlotte & Martin Bell',
-            'address':'guestbell@gmail.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'FacePainting':{
         'name':'Face Painting',
         'email':{
-            'name':'Tracy MacMillan',
-            'address':'tracy.macmillan@exxonmobil.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'Garden':{
-        'name':'Garden & Homewares',
+        'name':'Plants and Herbs',
         'email':{
-            'name':'Danella Perrins',
-            'address':'danellap@ozemail.com.au'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'Gourmet':{
-        'name':'Gourmet - Year 1',
+        'name':'Gourmet',
         'email':{
-            'name':'Lynette Kotze',
-            'address':'lynette.kotze@gmail.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'LobaChoc':{
         'name':'Lob-a-Choc',
         'email':{
-            'name':'Sarah Lochran',
-            'address':'sarah@hfgroup.com.au'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
-'Hoopla':{
-        'name':'Hoopla',
+'Rides':{
+        'name':'Rides',
         'email':{
-            'name':'Jim & Jo Cowan',
-            'address':'jocowan1@me.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
-'Pocket':{
-        'name':'Pocket Money',
+'Lucky':{
+        'name':'Lucky Bags',
         'email':{
-            'name':'Sandra Boland',
-            'address':'wbo37156@bigpond.net.au'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'PreLoved':{
-        'name':'Pre-loved - Prep',
+        'name':'Pre-loved Toys and Clothes',
         'email':{
-            'name':'Teresa Tully',
-            'address':'tmtully@optusnet.com.au'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
-'SnoCones':{
-        'name':'Sno Cones & Fairy Floss',
+'Floss':{
+        'name':'Fairy Floss',
         'email':{
-            'name':'Kristy Crome',
-            'address':'kristy_crome@hotmail.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
-'Sushi':{
-        'name':'Sushi',
+'Games':{
+        'name':'Games',
         'email':{
-            'name':'Megan Dillon',
-            'address':'megandillon72@gmail.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'SweetTreats':{
-        'name':'Sweet Treats',
+        'name':'Sweets and Preserves',
         'email':{
-            'name':'Allie Derrick',
-            'address':'alder23@hotmail.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'Raffle':{
         'name':'Wheelbarrow Raffle',
         'email':{
-            'name':'Mick Tamone',
-            'address':'mtamone@uvex.com.au'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'SetupFri':{
         'name':'Setup Crew - Friday',
         'email':{
-            'name':'Darren Basford',
-            'address':'darren.basford@outlook.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },
 'SetupSat':{
         'name':'Setup Crew - Saturday',
         'email':{
-            'name':'Darren Basford',
-            'address':'darren.basford@outlook.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },			
 'SetupSun':{
         'name':'Pulldown Crew - Sunday',
         'email':{
-            'name':'Darren Basford',
-            'address':'darren.basford@outlook.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },			
 'SetupMon':{
         'name':'Pulldown Crew - Monday',
         'email':{
-            'name':'Darren Basford',
-            'address':'darren.basford@outlook.com'
+            'name':'',
+            'address':'info@bardonkindy.com.au'
             }
         },								
 }
@@ -324,7 +323,7 @@ taillabel="""\
 def encodeEntities(s):
     return cgi.escape(s).encode('ascii', 'xmlcharrefreplace') 
 
-DEFAULT_STALL_NAME = 'Gourmet'
+DEFAULT_STALL_NAME = 'Art'
 
 
 # We set a parent key on the 'OneHourOfHelp' object to ensure that they are all in the same
@@ -623,22 +622,15 @@ class adminsave(webapp2.RequestHandler):
         entry.put()            
         self.redirect('stalladmin')
 
-class SweetsRedirect(webapp2.RequestHandler):
+class ArtRedirect(webapp2.RequestHandler):
     def get(self):
-        return self.redirect('stall?stall_name=SweetTreats')
+        return self.redirect('stall?stall_name=Art')
     pass
-
-class AdultBottlesRedirect(webapp2.RequestHandler):
-    def get(self):
-        return self.redirect('stall?stall_name=AdultBottles')
-    pass
-
 
 class AuctionRedirect(webapp2.RequestHandler):
     def get(self):
         return self.redirect('stall?stall_name=Auction')
     pass
-
 
 class BarRedirect(webapp2.RequestHandler):
     def get(self):
@@ -652,12 +644,12 @@ class BooksRedirect(webapp2.RequestHandler):
 
 class BurgerServersRedirect(webapp2.RequestHandler):
     def get(self):
-        return self.redirect('stall?stall_name=BurgerServers')
+        return self.redirect('stall?stall_name=BBQ')
     pass
 
 class BurgerBurnersRedirect(webapp2.RequestHandler):
     def get(self):
-        return self.redirect('stall?stall_name=BurgerBurners')
+        return self.redirect('stall?stall_name=BBQCooks')
     pass
 
 class CakesRedirect(webapp2.RequestHandler):
@@ -685,24 +677,19 @@ class GardenRedirect(webapp2.RequestHandler):
         return self.redirect('stall?stall_name=Garden')
     pass
 
-class GourmetRedirect(webapp2.RequestHandler):
-    def get(self):
-        return self.redirect('stall?stall_name=Gourmet')
-    pass
-
 class LobaChocRedirect(webapp2.RequestHandler):
     def get(self):
         return self.redirect('stall?stall_name=LobaChoc')
     pass
 
-class HooplaRedirect(webapp2.RequestHandler):
+class RidesRedirect(webapp2.RequestHandler):
     def get(self):
-        return self.redirect('stall?stall_name=Hoopla')
+        return self.redirect('stall?stall_name=Rides')
     pass
 
-class PocketRedirect(webapp2.RequestHandler):
+class LuckyRedirect(webapp2.RequestHandler):
     def get(self):
-        return self.redirect('stall?stall_name=Pocket')
+        return self.redirect('stall?stall_name=Lucky')
     pass
 
 class PreLovedRedirect(webapp2.RequestHandler):
@@ -710,14 +697,9 @@ class PreLovedRedirect(webapp2.RequestHandler):
         return self.redirect('stall?stall_name=PreLoved')
     pass
 
-class SnoConesRedirect(webapp2.RequestHandler):
+class FlossRedirect(webapp2.RequestHandler):
     def get(self):
-        return self.redirect('stall?stall_name=SnoCones')
-    pass
-
-class SushiRedirect(webapp2.RequestHandler):
-    def get(self):
-        return self.redirect('stall?stall_name=Sushi')
+        return self.redirect('stall?stall_name=Floss')
     pass
 
 class SweetTreatsRedirect(webapp2.RequestHandler):
@@ -730,11 +712,6 @@ class RaffleRedirect(webapp2.RequestHandler):
         return self.redirect('stall?stall_name=Raffle')
     pass
 
-class SetupFriRedirect(webapp2.RequestHandler):
-    def get(self):
-        return self.redirect('stall?stall_name=SetupFri')
-    pass
-
 class SetupSatRedirect(webapp2.RequestHandler):
     def get(self):
         return self.redirect('stall?stall_name=SetupSat')
@@ -743,10 +720,5 @@ class SetupSatRedirect(webapp2.RequestHandler):
 class SetupSunRedirect(webapp2.RequestHandler):
     def get(self):
         return self.redirect('stall?stall_name=SetupSun')
-    pass
-
-class SetupMonRedirect(webapp2.RequestHandler):
-    def get(self):
-        return self.redirect('stall?stall_name=SetupMon')
     pass
 
