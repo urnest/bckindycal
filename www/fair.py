@@ -48,14 +48,14 @@ stalls={
             'address':'info@bardonkindy.com.au'
             }
         },
-'BurgerServers':{
+'BBQ':{
         'name':'BBQ',
         'email':{
             'name':'',
             'address':'info@bardonkindy.com.au'
             }
         },
-'BurgerBurners':{
+' class="job"Burners':{
         'name':'BBQ - Cooks',
         'email':{
             'name':'',
@@ -198,7 +198,7 @@ stall_page_head="""
 
 <h2 class="section-head">ROSTER</h2>
 <p class="hdsub"><pre class="roster_instructions">Please add your name to the roster. The more the merrier!
-The official carnival open times are 10am-3pm, so earlier shifts are for set up and after 3pm time is for pack up.
+The official carnival open times are 10am-2pm, so earlier shifts are for set up and after 2pm time is for pack up.
 Please note that email and phone numbers you enter will not appear on this roster, they are sent to the stall convenor and used for private communication only.
 </pre></p>
 <table class="helper_table">
@@ -226,7 +226,7 @@ headerror = """\
 <link href="fair_css/rssrc1.css" rel="stylesheet" type="text/css" media="all" />
 </head>
 <div align=center>
-<h2 class="hd stall_name" style="text-transform:uppercase">Rainbow Carnival</h2>
+<h2 class="hd stall_name" style="text-transform:uppercase">Bardon Kindy Fair</h2>
 <h4>ERROR</h4>
 <div class="aq-box"><br/><br/>
 <table class="helper_table">
@@ -299,10 +299,8 @@ def makeRow(table_cols,
 stall_page_tail="""\
   </table><br><br>
           <div class="container">
-            <p>PLEASE NOTE:</strong> If you make a mistake or wish to change details, please  <a href="mailto:rainbow_stalls@outlook.com" class="gohome">email</a>.</p>
-  			<p>Thank you for your support.</p>
-  			<p><a class="gohome" href="/#stalls">GO TO HOME PAGE</a><br/><br/><br/><br/>
-            <p><a target="_blank" href="http://www.facebook.com/RainbowCarnival"><img src="fair_images/logo_fb.png" width="160" border="0"></a></p>
+            <p>Made a mistake? Need to change your shift? Please contact the stall convenor or <a href="mailto:info@bardonkindy.com.au" class="gohome">email the office</a>.</p>  			
+  			<p><a class="gohome" href="/fair.html">RETURN TO FAIR PAGE</a><br/><br/><br/><br/>
 		  </div> 
   
   <p class=ft><strong><br><br><br/><br/>
@@ -541,7 +539,7 @@ class stalladmin(webapp2.RequestHandler):
         if stall_name is None:
             return webapp2.redirect('fair.html')
         self.response.set_cookie('stall_name',stall_name)
-        page=pq.loadFile('fair_admin.html')
+        page=pq.loadFile('stall_admin.html')
         page.find(hasClass('stall_name')).text(stalls[stall_name]['name'])
         page.find(hasClass('stall_specific')).addClass('suppress')
         page.find(hasClass('stall_specific')).find(hasClass(stall_name))\
