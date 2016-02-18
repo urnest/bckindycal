@@ -10,6 +10,8 @@ import stuff
 import logging
 import zlib
 
+from pq import hasClass, tagName, attrEquals
+
 from google.appengine.ext import ndb
 
 from xn import Xn,inContext,firstLineOf
@@ -72,7 +74,8 @@ class Password(ndb.Model):
 defaultPasswords={
     'admin':'10greenfrogs',
     'staff':'password',
-    'parent':'password'
+    'parent':'password',
+    'fair':'fairyfloss',
 }
 
 def getPassword(level):
@@ -327,6 +330,34 @@ class staff_login_page(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
         pass
 
+class fair_login_page(webapp2.RequestHandler):
+    def get(self):
+        page=pq.loadFile('fair_login.html')
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+    def post(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if self.request.get('password','')==getPassword('fair'):
+            session.loginLevel='fair'
+            log('session %(id)s now logged in to level %(loginLevel)s'%{
+                    'id':session.sid,
+                    'loginLevel':session.loginLevel
+                    })
+            session.put()
+            from_=str(self.request.get('from'))
+            if from_=='' or from_=='fair_login.html':
+                from_='fair_admin.html'
+                pass
+            result=webapp2.redirect(from_)
+            result.set_cookie('kc-session',session.sid)
+            return result
+        page=pq.loadFile('fair_login.html')
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','from')).attr('value',self.request.get('from',''))
+        page.find(pq.hasClass('login_failed')).text('Incorrect Password')
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+
 def today(): return datetime.date.today()
 
 terms_schema=jsonschema.Schema({
@@ -475,7 +506,7 @@ def addAdminNavButtonToPage(page,loginLevel):
 class events_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel in ['admin','staff','parent']:
+        if not session.loginLevel:
             log('not logged in')
             return webapp2.redirect('login.html')
         page=pq.loadFile('events.html')
@@ -524,7 +555,7 @@ def formatDate(d):
 class event_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel in ['admin','staff','parent']:
+        if not session.loginLevel:
             log('not logged in')
             return webapp2.redirect('events.html?from=events.html')
         id=int(self.request.get('id'))
@@ -1376,7 +1407,7 @@ class edit_public_holiday_page(webapp2.RequestHandler):
 class maintenance_day_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
-        if not session.loginLevel in ['admin','staff','parent']:
+        if not session.loginLevel:
             log('not logged in')
             return webapp2.redirect('events.html')
         id=int(self.request.get('id'))
@@ -2434,7 +2465,25 @@ class import_data(webapp2.RequestHandler):
         pass
     pass
 
-class StallPage(webapp2.RequestHandler):
+class FairPage(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            log('not logged in')
+            return webapp2.redirect('login.html')
+        page=pq.loadFile('fair.html')
+        page.find(pq.hasClass('staff-only')).remove()
+        page.find(pq.hasClass('admin-only')).remove()
+        if session.loginLevel in ['admin','staff']:
+            addAdminNavButtonToPage(page,session.loginLevel)
+            pass
+        addScriptToPageHead('events.js',page)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+
+class fair_StallPage(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel:
@@ -2458,9 +2507,106 @@ class StallPage(webapp2.RequestHandler):
         page.find(pq.hasClass('staff-only')).remove()
         self.response.write(unicode(page).encode('utf-8'))
 
+class fair_AddName(webapp2.RequestHandler):
+    def post(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            log('not logged in')
+            return webapp2.redirect('login.html')
+        stall_name = self.request.cookies.get('stall_name')
+        hour = int(self.request.get('hour'))
+        name = self.request.get('name')
+        email = self.request.get('email',None)
+        phone = self.request.get('phone',None)
+        if name=='':
+            self.redirect(error('Please enter your name before pressing ADD'))
+            return
+        if not self.request.get('email') is None and email=='':
+            self.redirect(error('Please enter your email before pressing ADD'))
+            return
+        if not self.request.get('phone') is None and phone=='':
+            self.redirect(error('Please enter your mobile before pressing ADD'))
+            return
+        try:
+            ndb.transaction(lambda: fair.addName(stall_name,hour,name,email or '',phone or ''))
+            self.redirect('stall')
+        except fair.TooManyNames:
+            self.redirect(error('The shift is full. Too many names have been entered already. Please enter your name into another shift start time'))
+            return
+        except TransactionFailedError:
+            self.redirect(error('Please try again; Someone else put their name in at the same time'))
+
+
+class fair_stalladmin(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['fair','staff','admin']:
+            log('not logged in')
+            return webapp2.redirect('fair_login.html')
+        stall_name = self.request.get(
+            'stall_name',
+            self.request.cookies.get('stall_name', None))
+        if stall_name is None:
+            return webapp2.redirect('fair.html')
+        self.response.set_cookie('stall_name',stall_name)
+        page=pq.loadFile('stall_admin.html')
+        page.find(pq.hasClass('stall_name')).text(fair.stalls[stall_name]['name'])
+        page.find(pq.hasClass('stall_specific')).addClass('suppress')
+        page.find(pq.hasClass('stall_specific')).find(pq.hasClass(stall_name))\
+          .removeClass('suppress')
+        q=fair.StallPrefs.query(ancestor=fair.stall_key(stall_name))
+        prefs=q.fetch(1)
+        if len(prefs):
+            page.find(pq.hasClass('roster_instructions')).text(
+                str(prefs[0].roster_instructions))
+            if prefs[0].ask_for_email:
+                page.find(pq.attrEquals('name','ask_for_email')).attr('checked','checked')
+                pass
+            if prefs[0].ask_for_phone:
+                page.find(pq.attrEquals('name','ask_for_phone')).attr('checked','checked')
+                pass
+            helpers_required=fromJson(str(prefs[0].helpers_required))
+        else:
+            helpers_required={}
+            pass
+        helpers_by_hour=[(hour,int(helpers_required.get(str(hour),fair.default_helpers_required(hour)))) for hour in range(8,21)]
+        for hour,number_required in helpers_by_hour:
+            page.find(pq.attrEquals('name','helpers_'+str(hour)))\
+                .find(pq.attrEquals('value',str(number_required)))\
+                .attr('checked','checked')
+            pass
+        roster_section=page.find(pq.tagName('section'))\
+                           .filter(pq.attrEquals('id','roster'))
+        roster_div=pq.parse('<div style="display:inline-block"></div>',
+                            'roster_div')
+        roster_div.appendTo(roster_section)
+        roster_table=fair.makeRosterContent(stall_name).find(
+            hasClass('helper_table'))
+        trs=roster_table.find(tagName('tr'))
+        for i in range(0,len(trs)):
+            tds=trs[i:i+1].find(tagName('td'))
+            trs[i:i+1].html(tds[0:1])
+            tds[2:].appendTo(trs[i:i+1])
+            pass
+        roster_table.appendTo(roster_div)
+        page.find(tagName('section')).filter(attrEquals('id','emails'))\
+            .find(tagName('textarea')).text(
+                ' '.join([_ for _ in fair.getHelperEmails(stall_name) if _.strip()]))
+        page.find(tagName('section')).filter(attrEquals('id','mobiles'))\
+            .find(tagName('textarea')).text(
+                ' '.join([_ for _ in fair.getHelperMobiles(stall_name) if _.strip()]))
+        page.find(hasClass('non-admin-only')).remove()
+        page.find(hasClass('stall-specific')).addClass('suppress')
+        page.find(hasClass('stall-specific'))\
+            .filter(hasClass(stall_name)).removeClass('suppress')
+        self.response.write(unicode(page).encode('utf-8'))
 
 class fair_adminsave(webapp2.RequestHandler):
     def post(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['fair','staff','admin']:
+            log('not logged in')
+            return webapp2.redirect('fair_login.html')
         stall_name = self.request.get(
             'stall_name',
             self.request.cookies.get('stall_name', None))
@@ -2473,14 +2619,14 @@ class fair_adminsave(webapp2.RequestHandler):
         print ask_for_phone
         helpers_required={}
         for hour in range(8,21):
-            number=self.request.get('helpers_'+str(hour),default_helpers_required(hour))
+            number=self.request.get('helpers_'+str(hour),fair.default_helpers_required(hour))
             helpers_required[str(hour)]=number
-        q=StallPrefs.query(ancestor=stall_key(stall_name))
+        q=fair.StallPrefs.query(ancestor=fair.stall_key(stall_name))
         prefs=q.fetch(1)
         if len(prefs):
             entry=prefs[0]
         else:
-            entry = StallPrefs(parent=stall_key(stall_name))
+            entry = fair.StallPrefs(parent=fair.stall_key(stall_name))
         entry.roster_instructions=str(roster_instructions)
         entry.helpers_required=toJson(helpers_required)
         entry.ask_for_email=ask_for_email
@@ -2511,8 +2657,9 @@ application = webapp2.WSGIApplication([
     ('/parent',login_page),
     ('/maintenance_day.html',maintenance_day_page),
     ('/staff.html',staff_page),
-	('/staff',staff_page),
+    ('/staff',staff_page),
     ('/staff_login.html',staff_login_page),
+    ('/fair_login.html',fair_login_page),
     ('/twyc.html',twyc_page),
     ('/roster.html',roster_page),
     ('/index-rc.html',indexrc_page),
@@ -2554,10 +2701,14 @@ application = webapp2.WSGIApplication([
     ('/uploaded_file_refcount',uploaded_file_refcount),
     ('/logout',logout),
 #fair stuff:
-    ('/stalladmin', fair.stalladmin),
+    ('/fair',FairPage),
+    ('/fair.html',FairPage),
+    ('/stalladmin', fair_stalladmin),
+    ('/stalladmin.html', fair_stalladmin),
     ('/adminsave', fair_adminsave),
-    ('/stall', StallPage),
-    ('/add', fair.AddName),
+    ('/stall', fair_StallPage),
+    ('/stall.html', fair_StallPage),
+    ('/add', fair_AddName),
     ('/error', fair.Error),
 #fair redirects, so can do /Art and get to stall?stall_name=Art
     ('/Art',fair.ArtRedirect),
