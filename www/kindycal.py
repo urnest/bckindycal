@@ -2436,6 +2436,60 @@ class import_data(webapp2.RequestHandler):
         pass
     pass
 
+class StallPage(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            log('not logged in')
+            return webapp2.redirect('login.html')
+        stall_name = self.request.get(
+            'stall_name',
+            self.request.cookies.get('stall_name',
+                                     fair.DEFAULT_STALL_NAME))
+        self.response.set_cookie('stall_name',stall_name)
+        content=fair.makeRosterContent(stall_name)
+        page=pq.loadFile('fair_index.html')
+        main=page.find(pq.tagName('main'))
+        section_template=main.find(pq.tagName('section')).find(pq.attrEquals('id','info'))
+        roster_section=section_template.clone()
+        roster_section.attr('id','roster')
+        roster_section.html(content)
+        main.html(roster_section)
+        #stall page never shows admin stuff
+        page.find(pq.hasClass('admin-only')).remove()
+        page.find(pq.hasClass('staff-only')).remove()
+        self.response.write(unicode(page).encode('utf-8'))
+
+
+class fair_adminsave(webapp2.RequestHandler):
+    def post(self):
+        stall_name = self.request.get(
+            'stall_name',
+            self.request.cookies.get('stall_name', None))
+        if stall_name is None:
+            return webapp2.redirect('fair_index.html')
+        roster_instructions=self.request.get('roster_instructions')
+        ask_for_email=self.request.get('ask_for_email',False)!=False
+        ask_for_phone=self.request.get('ask_for_phone',False)!=False
+        print ask_for_email
+        print ask_for_phone
+        helpers_required={}
+        for hour in range(8,21):
+            number=self.request.get('helpers_'+str(hour),default_helpers_required(hour))
+            helpers_required[str(hour)]=number
+        q=StallPrefs.query(ancestor=stall_key(stall_name))
+        prefs=q.fetch(1)
+        if len(prefs):
+            entry=prefs[0]
+        else:
+            entry = StallPrefs(parent=stall_key(stall_name))
+        entry.roster_instructions=str(roster_instructions)
+        entry.helpers_required=toJson(helpers_required)
+        entry.ask_for_email=ask_for_email
+        entry.ask_for_phone=ask_for_phone
+        entry.put()            
+        self.redirect('stalladmin')
+
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
@@ -2503,9 +2557,10 @@ application = webapp2.WSGIApplication([
     ('/logout',logout),
 #fair stuff:
     ('/stalladmin', fair.stalladmin),
-    ('/adminsave', fair.adminsave),
-    ('/stall', fair.StallPage),
+    ('/adminsave', fair_adminsave),
+    ('/stall', StallPage),
     ('/add', fair.AddName),
+    ('/error', fair.Error),
 #fair redirects, so can do /Art and get to stall?stall_name=Art
     ('/Art',fair.ArtRedirect),
     ('/Auction',fair.AuctionRedirect),

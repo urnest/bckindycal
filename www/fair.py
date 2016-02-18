@@ -356,26 +356,6 @@ def default_helpers_required(hour):
         return 4
     return 0
 
-class StallPage(webapp2.RequestHandler):
-    def get(self):
-        stall_name = self.request.get(
-            'stall_name',
-            self.request.cookies.get('stall_name',
-                                     DEFAULT_STALL_NAME))
-        self.response.set_cookie('stall_name',stall_name)
-        content=makeRosterContent(stall_name)
-        page=pq.loadFile('fair_index.html')
-        main=page.find(tagName('main'))
-        section_template=main.find(tagName('section')).find(attrEquals('id','info'))
-        roster_section=section_template.clone()
-        roster_section.attr('id','roster')
-        roster_section.html(content)
-        main.html(roster_section)
-        #stall page never shows admin stuff
-        page.find(hasClass('admin-only')).remove()
-        page.find(hasClass('staff-only')).remove()
-        self.response.write(unicode(page).encode('utf-8'))
-
 Listofproducts= ["Biscotti","Butters / Curds","Chutney / Relish","Curry Paste","Dips","Drinks","Dry Items",
                  "Jam - Sweet","Jam - Savoury","Jelly",
                  "Kits","Marmalade","Preserved Goods",
@@ -590,35 +570,6 @@ class stalladmin(webapp2.RequestHandler):
         page.find(hasClass('stall-specific'))\
             .filter(hasClass(stall_name)).removeClass('suppress')
         self.response.write(unicode(page).encode('utf-8'))
-
-class adminsave(webapp2.RequestHandler):
-    def post(self):
-        stall_name = self.request.get(
-            'stall_name',
-            self.request.cookies.get('stall_name', None))
-        if stall_name is None:
-            return webapp2.redirect('fair_index.html')
-        roster_instructions=self.request.get('roster_instructions')
-        ask_for_email=self.request.get('ask_for_email',False)!=False
-        ask_for_phone=self.request.get('ask_for_phone',False)!=False
-        print ask_for_email
-        print ask_for_phone
-        helpers_required={}
-        for hour in range(8,21):
-            number=self.request.get('helpers_'+str(hour),default_helpers_required(hour))
-            helpers_required[str(hour)]=number
-        q=StallPrefs.query(ancestor=stall_key(stall_name))
-        prefs=q.fetch(1)
-        if len(prefs):
-            entry=prefs[0]
-        else:
-            entry = StallPrefs(parent=stall_key(stall_name))
-        entry.roster_instructions=str(roster_instructions)
-        entry.helpers_required=toJson(helpers_required)
-        entry.ask_for_email=ask_for_email
-        entry.ask_for_phone=ask_for_phone
-        entry.put()            
-        self.redirect('stalladmin')
 
 class ArtRedirect(webapp2.RequestHandler):
     def get(self):
