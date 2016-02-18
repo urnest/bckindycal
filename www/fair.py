@@ -505,13 +505,13 @@ class AddName(webapp2.RequestHandler):
         email = self.request.get('email',None)
         phone = self.request.get('phone',None)
         if name=='':
-            self.redirect(error('Please enter your name before pressing Add'))
+            self.redirect(error('Please enter your name before pressing ADD'))
             return
         if not self.request.get('email') is None and email=='':
-            self.redirect(error('Please enter your email before pressing Add'))
+            self.redirect(error('Please enter your email before pressing ADD'))
             return
         if not self.request.get('phone') is None and phone=='':
-            self.redirect(error('Please enter your mobile before pressing Add'))
+            self.redirect(error('Please enter your mobile before pressing ADD'))
             return
         try:
             ndb.transaction(lambda: addName(stall_name,hour,name,email or '',phone or ''))
@@ -673,6 +673,11 @@ class FacePaintingRedirect(webapp2.RequestHandler):
 class GardenRedirect(webapp2.RequestHandler):
     def get(self):
         return self.redirect('stall?stall_name=Garden')
+    pass
+
+class GamesRedirect(webapp2.RequestHandler):
+    def get(self):
+        return self.redirect('stall?stall_name=Games')
     pass
 
 class LobaChocRedirect(webapp2.RequestHandler):

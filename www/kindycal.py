@@ -1137,7 +1137,7 @@ def getVolunteeersUploadedFileRefs(volunteers):
     volunteers_schema.validate(volunteers)
     result=set()
     for v in volunteers:
-        result|=getUploadedFileRefsFromHTML(v['note'])
+        result|=getUploadedFileRefsFromHTML(v.get('note',''))
         pass
     return result
 
@@ -2185,7 +2185,7 @@ class roster_bychild(webapp2.RequestHandler):
                     (maintenance_day['name']+' '+formatDate(maintenance_day['date']),
                      v['parents_name'],
                      v['attended'],
-                     v['note'],
+                     v.get('note',''),
                      maintenance_day['id']))
                 pass
             pass
@@ -2217,12 +2217,10 @@ class roster_bychild(webapp2.RequestHandler):
                     .attr('href','edit_maintenance_day.html?id=%(id)s'%vars())
                 t2.find(pq.hasClass('volunteer-parent-name'))\
                     .text(parents_name)
-                checkbox=t2.find(pq.hasClass('volunteer-attended')).find(pq.tagName('input'))
-                checkbox.attr('disabled','disabled')
                 if attended:
-                    checkbox.attr('checked','checked')
+                    t2.find(pq.hasClass('volunteer-attended')).text('Y')
                 else:
-                    checkbox.removeAttr('checked')
+                    t2.find(pq.hasClass('volunteer-attended')).text('')
                     pass
                 t2.find(pq.hasClass('volunteer-note')).html(pq.parse(note))
                 t2.appendTo(table)
@@ -2518,6 +2516,7 @@ application = webapp2.WSGIApplication([
     ('/Drinks',fair.DrinksRedirect),
     ('/FacePainting',fair.FacePaintingRedirect),
     ('/Garden',fair.GardenRedirect),
+	('/Games',fair.GamesRedirect),
     ('/LobaChoc',fair.LobaChocRedirect),
     ('/Rides',fair.RidesRedirect),
     ('/Lucky',fair.LuckyRedirect),
@@ -2538,6 +2537,7 @@ application = webapp2.WSGIApplication([
     ('/drinks',fair.DrinksRedirect),
     ('/facepainting',fair.FacePaintingRedirect),
     ('/garden',fair.GardenRedirect),
+	('/games',fair.GamesRedirect),
     ('/lobachoc',fair.LobaChocRedirect),
     ('/rides',fair.RidesRedirect),
     ('/lucky',fair.LuckyRedirect),
