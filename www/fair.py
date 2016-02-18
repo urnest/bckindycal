@@ -356,26 +356,6 @@ def default_helpers_required(hour):
         return 4
     return 0
 
-class StallPage(webapp2.RequestHandler):
-    def get(self):
-        stall_name = self.request.get(
-            'stall_name',
-            self.request.cookies.get('stall_name',
-                                     DEFAULT_STALL_NAME))
-        self.response.set_cookie('stall_name',stall_name)
-        content=makeRosterContent(stall_name)
-        page=pq.loadFile('fair_index.html')
-        main=page.find(tagName('main'))
-        section_template=main.find(tagName('section')).find(attrEquals('id','info'))
-        roster_section=section_template.clone()
-        roster_section.attr('id','roster')
-        roster_section.html(content)
-        main.html(roster_section)
-        #stall page never shows admin stuff
-        page.find(hasClass('admin-only')).remove()
-        page.find(hasClass('staff-only')).remove()
-        self.response.write(unicode(page).encode('utf-8'))
-
 Listofproducts= ["Biscotti","Butters / Curds","Chutney / Relish","Curry Paste","Dips","Drinks","Dry Items",
                  "Jam - Sweet","Jam - Savoury","Jelly",
                  "Kits","Marmalade","Preserved Goods",
@@ -496,32 +476,6 @@ def errorPage(msg):
     page=pq.parse(result,'errorPage')
     return str(page)
         
-class AddName(webapp2.RequestHandler):
-
-    def post(self):
-        stall_name = self.request.cookies.get('stall_name')
-        hour = int(self.request.get('hour'))
-        name = self.request.get('name')
-        email = self.request.get('email',None)
-        phone = self.request.get('phone',None)
-        if name=='':
-            self.redirect(error('Please enter your name before pressing ADD'))
-            return
-        if not self.request.get('email') is None and email=='':
-            self.redirect(error('Please enter your email before pressing ADD'))
-            return
-        if not self.request.get('phone') is None and phone=='':
-            self.redirect(error('Please enter your mobile before pressing ADD'))
-            return
-        try:
-            ndb.transaction(lambda: addName(stall_name,hour,name,email or '',phone or ''))
-            self.redirect('stall')
-        except TooManyNames:
-            self.redirect(error('The shift is full. Too many names have been entered already. Please enter your name into another shift start time'))
-            return
-        except TransactionFailedError:
-            self.redirect(error('Please try again; Someone else put their name in at the same time'))
-
 class Error(webapp2.RequestHandler):
     def get(self):
         self.response.write(headerror)
@@ -530,95 +484,6 @@ class Error(webapp2.RequestHandler):
      
         self.response.write(tailerror)     
 
-
-class stalladmin(webapp2.RequestHandler):
-    def get(self):
-        stall_name = self.request.get(
-            'stall_name',
-            self.request.cookies.get('stall_name', None))
-        if stall_name is None:
-            return webapp2.redirect('fair.html')
-        self.response.set_cookie('stall_name',stall_name)
-        page=pq.loadFile('stall_admin.html')
-        page.find(hasClass('stall_name')).text(stalls[stall_name]['name'])
-        page.find(hasClass('stall_specific')).addClass('suppress')
-        page.find(hasClass('stall_specific')).find(hasClass(stall_name))\
-          .removeClass('suppress')
-        q=StallPrefs.query(ancestor=stall_key(stall_name))
-        prefs=q.fetch(1)
-        if len(prefs):
-            page.find(hasClass('roster_instructions')).text(
-                str(prefs[0].roster_instructions))
-            if prefs[0].ask_for_email:
-                page.find(pq.attrEquals('name','ask_for_email')).attr('checked','checked')
-                pass
-            if prefs[0].ask_for_phone:
-                page.find(pq.attrEquals('name','ask_for_phone')).attr('checked','checked')
-                pass
-            helpers_required=fromJson(str(prefs[0].helpers_required))
-        else:
-            helpers_required={}
-            pass
-        helpers_by_hour=[(hour,int(helpers_required.get(str(hour),default_helpers_required(hour)))) for hour in range(8,21)]
-        for hour,number_required in helpers_by_hour:
-            page.find(pq.attrEquals('name','helpers_'+str(hour)))\
-                .find(pq.attrEquals('value',str(number_required)))\
-                .attr('checked','checked')
-            pass
-        roster_section=page.find(tagName('section'))\
-                           .filter(attrEquals('id','roster'))
-        roster_div=pq.parse('<div style="display:inline-block"></div>',
-                            'roster_div')
-        roster_div.appendTo(roster_section)
-        roster_table=makeRosterContent(stall_name).find(
-            hasClass('helper_table'))
-        trs=roster_table.find(tagName('tr'))
-        for i in range(0,len(trs)):
-            tds=trs[i:i+1].find(tagName('td'))
-            trs[i:i+1].html(tds[0:1])
-            tds[2:].appendTo(trs[i:i+1])
-            pass
-        roster_table.appendTo(roster_div)
-        page.find(tagName('section')).filter(attrEquals('id','emails'))\
-            .find(tagName('textarea')).text(
-                ' '.join([_ for _ in getHelperEmails(stall_name) if _.strip()]))
-        page.find(tagName('section')).filter(attrEquals('id','mobiles'))\
-            .find(tagName('textarea')).text(
-                ' '.join([_ for _ in getHelperMobiles(stall_name) if _.strip()]))
-        page.find(hasClass('non-admin-only')).remove()
-        page.find(hasClass('stall-specific')).addClass('suppress')
-        page.find(hasClass('stall-specific'))\
-            .filter(hasClass(stall_name)).removeClass('suppress')
-        self.response.write(unicode(page).encode('utf-8'))
-
-class adminsave(webapp2.RequestHandler):
-    def post(self):
-        stall_name = self.request.get(
-            'stall_name',
-            self.request.cookies.get('stall_name', None))
-        if stall_name is None:
-            return webapp2.redirect('fair_index.html')
-        roster_instructions=self.request.get('roster_instructions')
-        ask_for_email=self.request.get('ask_for_email',False)!=False
-        ask_for_phone=self.request.get('ask_for_phone',False)!=False
-        print ask_for_email
-        print ask_for_phone
-        helpers_required={}
-        for hour in range(8,21):
-            number=self.request.get('helpers_'+str(hour),default_helpers_required(hour))
-            helpers_required[str(hour)]=number
-        q=StallPrefs.query(ancestor=stall_key(stall_name))
-        prefs=q.fetch(1)
-        if len(prefs):
-            entry=prefs[0]
-        else:
-            entry = StallPrefs(parent=stall_key(stall_name))
-        entry.roster_instructions=str(roster_instructions)
-        entry.helpers_required=toJson(helpers_required)
-        entry.ask_for_email=ask_for_email
-        entry.ask_for_phone=ask_for_phone
-        entry.put()            
-        self.redirect('stalladmin')
 
 class ArtRedirect(webapp2.RequestHandler):
     def get(self):

@@ -45,7 +45,13 @@ handlers:
 - url: /staff_login.html$
   script: kindycal.application
 
+- url: /fair_login.html$
+  script: kindycal.application
+
 - url: /index.html$
+  script: kindycal.application
+
+- url: /fair.html$
   script: kindycal.application
 
 - url: /staff.html$
