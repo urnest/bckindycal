@@ -2519,22 +2519,22 @@ class fair_AddName(webapp2.RequestHandler):
         email = self.request.get('email',None)
         phone = self.request.get('phone',None)
         if name=='':
-            self.redirect(error('Please enter your name before pressing ADD'))
+            self.redirect(fair.error('Please enter your name before pressing ADD'))
             return
         if not self.request.get('email') is None and email=='':
-            self.redirect(error('Please enter your email before pressing ADD'))
+            self.redirect(fair.error('Please enter your email before pressing ADD'))
             return
         if not self.request.get('phone') is None and phone=='':
-            self.redirect(error('Please enter your mobile before pressing ADD'))
+            self.redirect(fair.error('Please enter your mobile before pressing ADD'))
             return
         try:
             ndb.transaction(lambda: fair.addName(stall_name,hour,name,email or '',phone or ''))
             self.redirect('stall')
         except fair.TooManyNames:
-            self.redirect(error('The shift is full. Too many names have been entered already. Please enter your name into another shift start time'))
+            self.redirect(fair.error('The shift is full. Too many names have been entered already. Please enter your name into another shift start time'))
             return
         except TransactionFailedError:
-            self.redirect(error('Please try again; Someone else put their name in at the same time'))
+            self.redirect(fair.error('Please try again; Someone else put their name in at the same time'))
 
 
 class fair_stalladmin(webapp2.RequestHandler):
