@@ -6,13 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bardon Community Kindy</title>
-    <link href='//fonts.googleapis.com/css?family=Montserrat|Open+Sans|Lato' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Montserrat|Open+Sans|Lato' rel='stylesheet' type='text/css' media='all'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <link href="bckfair.css" rel="stylesheet" type="text/css" media="all" />
     <link href="kc.css" rel="stylesheet" type="text/css" media="all" />
     <link href="inputs.css" rel="stylesheet" type="text/css" media="all" />
     <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
+    <script type="text/javascript" src="kc.js"></script>
     
     <!-- SMOOTH SCROLL -->
     <script>
@@ -40,8 +42,6 @@
 	<!-- End of SMOOTH SCROLL -->
 </head>
 <body>
-
-
     <div id="page">
 	<header id="header" class="site-header">
         <nav id="navbar" class="site-navbar navbar navbar-static-top" role="navigation">
@@ -65,16 +65,38 @@
           </div>
         </nav>
       </header>
-      <main id="main" class="site-main">
-       
-        <h2 class="school">CALENDAR</h2>
-        <div class="blk-box" align=center>
-          <br><br>
-        
-          </div>
-      </main>
+
+    <main id="main" class="site-main">
+    
+     <div id="content" class="shell">
+      <h2>FAIR CONVENOR ADMIN</h2>
+      <h3>Choose your stall:</h3>
+         <div>
+        	<a class="adm" href="/Auction"><i class="fa fa-th fa-fw"></i> Auction</a><br> 
+            <a class="adm" href="/BBQ"><i class="fa fa-th fa-fw"></i> BBQ</a><br>
+            <a class="adm" href="/Books"><i class="fa fa-th fa-fw"></i> Books</a><br>
+            <a class="adm" href="/Cakes"><i class="fa fa-th fa-fw"></i> Cakes</a><br>
+            <a class="adm" href="/Art"><i class="fa fa-th fa-fw"></i> Children's Art</a><br>
+            <a class="adm" href="/Coffee"><i class="fa fa-th fa-fw"></i> Coffee Shop</a><br>
+            <a class="adm" href="/Bar"><i class="fa fa-th fa-fw"></i> Drinks (Bar)</a><br>
+            <a class="adm" href="/Drinks"><i class="fa fa-th fa-fw"></i> Drinks (Soft)</a><br>
+            <a class="adm" href="/FacePainting"><i class="fa fa-th fa-fw"></i> Face Painting</a><br>
+            <a class="adm" href="/Floss"><i class="fa fa-th fa-fw"></i> Fairy Floss</a><br>
+            <a class="adm" href="/Games"><i class="fa fa-th fa-fw"></i> Games</a><br>
+            <a class="adm" href="/LobaChoc"><i class="fa fa-th fa-fw"></i> Lob-a-Choc</a><br>
+            <a class="adm" href="/Lucky"><i class="fa fa-th fa-fw"></i> Lucky Bags</a><br>
+            <a class="adm" href="/Garden"><i class="fa fa-th fa-fw"></i> Plants & Herbs</a><br>
+            <a class="adm" href="/PreLoved"><i class="fa fa-th fa-fw"></i> PreLoved</a><br>
+            <a class="adm" href="/Rides"><i class="fa fa-th fa-fw"></i> Rides</a><br>
+            <a class="adm" href="/SetupSat"><i class="fa fa-th fa-fw"></i> Saturday - Setup Crew</a><br>
+            <a class="adm" href="/SetupSun"><i class="fa fa-th fa-fw"></i> Sunday - Pulldown Crew</a><br> 
+            <a class="adm" href="/SweetTreats"><i class="fa fa-th fa-fw"></i> Sweets & Preserves</a><br>
+            <a class="adm" href="/Raffle"><i class="fa fa-th fa-fw"></i> Wheelbarrow Raffle</a><br>
+            <br>               
+
+         </div>
+      </div>
+     </main>
     </div>
-    <div id="fixed"></div>    
-    <div class="scroll-to-top" data-spy="affix" data-offset-top="200"><a href="#page" class="smooth-scroll"><i class="fa fa-arrow-up"></i></a></div>  
-  </body>
+</body>
 </html>

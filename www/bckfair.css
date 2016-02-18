@@ -966,6 +966,13 @@ kbd {
     background-color: #eeeeee;
     border-radius: 3px;
 }
+.grnlt-box {
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #333333;
+    background-color: #e5f3d9;
+    border-radius: 3px;
+}
 .white-box {
     padding: 2px 4px;
     font-size: 90%;
@@ -5727,6 +5734,15 @@ p.setuphead {
     line-height: 1.2;
     margin: 0.3em 10px 0 0;
     padding-right: 0.5em;
+}
+p.fairnote	{
+	color: #474747;
+	font-size: 16px;
+	font-weight: 300;
+	line-height: 24px;
+}
+h3.fairnote	{
+	color: #939;
 }
 h3.stall	{
 	color: #39a7ca;

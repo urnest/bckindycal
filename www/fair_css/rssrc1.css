@@ -280,7 +280,7 @@ section#roster input.roster-phone  {
 section#roster .helper_table td.helpercell  {
     color: #000033;
     font-size: 12px;
-    background: #a8cdd5;
+    background: #e5f3d9;
 }
 section#roster input:hover.add-me {
 	margin: 3px 0px;
@@ -294,7 +294,7 @@ section#roster .helper_table td {
 	border-left: 5px solid #ffffff;
     border-right: 5px solid #ffffff; 
 	border-bottom: 1px solid #ffffff;
-    color: #427b88;
+    color: #939;
     margin: 0;
     padding: 3px 3px 3px 3px;
   }
@@ -989,12 +989,30 @@ kbd {
     background-color: #ffffff;
     border-radius: 3px;
 }
+.whitetre-box {
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #333333;
+    background-color: #ffffff;
+    border-radius: 3px;
+	width: 80%;
+	margin: auto;
+}
 .aq-box {
     padding: 2px 4px;
     font-size: 90%;
     color: #333333;
     background-color: #A8CDD5;
     border-radius: 3px;
+}
+.aqtre-box {
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #333333;
+    background-color: #b6dfa6;
+    border-radius: 3px;
+	width: 80%;
+	margin: auto;
 }
 .sky-box {
     padding: 2px 4px;
