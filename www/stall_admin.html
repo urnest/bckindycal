@@ -75,6 +75,11 @@ div.form-background {
     color: #000000;
 	font-weight: 700;
 }
+.convenor {
+    color: #ffffff;
+	font-size: 26px;
+	font-weight: 700;
+}
 textarea.comment {
 	width:300px;
 	border: solid #185ca8 3px;
@@ -121,6 +126,9 @@ textarea.commentp {
 .blue {
 	color: #185ca8;
 	font-size: 14px;
+}
+input[type="submit"].save {
+	font-size: 25px;
 }
 section#settings P {
 	font-family: 'Open Sans', sans-serif;
@@ -263,11 +271,11 @@ h1	{
             </div>
             <div class="collapse navbar-collapse" id="navbar-collapse-1">
               <ul id="navigation" class="nav navbar-nav navbar-right">
-                <li><a href="fair_admin.html">STALLS</a></li>
-                <li><a href="#settings">PREFS</a></li>
-                <li><a href="#roster">ROSTER</a></li>
-                <li><a href="#emails">EMAILS</a></li>
-                <li><a href="#mobiles">MOBILES</a></li>
+                <li><a href="fair_admin.html">ADMIN MENU</a></li>
+                <li><a href="#settings">PREFERENCES</a></li>
+                <li><a href="#roster">CURRENT ROSTER</a></li>
+                <li><a href="#emails">EMAIL LIST</a></li>
+                <li><a href="#mobiles">MOBILE LIST</a></li>
                 <li><a href="adminlogout">LOGOUT</a></li>                                 
               </ul>
             </div>
@@ -275,10 +283,11 @@ h1	{
         </nav>
       </header>
       <main id="main" class="site-main">
-	<section id="settings" class="section section-center section-cta">	  
+	<section id="settings" class="section section-center section-cta">
+      <h1 class="convenor">STALL CONVENOR ADMIN</h1>	  
 	  <div class="whitetre-box">
-      <h1 class="hd stall_name">Gourmet Stall</h1>
-	    <h2>ROSTER PREFERENCES</h2>
+       <h1 class="hd stall_name">Gourmet Stall</h1>
+	    <h3>ROSTER PREFERENCES</h3>
 	    <div class="holder">
 	      <form method="post" action="adminsave">	
 		<h4 class="blue">VOLUNTEERS PER SHIFT</h4>
@@ -768,7 +777,7 @@ h1	{
 		<h4 class="blue"><input type="checkbox" name="ask_for_email"> Email Address</h4>
 		<h4 class="blue">&nbsp;<input type="checkbox" name="ask_for_phone"> Mobile Number</h4>
 		<br/><br/>
-		<input class="save" type="submit" value=" &nbsp; SAVE &nbsp; "><br/><br/>
+		<input class="save" type="submit" value=" &nbsp; SAVE CHANGES &nbsp; "><br/><br/>
 	      </form>
 	    </div>
 	  </div>
