@@ -163,7 +163,9 @@ class Tag(Node):
         self.attrs['class']=' '.join(self.classes)
         return self
     def removeClass(self,c):
-        self.classes.remove(c)
+        if c in self.classes:
+            self.classes.remove(c)
+            pass
         self.attrs['class']=' '.join(self.classes)
         if len(self.classes)==0:
             del self.attrs['class']

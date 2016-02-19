@@ -1501,6 +1501,42 @@ class add_maintenance_day_volunteer(webapp2.RequestHandler):
         pass
     pass
 
+add_prefair_helper_schema=jsonschema.Schema({
+    'stall_name':StringType,
+    'name':StringType,
+    'email':StringType,
+    'note':StringType
+    })
+
+class add_prefair_helper(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                add_prefair_helper_schema.validate(params)
+                stall_name=params['stall_name']
+                entry = fair.StallPreFairHelper(
+                    parent=fair.stall_key(stall_name),
+                    name=params['name'],
+                    email=params['email'],
+                    note=params['note'])
+                entry.put()
+                result={
+                    'result':{
+                        'added':True,
+                        'names':[_['name'] for _ in fair.getStallPreFairHelpers(stall_name)]
+                    }
+                }
+                pass
+        except:
+            result={'error':str(inContext('add_prefair_helper'))}
+            pass
+        return self.response.write(toJson(result))
+    pass
+
 class remember_month(webapp2.RequestHandler):
     def post(self):
         try:
@@ -2543,6 +2579,7 @@ class FairPage(webapp2.RequestHandler):
             if conv.name:
                 a.attr('href','mailto:'+conv.email)
                 a.text(conv.name)
+                a.removeClass('stallconvac')
 	    else:
                 log(stallname)
 		a.attr('href','/convenor_signup?stall_name='+stallname)
@@ -2567,16 +2604,39 @@ class fair_StallPage(webapp2.RequestHandler):
                                      fair.DEFAULT_STALL_NAME))
         self.response.set_cookie('stall_name',stall_name)
         content=fair.makeRosterContent(stall_name)
-        page=pq.loadFile('fair_index.html')
+        page=pq.loadFile('stall.html')
         main=page.find(pq.tagName('main'))
         section_template=main.find(pq.tagName('section')).find(pq.attrEquals('id','info'))
         roster_section=section_template.clone()
         roster_section.attr('id','roster')
         roster_section.html(content)
         main.html(roster_section)
+        stall=page.find(pq.hasClass('kindycal-py-stall'))
+        stallname=stall_name
+	if stallname.startswith('/'):
+            stallname=stallname[1:]
+        #pass stall name to fair.js via id
+        stall.attr('id',stallname)
+        conv=fair.getStallConvenor(stallname)
+        a=stall.find(pq.hasClass('stallconv')).find(pq.tagName('a'))
+        if conv.name:
+            a.attr('href','mailto:'+conv.email)
+            a.text(conv.name)
+            a.removeClass('stallconvac')
+	else:
+            log(stallname)
+	    a.attr('href','/convenor_signup?stall_name='+stallname)
+	    a.attr('title','Click to volunteer as Convenor')
+            a.addClass('stallconvac')
+            a.text('VACANT')
+            pass
+        preFairHelpers=fair.getStallPreFairHelpers(stallname)
+        page.find(pq.hasClass('pre-fair-helper-names')).text(', '.join(
+            [_['name'] for _ in preFairHelpers]))
         #stall page never shows admin stuff
         page.find(pq.hasClass('admin-only')).remove()
         page.find(pq.hasClass('staff-only')).remove()
+        addScriptToPageHead('stall.js',page)
         self.response.write(unicode(page).encode('utf-8'))
 
 class fair_AddName(webapp2.RequestHandler):
@@ -2740,6 +2800,7 @@ application = webapp2.WSGIApplication([
     # following are not real pages, they are called by javascript files
     # to get and save data
     ('/add_maintenance_day_volunteer',add_maintenance_day_volunteer),
+    ('/add_prefair_helper',add_prefair_helper),
     ('/add_roster_job_volunteer',add_roster_job_volunteer),
     ('/all_maintenance_days',all_maintenance_days),
     ('/convenor_signup',convenor_signup),

@@ -190,17 +190,23 @@ stalls={
         },								
 }
 stall_page_head="""
-<div align=center>
+<div align="center">
           <div class="container">
             <h2 class="hd stall_name" style="text-transform:uppercase">Gourmet Stall</h2>
           </div> 
+<div align="center" class="kindycal-py-stall">
+<p style="text-align:center" class="stallconv">CONVENOR: <a class="stallconvac" href="/convenor_signup">VACANT</a></p>
+</div>
 
-
-<h3 class="section-head">ROSTER</h3>
 <p class="hdsub"><pre width="90%" class="roster_instructions">Please add your name to the roster. The more the merrier!
 The official carnival open times are 10am-2pm, so earlier shifts are for set up and after 2pm time is for pack up.
 Please note that email and phone numbers you enter will not appear on this roster, they are sent to the stall convenor and used for private communication only.
 </pre></p>
+<h3 class="section-head">PRE-FAIR HELP</h3>
+<p>Can you help with organising and preparing goods for the stall? <a class="add-prefair-helper" href="add_prefair_helper">ADD ME</a></p>
+<p class="pre-fair-helper-names">Alan, John</p>
+<br>
+<h3 class="section-head">ROSTER</h3>
 <table class="helper_table">
  <tr class="table_headings">
 	<td width=60 align=center class=hdoff>START</td>
@@ -355,6 +361,12 @@ class StallConvenor(ndb.Model):
     email=ndb.StringProperty(indexed=False,repeated=False)
     phone=ndb.StringProperty(indexed=False,repeated=False)		
 
+class StallPreFairHelper(ndb.Model):
+    '''Stall convenor'''
+    name=ndb.StringProperty(indexed=False,repeated=False)
+    email=ndb.StringProperty(indexed=False,repeated=False)
+    note=ndb.StringProperty(indexed=False,repeated=False)		
+
 def default_helpers_required(hour):
     if hour < 9:
         return 0
@@ -417,6 +429,13 @@ def getStallConvenor(stall_name):
         pass
     print 'convs: %(convs)r' %vars()
     return convs
+	
+def getStallPreFairHelpers(stall_name):
+    q=StallPreFairHelper.query(ancestor=stall_key(stall_name))
+    helpers=q.fetch(1000)
+    result=[{ 'name':_.name,'email':_.email,'note':_.note} for _ in helpers]
+    result.sort()
+    return result
 	
 def makeRosterContent(stall_name):
     print 'prefs'
