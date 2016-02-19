@@ -85,13 +85,14 @@ textarea.comment {
 	border: solid #185ca8 3px;
 	background-color: #efefef;
 	text-align: center;
-	font-size: 10px;
+	font-size: 14px;
 }
 textarea.commentp {
 	width:500px;
 	border: solid #185ca8 3px;
 	background-color: #E6E6E6;
 	text-align: center;
+	font-size: 14px;
 }
 .time {
 	color: #185ca8;
@@ -101,9 +102,27 @@ textarea.commentp {
 	border-bottom: 2px solid #cccccc;
 	line-height: 30px;
 }
-.time:checked + label {
-    background: grey;
-    border: 4px solid #e1e1e1;
+.checkbox, .radio {
+	width: 19px;
+	height: 25px;
+	padding: 0 5px 0 0;
+	background: url(fair_images/checkbox.png) no-repeat;
+	display: block;
+	clear: left;
+	float: left;
+}
+.radio {
+	background: url(fair_images/radio.png) no-repeat;
+}
+.select {
+	position: absolute;
+	width: 158px; /* With the padding included, the width is 190 pixels: the actual width of the image. */
+	height: 21px;
+	padding: 0 24px 0 8px;
+	color: #fff;
+	font: 12px/21px arial,sans-serif;
+	background: url(fair_images/select.png) no-repeat;
+	overflow: hidden;
 }
 
 .timehd {
@@ -167,6 +186,7 @@ h1	{
     <script src="jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
+    <script type="text/javascript" src="js/custom-form-elements.js"></script>
     
     <!-- SMOOTH SCROLL -->
     <script>
@@ -301,469 +321,469 @@ h1	{
 		  <tr>
 		    <td class="hour time">8am</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="0" class="styled"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="1" class="styled"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="2" class="styled"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="3" class="styled"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_8" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_8" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">9am</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_9" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_9" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">10am</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_10" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_10" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">11am</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_11" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_11" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">12noon</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_12" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_12" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">1pm</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_13" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_13" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">2pm</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_14" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_14" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">3pm</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_15" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_15" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">4pm</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_16" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_16" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">5pm</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_17" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_17" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">6pm</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_18" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_18" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">7pm</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_19" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_19" value="10"></input>
 		    </td>
 		  </tr>
 		  <tr>
 		    <td class="hour time">8pm</td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="0"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="0"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="1"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="1"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="2"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="2"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="3"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="3"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="4"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="4"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="5"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="5"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="6"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="6"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="7"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="7"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="8"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="8"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="9"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="9"></input>
 		    </td>
 		    <td class="time">
-		      <input type="radio" name="helpers_20" value="10"></input>
+		      <input type="radio" class="styled" name="helpers_20" value="10"></input>
 		    </td>
 		  </tr>
 		</table><br><span class="line"></span><br/>
@@ -794,10 +814,10 @@ h1	{
 	    <p class="blue">Choose how you want the list of addresses to be separated.</p>
 	    <form>
 	      <p>Separate by:<br/>
-		<input name="separator" type="radio" class="separate-by-space" checked="checked"> Space
-		<input name="separator" type="radio" class="separate-by-comma"> Comma
-		<input name="separator" type="radio" class="separate-by-semicolon"> Semicolon
-		<input name="separator" type="radio" class="separate-by-newline"> Newline</p>
+		<input name="separator" type="radio" class="separate-by-space" checked="checked"> Space &nbsp;&nbsp;
+		<input name="separator" type="radio" class="separate-by-comma"> Comma &nbsp;&nbsp;
+		<input name="separator" type="radio" class="separate-by-semicolon"> Semicolon &nbsp;&nbsp;
+		<input name="separator" type="radio" class="separate-by-newline"> Newline &nbsp;&nbsp;</p>
 	    </form>
 	    <div style="display:inline-block"><textarea class="comment"></textarea></div>
 	    <!-- populated by guestbook.py class admin -->
@@ -810,10 +830,10 @@ h1	{
 	    <p class="blue">Choose how you want the list of numbers to be separated.</p>
 	    <form>
 	      <p>Separate by:<br/>
-		<input name="separator" type="radio" class="separate-by-space" checked="checked"> Space
-		<input name="separator" type="radio" class="separate-by-comma"> Comma
-		<input name="separator" type="radio" class="separate-by-semicolon"> Semicolon
-		<input name="separator" type="radio" class="separate-by-newline"> New line</p>
+		<input name="separator" type="radio" class="separate-by-space" checked="checked"> Space &nbsp;&nbsp;
+		<input name="separator" type="radio" class="separate-by-comma"> Comma &nbsp;&nbsp;
+		<input name="separator" type="radio" class="separate-by-semicolon"> Semicolon &nbsp;&nbsp;
+		<input name="separator" type="radio" class="separate-by-newline"> New line &nbsp;&nbsp;</p>
 	    </form>
 	    <div style="display:inline-block"><textarea class="comment"></textarea></div>
 	    <!-- populated by guestbook.py class admin -->

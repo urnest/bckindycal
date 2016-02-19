@@ -492,6 +492,19 @@ hr {
 pre {
     overflow: auto;
 }
+pre.roster_instructions {
+ padding:30px;
+ box-sizing:border-box;
+ -moz-box-sizing:border-box;
+ webkit-box-sizing:border-box;
+ display:block; 
+ white-space: pre-wrap;  
+ white-space: -moz-pre-wrap; 
+ white-space: -pre-wrap; 
+ white-space: -o-pre-wrap; 
+ word-wrap: break-word; 
+ width:90%; overflow-x:auto;
+}
 code, kbd, pre, samp {
     font-family: monospace, monospace;
     font-size: 1em;

@@ -196,8 +196,8 @@ stall_page_head="""
           </div> 
 
 
-<h2 class="section-head">ROSTER</h2>
-<p class="hdsub"><pre class="roster_instructions">Please add your name to the roster. The more the merrier!
+<h3 class="section-head">ROSTER</h3>
+<p class="hdsub"><pre width="90%" class="roster_instructions">Please add your name to the roster. The more the merrier!
 The official carnival open times are 10am-2pm, so earlier shifts are for set up and after 2pm time is for pack up.
 Please note that email and phone numbers you enter will not appear on this roster, they are sent to the stall convenor and used for private communication only.
 </pre></p>
@@ -348,12 +348,18 @@ class StallPrefs(ndb.Model):
     ask_for_phone=ndb.BooleanProperty(indexed=False,repeated=False)
     #json { <hour> : <number-required> } #default number is 6
     helpers_required=ndb.StringProperty(indexed=False,repeated=False)
-
-
+	
+class StallConvenor(ndb.Model):
+    '''Stall convenor'''
+    name=ndb.StringProperty(indexed=False,repeated=False)
+    email=ndb.StringProperty(indexed=False,repeated=False)
+    phone=ndb.StringProperty(indexed=False,repeated=False)		
 
 def default_helpers_required(hour):
-    if hour < 16:
-        return 4
+    if hour < 9:
+        return 0
+    if hour < 15:
+        return 4	
     return 0
 
 Listofproducts= ["Biscotti","Butters / Curds","Chutney / Relish","Curry Paste","Dips","Drinks","Dry Items",
@@ -395,6 +401,22 @@ def getPrefs(stall_name):
         pass
     print 'prefs: %(prefs)r' %vars()
     return prefs
+
+def getStallConvenor(stall_name):
+    q=StallConvenor.query(ancestor=stall_key(stall_name))
+    convs=q.fetch(1)
+    print 'convs: %(convs)r' %vars()
+    if len(convs):
+        convs=convs[0]
+        print 'convs2: %(convs)r' %vars()
+    else:
+        convs = StallConvenor(parent=stall_key(stall_name))
+        convs.name=''
+        convs.email=''
+        convs.phone=''
+        pass
+    print 'convs: %(convs)r' %vars()
+    return convs
 	
 def makeRosterContent(stall_name):
     print 'prefs'

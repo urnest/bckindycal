@@ -5764,6 +5764,40 @@ p.stall	{
 	text-align: left;
 	line-height: 1.5;
 }
+p.stallconv	{
+	color: #000000;
+	font-size: 12px;
+	margin: 10px 10px 1em;
+	border: 0 none;
+	padding: 0;	
+	text-align: left;
+	line-height: 1.5;
+}
+p.stallconvac	{
+	color: #000000;
+	font-size: 12px;
+	margin: 10px 10px 1em;
+	border: 0 none;
+	padding: 0;	
+	text-align: left;
+	line-height: 1.5;
+}
+a.stallconvac	{
+	color: #ff0000;
+	font-size: 12px;
+	border: 0 none;
+	padding: 0;	
+	text-align: left;
+	line-height: 1.5;
+}
+a:hover.stallconvac	{
+	color: #cccccc;
+	font-size: 12px;
+	border: 0 none;
+	padding: 0;	
+	text-align: left;
+	line-height: 1.5;
+}
 p.stallhead {
 	color: #939;	
     display: inline-block;

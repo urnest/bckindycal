@@ -2477,8 +2477,27 @@ class FairPage(webapp2.RequestHandler):
         if session.loginLevel in ['admin','staff']:
             addAdminNavButtonToPage(page,session.loginLevel)
             pass
-        addScriptToPageHead('events.js',page)
-        makePageBodyInvisible(page)
+        stalls=page.find(pq.hasClass('stalls'))
+        for stall in stalls.children().filter(pq.tagName('div')):
+            stall=pq.Selection(stall)
+            stallname=stall.find(pq.hasClass('jobros')).attr('href')[0]
+	    if stallname.startswith('/'):
+                stallname=stallname[1:]
+            #pass stall name to fair.js via id
+            stall.attr('id',stallname)
+            conv=fair.getStallConvenor(stallname)
+            a=stall.find(pq.hasClass('stallconv')).find(pq.tagName('a'))
+            if conv.name:
+                a.attr('href','mailto:'+conv.email)
+                a.text(conv.name)
+	    else:
+                log(stallname)
+		a.attr('href','/convenor_signup?stall_name='+stallname)
+		a.attr('title','Click to volunteer as Convenor')
+                a.addClass('stallconvac')
+                a.text('VACANT')
+        addScriptToPageHead('fair.js',page)
+        #makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -2519,13 +2538,13 @@ class fair_AddName(webapp2.RequestHandler):
         email = self.request.get('email',None)
         phone = self.request.get('phone',None)
         if name=='':
-            self.redirect(fair.error('Please enter your name before pressing ADD'))
+            self.redirect(fair.error('Please enter your name'))
             return
         if not self.request.get('email') is None and email=='':
-            self.redirect(fair.error('Please enter your email before pressing ADD'))
+            self.redirect(fair.error('Please enter your email'))
             return
         if not self.request.get('phone') is None and phone=='':
-            self.redirect(fair.error('Please enter your mobile before pressing ADD'))
+            self.redirect(fair.error('Please enter your mobile'))
             return
         try:
             ndb.transaction(lambda: fair.addName(stall_name,hour,name,email or '',phone or ''))
