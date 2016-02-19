@@ -137,5 +137,6 @@ skip_files:
 - ^(.*/)?.*\.py[co]$
 - ^(.*/)?.*/RCS/.*$
 - ^(.*/)?\..*$
+- ^(.*/)?tinymce[^/]*/tests/.*$
 - ^(.*/)?jquery-ui[^/]*/tests/.*$
 - ^(.*/)?jquery-ui[^/]*/demos/.*$
