@@ -2195,6 +2195,59 @@ class all_maintenance_days(webapp2.RequestHandler):
         pass
     pass
 
+convenor_signup_schema=jsonschema.Schema({
+    'stall_name':StringType,
+    'name':StringType,
+    'email':StringType,
+    'phone':StringType
+    })
+class convenor_signup(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                convenor_signup_schema.validate(params)
+                stall_name=params['stall_name']
+                q=fair.StallConvenor.query(ancestor=fair.stall_key(stall_name))
+                convenor=q.fetch(1)
+                if len(convenor):
+                    entry=convenor[0]
+                else:
+                    entry = fair.StallConvenor(
+                        parent=fair.stall_key(stall_name),
+                        name='',
+                        email='',
+                        phone='')
+                    pass
+                if entry.name != '':
+                    added=False
+                else:
+                    entry.name=params['name']
+                    entry.email=params['email']
+                    entry.phone=params['phone']
+                    entry.put()
+                    added=True
+                    pass
+                result={
+                    'result':{
+                        'added':added,
+                        'name':entry.name,
+                        'email':entry.email,
+                        'phone':entry.phone
+                    }
+                }
+                pass
+        except:
+            result={
+                'error':str(inContext('convenor_signup'))
+            }
+            pass
+        return self.response.write(toJson(result))
+    pass
+
 def normaliseChildsName(x):
     y=x.split()
     z=[_[0].upper()+_[1:] for _ in y]
@@ -2689,6 +2742,7 @@ application = webapp2.WSGIApplication([
     ('/add_maintenance_day_volunteer',add_maintenance_day_volunteer),
     ('/add_roster_job_volunteer',add_roster_job_volunteer),
     ('/all_maintenance_days',all_maintenance_days),
+    ('/convenor_signup',convenor_signup),
     ('/delete_roster_job',delete_roster_job),
     ('/delete_roster_job_volunteer',delete_roster_job_volunteer),
     ('/get_month_to_show',get_month_to_show),
