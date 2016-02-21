@@ -479,7 +479,7 @@ def makeRosterContent(stall_name):
     ths=helper_table.find(hasClass('helper-th'))
     ths[table_cols-2:].remove()
     #suppress roster table and heading etc if there are no rows
-    if helpers_by_hour==0:
+    if len(helpers_by_hour)==0:
         content.find(hasClass('kindycal-py-roster-el')).remove()
         pass
     content.find(hasClass('stall_name')).text(stalls[stall_name]['name'])
