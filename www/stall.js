@@ -10,7 +10,7 @@ var addPreFairHelper=function($from,stallName){
     '<div>'+
       '<p>Your Name: <input type="text" name="name"></p>'+
       '<p>Email: <input type="text" name="email"></p>'+
-      '<p>Note: <input type="text" name="note"></p>'+
+      '<p>Note (eg donations or handy skills): <input type="text" name="note"></p>'+
       '</div>');
   var add=function(name,email,note){
     $dialog.find('input').removeClass('invalid-input');

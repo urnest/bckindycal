@@ -550,6 +550,32 @@ a:hover.jobros {
     text-decoration: none;
     font-size: 100%;
 }
+a.helpros {
+	background: #000000 none repeat scroll 0 0;
+    border: 1px solid #000000;
+    color: #fff;
+    border-radius: 5px;
+    display: inline-block;
+    line-height: 22px;
+    margin: 0 5px 0 0;
+    padding: 0 10px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+}
+a:hover.helpros {
+	background: #333333 none repeat scroll 0 0;
+    border: 1px solid #333333;
+    color: #ffffff;
+    border-radius: 5px;
+    display: inline-block;
+    line-height: 22px;
+    margin: 0 5px 0 0;
+    padding: 0 10px;
+ 	transition: all 0.1s ease-out 0s;
+    text-decoration: none;
+    font-size: 100%;
+}
 input[type="submit"].job {
 	background: #41ad48 none repeat scroll 0 0;
     border: 1px solid #41ad48;

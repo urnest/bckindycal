@@ -198,15 +198,18 @@ stall_page_head="""
 <p style="text-align:center" class="stallconv">CONVENOR: <a class="stallconvac" href="/convenor_signup">VACANT</a></p>
 </div>
 
-<p class="hdsub"><pre width="90%" class="roster_instructions">Please add your name to the roster. The more the merrier!
+<p class="hdsub"><pre width="90%" style="max-width:600px"class="roster_instructions">Please add your name to the roster. The more the merrier!
 The official carnival open times are 10am-2pm, so earlier shifts are for set up and after 2pm time is for pack up.
 Please note that email and phone numbers you enter will not appear on this roster, they are sent to the stall convenor and used for private communication only.
 </pre></p>
+<hr class="stallhd">
 <h3 class="section-head">PRE-FAIR HELP</h3>
-<p>Can you help with organising and preparing goods for the stall? <a class="add-prefair-helper" href="add_prefair_helper">ADD ME</a></p>
-<p class="pre-fair-helper-names">Alan, John</p>
-<br>
+<p class="blue" width="90%" style="max-width:600px">Can you help with organising and preparing goods for the stall? &nbsp; <a class="add-prefair-helper helpros" href="add_prefair_helper"> ADD ME</a></p>
+<p class="pre-fair-helper-names" width="90%" style="max-width:600px">Alan, John</p>
+<br><br>
+<hr class="stallhd">
 <h3 class="section-head">ROSTER</h3>
+<p>NOTE: Your email address is only seen by stall convenors and not published on the roster.</p><br>
 <table class="helper_table">
  <tr class="table_headings">
 	<td width=60 align=center class=hdoff>START</td>
