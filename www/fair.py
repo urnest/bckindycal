@@ -207,10 +207,10 @@ Please note that email and phone numbers you enter will not appear on this roste
 <p class="blue" width="90%" style="max-width:600px">Can you help with organising and preparing goods for the stall? &nbsp; <a class="add-prefair-helper helpros" href="add_prefair_helper"> ADD ME</a></p>
 <p class="pre-fair-helper-names" width="90%" style="max-width:600px">Alan, John</p>
 <br><br>
-<hr class="stallhd">
-<h3 class="section-head">ROSTER</h3>
-<p>NOTE: Your email address is only seen by stall convenors and not published on the roster.</p><br>
-<table class="helper_table">
+<hr class="stallhd kindycal-py-roster-el">
+<h3 class="section-head kindycal-py-roster-el">ROSTER</h3>
+<p class="kindycal-py-roster-el">NOTE: Your email address is only seen by stall convenors and not published on the roster.</p><br>
+<table class="helper_table kindycal-py-roster-el">
  <tr class="table_headings">
 	<td width=60 align=center class=hdoff>START</td>
 	<td width=200 align=left class=hdred>&nbsp;</td>
@@ -308,7 +308,7 @@ def makeRow(table_cols,
 stall_page_tail="""\
   </table><br><br>
           <div class="container">
-            <p>Made a mistake? Need to change your shift? Please contact the stall convenor or <a href="mailto:info@bardonkindy.com.au" class="gohome">email the office</a>.</p>  			
+            <p>Made a mistake? <span class="kindycal-py-roster-el">Need to change your shift? </span>Please contact the stall convenor or <a href="mailto:info@bardonkindy.com.au" class="gohome">email the office</a>.</p>  			
   			<p><a class="gohome" href="/fair.html">RETURN TO FAIR PAGE</a><br/><br/><br/><br/>
 		  </div> 
   
@@ -481,6 +481,10 @@ def makeRosterContent(stall_name):
                 .attr('colspan',str(table_cols))
     ths=helper_table.find(hasClass('helper-th'))
     ths[table_cols-2:].remove()
+    #suppress roster table and heading etc if there are no rows
+    if len(helpers_by_hour)==0:
+        content.find(hasClass('kindycal-py-roster-el')).remove()
+        pass
     content.find(hasClass('stall_name')).text(stalls[stall_name]['name'])
     content.find(hasClass('stall-convenor-name')).text(
         stalls[stall_name]['email']['name'])
