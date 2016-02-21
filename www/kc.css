@@ -33,6 +33,9 @@ span.ulhd {
     /*kc.rendering function in kc.js needs positioning context*/
     position:relative;
 }
+.kc-display-none {
+    display: none;
+}
 .kc-inline-block {
     display: inline-block;
 }
