@@ -55,13 +55,6 @@ stalls={
             'address':'info@bardonkindy.com.au'
             }
         },
-' class="job"Burners':{
-        'name':'BBQ - Cooks',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
-        },
 'Cakes':{
         'name':'Cakes',
         'email':{
@@ -195,6 +188,7 @@ stall_page_head="""
             <h2 class="hd stall_name" style="text-transform:uppercase">Gourmet Stall</h2>
           </div> 
 <div align="center" class="kindycal-py-stall">
+<p><img class="stall_image" src="fair_images/stall-BBQ.jpg"></p>
 <p style="text-align:center" class="stallconv">CONVENOR: <a class="stallconvac" href="/convenor_signup">VACANT</a></p>
 </div>
 
@@ -489,6 +483,7 @@ def makeRosterContent(stall_name):
         content.find(hasClass('kindycal-py-noroster-el')).addClass('kc-display-none')
         pass
     content.find(hasClass('stall_name')).text(stalls[stall_name]['name'])
+    content.find(hasClass('stall_image')).attr('src','fair_images/roster-%(stall_name)s.jpg'%vars())
     content.find(hasClass('stall-convenor-name')).text(
         stalls[stall_name]['email']['name'])
     content.find(hasClass('roster_instructions')).text(

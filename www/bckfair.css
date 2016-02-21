@@ -212,8 +212,8 @@ section#roster form {
 hr.stallhd { 
 	border: 0; 
 	height: 1px; 
-	background: #939; 
-	background-image: linear-gradient(to right, #ccc, #939, #ccc); 
+	background: #41ad48; 
+	background-image: linear-gradient(to right, #ccc, #41ad48, #ccc); 
 	width: 90%;
 	max-width: 600px;
 }
