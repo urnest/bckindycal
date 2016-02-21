@@ -249,6 +249,9 @@ x fix + button after adding new date (use before rather than append)
 
 - allow remove of stuff added during parent's session  
 
+- make more use of ndb keys? eg instead of storing big json
+  record, store it as ndb objects eg
+
 -----------------------
 
   /usr/local/google_appengine/appcfg.py -e xju360@gmail.com update .
