@@ -2306,7 +2306,7 @@ class roster_bychild(webapp2.RequestHandler):
                      v['parents_name'],
                      v['attended'],
                      v.get('note',''),
-                     maintenance_day['id']))
+                     'edit_maintenance_day.html?id=%(id)s'%maintenance_day))
                 pass
             pass
         x=[fromJson(_.data) for _ in RosterJob.query(ancestor=root_key).fetch(10000)]
@@ -2318,7 +2318,7 @@ class roster_bychild(webapp2.RequestHandler):
                          v['parents_name'],
                          v['attended'],
                          v.get('note',''),
-                         maintenance_day['id']))
+                         'edit_roster_job.html?id=%(id)s'%roster_job))
                     pass
                 pass
             pass
@@ -2331,10 +2331,10 @@ class roster_bychild(webapp2.RequestHandler):
             log('%(childs_name)s %(jobs)r'%vars())
             t2=rowt.clone()
             t2.find(pq.hasClass('volunteer-child-name')).text(childs_name)
-            for job_name,parents_name,attended,note,id in jobs:
+            for job_name,parents_name,attended,note,href in jobs:
                 t2.find(pq.hasClass('name')).find(pq.tagName('a'))\
                     .text(job_name)\
-                    .attr('href','edit_maintenance_day.html?id=%(id)s'%vars())
+                    .attr('href',href)
                 t2.find(pq.hasClass('volunteer-parent-name'))\
                     .text(parents_name)
                 if attended:
