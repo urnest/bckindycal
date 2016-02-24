@@ -145,7 +145,7 @@ section#roster a {
 	text-decoration:none;
 }
 section#roster a:hover {
-	color:#ffffff;
+	color:#000000;
 	text-decoration:none;	
 }
 section#roster a.gohome:hover {
@@ -208,6 +208,14 @@ section#roster a.button span {
 }
 section#roster form {
     padding-top:5px;
+}
+hr.stallhd { 
+	border: 0; 
+	height: 1px; 
+	background: #41ad48; 
+	background-image: linear-gradient(to right, #ccc, #41ad48, #ccc); 
+	width: 90%;
+	max-width: 600px;
 }
 					
 section#roster input, textarea, select {
@@ -4667,7 +4675,7 @@ a {
     background-attachment: fixed;
 }
 .section {
-    padding: 70px 0;
+    padding: 12px 0;
 }
 @media (max-width:991px) {
     .section {

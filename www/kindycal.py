@@ -2731,10 +2731,63 @@ class fair_stalladmin(webapp2.RequestHandler):
         page.find(hasClass('stall-specific')).addClass('suppress')
         page.find(hasClass('stall-specific'))\
             .filter(hasClass(stall_name)).removeClass('suppress')
+        preFairHelpers=fair.getStallPreFairHelpers(stall_name)
+        preFairHelpersTable=page.find(pq.hasClass('pre-fair-helpers'))
+        rt=preFairHelpersTable.find(pq.tagName('tr')).remove().first()
+        for helper in preFairHelpers:
+            r=rt.clone()
+            r.find(pq.hasClass('helper-name')).text(helper['name'])
+            r.find(pq.hasClass('helper-email')).text(helper['email'])
+            r.find(pq.hasClass('helper-email')).attr('href','mailto:'+helper['email'])
+            r.find(pq.hasClass('helper-note')).text(helper['note'])
+            r.appendTo(preFairHelpersTable)
+            pass
+        if len(preFairHelpers)>0:
+            page.find(pq.hasClass('no-prefair-helpers-yet')).remove()
+            pass
         if session.loginLevel in ['admin','staff']:
             addAdminNavButtonToPage(page,session.loginLevel)
+        self.response.write(unicode(page).encode('utf-8'))
+
+class FairConvenorListPage(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['fair','staff','admin']:
+            log('not logged in')
+            return webapp2.redirect('fair_login.html')
+        page=pq.loadFile('fair_convenor_list.html')
+        list=page.find(pq.hasClass('stall-convenor-list'))
+        vacant=list.find(pq.hasClass('no-convenor-yet')).first()
+        rt=list.find(pq.hasClass('stall-row')).remove().first()
+        list.children().remove()
+        stalls=fair.stalls.items()
+        stalls.sort(lambda x,y: cmp(x[1]['name'],y[1]['name']))
+        for stall in stalls:
+            stall_name=stall[0]
+            display_name=fair.stalls[stall_name]['name']
+            conv=fair.getStallConvenor(stall_name)
+            log('stall %(stall_name)s convenor %(conv)r'%vars())
+            r=rt.clone()
+            r.find(pq.hasClass('adm'))\
+             .attr('href','stalladmin?stall_name=%(stall_name)s'%vars())\
+             .find(pq.hasClass('stall-name')).text(display_name)
+            if conv.name=='':
+                log('vacant')
+                vacant.clone().replace(r.find(pq.hasClass('convenor')))
+                pass
+            else:
+                log('not vacant')
+                r.find(pq.hasClass('convenor-name')).text(conv.name)
+                r.find(pq.hasClass('convenor-email'))\
+                 .text(conv.email)\
+                 .attr('href','mailto:'+conv.email)
+                r.find(pq.hasClass('convenor-phone')).text(conv.phone)
+                pass
+            r.appendTo(list)
             pass
         self.response.write(unicode(page).encode('utf-8'))
+        pass
+    pass
 
 class fair_adminsave(webapp2.RequestHandler):
     def post(self):
@@ -2840,6 +2893,7 @@ application = webapp2.WSGIApplication([
 #fair stuff:
     ('/fair',FairPage),
     ('/fair.html',FairPage),
+    ('/fair_convenor_list.html',FairConvenorListPage),
     ('/stalladmin', fair_stalladmin),
     ('/stalladmin.html', fair_stalladmin),
     ('/adminsave', fair_adminsave),

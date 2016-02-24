@@ -44,6 +44,16 @@ section#roster P {
 	font-size: 12px;
 	color: #333333;
 }
+section#roster P.stallconv {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 14px;
+	color: #333333;
+}
+section#roster P.blue {
+	font-family: 'Open Sans', sans-serif;
+	color: #185ca8;
+	font-size: 14px;
+}
 section#roster P.hd {
 	font-family: 'Open Sans', sans-serif;
 	line-height: 1.5;
@@ -148,6 +158,14 @@ section#roster a {
 	text-decoration:none;
 }
 section#roster a:hover {
+	color:#000000;
+	text-decoration:none;	
+}
+section#roster a.helpros {
+	color:#ffffff;
+	text-decoration:none;
+}
+section#roster a.helpros:hover {
 	color:#ffffff;
 	text-decoration:none;	
 }
@@ -493,7 +511,8 @@ pre {
     overflow: auto;
 }
 pre.roster_instructions {
- padding:30px;
+ margin: 30px 0px 30px 0px;
+ padding: 0px 30px 0px 30px;
  box-sizing:border-box;
  -moz-box-sizing:border-box;
  webkit-box-sizing:border-box;
@@ -4706,7 +4725,7 @@ a {
     background-attachment: fixed;
 }
 .section {
-    padding: 70px 0;
+    padding: 12px 0;
 }
 @media (max-width:991px) {
     .section {

@@ -36,8 +36,8 @@
     var $dialog=$(
       '<div>'+
 	'<p>Your Name: <input type="text" name="name"></p>'+
-	'<p>Email: <input type="text" name="email"></p>'+
-	'<p>Phone: <input type="text" name="phone"></p>'+
+	'<p>Email (seen by all parents): <input type="text" name="email"></p>'+
+	'<p>Phone (seen only by stall convenor): <input type="text" name="phone"></p>'+
 	'</div>');
     var add=function(name,email,phone){
       $dialog.find('input').removeClass('invalid-input');
