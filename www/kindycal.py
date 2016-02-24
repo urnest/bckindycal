@@ -2731,6 +2731,9 @@ class fair_stalladmin(webapp2.RequestHandler):
         page.find(hasClass('stall-specific')).addClass('suppress')
         page.find(hasClass('stall-specific'))\
             .filter(hasClass(stall_name)).removeClass('suppress')
+        if session.loginLevel in ['admin','staff']:
+            addAdminNavButtonToPage(page,session.loginLevel)
+            pass
         self.response.write(unicode(page).encode('utf-8'))
 
 class fair_adminsave(webapp2.RequestHandler):

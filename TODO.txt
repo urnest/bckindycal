@@ -1,3 +1,17 @@
+- edit fair description
+
+- fix up stall v stall admin so it works more naturally
+
+- hide events
+  - add hidden attribute
+    - json schema
+    - data fixer
+    - edit_event.html
+    - parent calendar view
+    - staff calendar view
+
+- bin fair volunteer
+
 - .ics https://tools.ietf.org/html/rfc2445
 
 BEGIN:VCALENDAR\r\n
