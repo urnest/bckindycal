@@ -10,11 +10,34 @@ import json
 
 from pq import hasClass, tagName, attrEquals
 
+from xn import Xn,inContext,firstLineOf
+l1=firstLineOf
+
 def toJson(x):
     return json.dumps(x,sort_keys=True,indent=4,separators=(',',': '))
 
 def fromJson(x):
     return json.loads(x)
+
+import logging
+
+def log(s):
+    return logging.info(s)
+
+class Scope:
+    def __init__(self,description):
+        self.description=description
+        self.result_=None
+        log('+ '+self.description)
+        pass
+    def __del__(self):
+        log('- '+self.description+' = '+repr(self.result_))
+        pass
+    def result(self,result):
+        self.result_=result
+        return result
+    pass
+
 
 
 stalls={
@@ -239,7 +262,13 @@ headerror = """\
 tailerror = """\
 """
 
-non_empty_cell="""<td align=center class="helpercell" style="height:54px">%(name)s<span class="admin-only">%(contact)s</span></td>"""
+non_empty_cell="""<td align=center class="helpercell" style="height:54px">
+<input type="hidden" class="helper-number">
+<input type="hidden" class="hour">
+<input type="hidden" class="stall-name">
+<span class="admin-only"><a class="delete-fair-helper" href="delete_stall_helper"><i class="fa fa-trash-o"></i></a>
+</span>%(name)s<span class="admin-only">%(contact)s</span></td>"""
+
 empty_cell="""<td align="center" class="helpercell" style="height:54px">&nbsp;</td>"""
 
 def getHr(hour):
@@ -253,7 +282,7 @@ def getHr(hour):
     else:
         return '%spm'%(hour-12)
 
-def cell(names,phones,emails, i):
+def cell(names,phones,emails,i,hour,stall_name):
     'get name phone and email of ith person in list of names'
     '- return '' if there are less than i names in list'
     if i < len(names):
@@ -265,10 +294,18 @@ def cell(names,phones,emails, i):
             contact=' ('+', '.join(contact)+')'
         else:
             contact=''
-        return non_empty_cell%vars()
+            pass
+        
+        result=pq.parse(non_empty_cell%vars())
+        inputs=result.find(pq.tagName('input'))
+        inputs.filter(pq.hasClass('helper-number')).attr('value',str(i))
+        inputs.filter(pq.hasClass('hour')).attr('value',str(hour))
+        inputs.filter(pq.hasClass('stall-name')).attr('value',stall_name)
+        return unicode(result).encode('utf-8')
     return empty_cell
 
 def makeRow(table_cols,
+            stall_name,
             hour,
             names,
             phones,
@@ -293,7 +330,7 @@ def makeRow(table_cols,
     else:
         result=result+'''<td class="sm" align="left">&nbsp;&nbsp;SHIFT FULL</td>'''
     result=result+ \
-      ''.join([ cell(names,phones,emails, i) \
+      ''.join([ cell(names,phones,emails, i,hour,stall_name) \
                     for i in range(0,helpers_required) ])
     result=result+''.join(['<td class="grey-background" style="height:54px">&nbsp;</td>' for _ in range(helpers_required,table_cols-2)])
     result=result+'</tr><tr><td class="dkgrey-background" colspan="%(table_cols)s"></td></tr>\n'%vars()
@@ -304,8 +341,12 @@ stall_page_tail="""\
   </table><br><br>
           <div class="container">
             <p>Made a mistake? <span class="kindycal-py-roster-el">Need to change your shift? </span>Please contact the stall convenor or <a href="mailto:info@bardonkindy.com.au" class="gohome">email the office</a>.</p>  			
-  			<p><a class="gohome" href="/fair.html">RETURN TO FAIR PAGE</a><br/><br/><br/><br/>
+  			<p><a class="gohome" href="/fair.html">RETURN TO FAIR PAGE</a><br/><br/>
 		  </div> 
+        <div class="fair-only container" align=center>
+          <br><br>
+            <p><a href="stalladmin.html?stall_name=None"  class="jobros edit-stall-link">STALL ADMIN</a></p><br><br><br/><br/>
+          </div>
   
   <p class=ft><strong><br><br><br/><br/>
 """
@@ -459,6 +500,7 @@ def makeRosterContent(stall_name):
             pass
         if max_helpers>0:
             result=result+makeRow(table_cols,
+                                  stall_name,
                                   hour, 
                                   names,
                                   phones,
@@ -511,6 +553,24 @@ def addName(stall_name, hour, name, email, phone):
         entry.phones.append(phone)
         entry.put()
 
+def deleteHelper(stall_name,hour,helper_number):
+    'delete helper with index %(helper_number)s from hour %(hour)s from stall %(stall_name)s'
+    scope=Scope(l1(deleteHelper.__doc__)%vars())
+    try:
+        entry_query = OneHourOfHelp.query(OneHourOfHelp.hour == hour, ancestor=stall_key(stall_name))
+        entries = entry_query.fetch(1)
+        if len(entries)==0:
+            return scope.result('no such hour of help')
+        entry=entries[0]
+        del entry.names[helper_number]
+        del entry.emails[helper_number]
+        del entry.phones[helper_number]
+        entry.put()
+        return scope.result('entry now %(entry)s'%vars())
+    except:
+        raise inContext(scope.description)
+    pass
+
 def error(msg):
     'return url of error page with specified message'
     return 'error?'+urllib.urlencode({'msg':msg})
@@ -529,7 +589,6 @@ class Error(webapp2.RequestHandler):
             self.request.get('msg','')))
      
         self.response.write(tailerror)     
-
 
 class ArtRedirect(webapp2.RequestHandler):
     def get(self):

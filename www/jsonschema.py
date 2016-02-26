@@ -14,7 +14,7 @@ class Schema:
         return repr(self.x)
     def validate(self,x):
         'verify that %(x)r conforms to jsonschema.Schema %(self)r'%vars()
-        validate(self.x,x)
+        return validate(self.x,x)
         return
     pass
 
@@ -112,7 +112,7 @@ def validate(schema,x):
                     except:
                         raise inContext('validate dictionary item %(key)r'%vars())
                     pass
-                return
+                return x
             for name, y in x.items():
                 try:
                     if not name in schema:
@@ -151,7 +151,7 @@ def validate(schema,x):
             while len(choices):
                 try:
                     validate(choices[0],x)
-                    return
+                    return x
                 except Exception,e:
                     failures.append(e)
                     pass
@@ -160,7 +160,8 @@ def validate(schema,x):
             raise Xn(' and '.join([str(_) for _ in failures]))
         if isinstance(schema,Schema):
             schema.validate(x)
-        pass
+            pass
+        return x
     except:
         raise inContext(l1(validate.__doc__)%vars())
     pass

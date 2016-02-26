@@ -2667,9 +2667,16 @@ class fair_StallPage(webapp2.RequestHandler):
         preFairHelpers=fair.getStallPreFairHelpers(stallname)
         page.find(pq.hasClass('pre-fair-helper-names')).text(', '.join(
             [_['name'] for _ in preFairHelpers]))
-        #stall page never shows admin stuff
-        page.find(pq.hasClass('admin-only')).remove()
-        page.find(pq.hasClass('staff-only')).remove()
+        if not session.loginLevel in ['admin']:
+            page.find(pq.hasClass('admin-only')).remove()
+            pass
+        if not session.loginLevel in ['staff','admin']:
+            page.find(pq.hasClass('staff-only')).remove()
+            pass
+        if not session.loginLevel in ['fair','staff','admin']:
+            page.find(pq.hasClass('fair-only')).remove()
+            pass
+        page.find(pq.hasClass('edit-stall-link')).attr('href','stalladmin?stall_name=%(stallname)s'%vars())
         addScriptToPageHead('stall.js',page)
         self.response.write(unicode(page).encode('utf-8'))
 
@@ -2781,7 +2788,10 @@ class fair_stalladmin(webapp2.RequestHandler):
             pass
         if session.loginLevel in ['admin','staff']:
             addAdminNavButtonToPage(page,session.loginLevel)
+        addScriptToPageHead('stall_admin.js',page)
         self.response.write(unicode(page).encode('utf-8'))
+        pass
+    pass
 
 class FairConvenorListPage(webapp2.RequestHandler):
     def get(self):
@@ -2855,6 +2865,31 @@ class fair_adminsave(webapp2.RequestHandler):
         entry.ask_for_phone=ask_for_phone
         entry.put()            
         self.redirect('stalladmin')
+
+class delete_stall_helper(webapp2.RequestHandler):
+    def post(self):
+        'delete stall helper'
+        scope=Scope(l1(delete_stall_helper.post.__doc__)%vars())
+        try:
+            schema=jsonschema.Schema({
+                    'helper_number':IntType,
+                    'hour':IntType,
+                    'stall_name':StringType
+                    })
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['fair','staff','admin']:
+                log('not logged in')
+                return webapp2.redirect('fair_login.html')
+            params=schema.validate(fromJson(self.request.get('params')))
+            fair.deleteHelper(**params)
+            result={'result':'OK'}
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext(scope.description))}))
+            pass
+        pass
+    pass
+
 
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
@@ -2936,6 +2971,7 @@ application = webapp2.WSGIApplication([
     ('/stall.html', fair_StallPage),
     ('/add', fair_AddName),
     ('/error', fair.Error),
+    ('/delete_stall_helper', delete_stall_helper),
 #fair redirects, so can do /Art and get to stall?stall_name=Art
     ('/Art',fair.ArtRedirect),
     ('/Auction',fair.AuctionRedirect),
