@@ -247,6 +247,14 @@ textarea.wt {
   background-color: #ffffff;
   border: solid #333333 1px;
 }
+TD.helper-name {
+	font-family: "Montserrat", sans-serif;
+	font-size: 11px;
+	color: #ffffff;
+	line-height:20px;
+    margin: 0;
+    padding: 6px 18px 4px 14px;
+}
 section#roster .roster-add  {
     padding-left: 5px;
 }

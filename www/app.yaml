@@ -48,6 +48,9 @@ handlers:
 - url: /fair_login.html$
   script: kindycal.application
 
+- url: /fair_admin.html$
+  script: kindycal.application
+
 - url: /fair_convenor_list.html$
   script: kindycal.application
 

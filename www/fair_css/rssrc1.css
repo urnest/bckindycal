@@ -27,6 +27,44 @@ body {
 #navbar {
     height: 70px; /* in case we have no nav items, keep the height */
 }
+TD.helper-name {
+	font-size: 14px;
+	color: #000000;
+	line-height:20px;
+    margin: 0;
+    padding: 6px 18px 4px 14px;
+	vertical-align: top;
+}
+TD.helper-top {
+	font-size: 14px;
+	color: #000000;
+	line-height:20px;
+    margin: 0;
+    padding: 6px 18px 4px 14px;
+	vertical-align: top;
+}
+TD.helper-note {
+	font-size: 14px;
+	color: #666666;
+	line-height:20px;
+    margin: 0;
+    padding: 6px 18px 4px 14px;
+	max-width: 400px;
+	text-align: left;
+	vertical-align: top;
+}
+a.helper-email {
+	font-size: 14px;
+	line-height:20px;
+    margin: 0;
+    padding: 6px 18px 4px 14px;
+}
+a:hover.helper-email {
+	font-size: 14px;
+	line-height:20px;
+    margin: 0;
+    padding: 6px 18px 4px 14px;
+}
 section#emails textarea {
     width: 300px;
 }
@@ -52,6 +90,11 @@ section#roster P.stallconv {
 section#roster P.blue {
 	font-family: 'Open Sans', sans-serif;
 	color: #185ca8;
+	font-size: 14px;
+}
+section#roster P.pre-fair-helper-names {
+	font-family: 'Open Sans', sans-serif;
+	color: #000000;
 	font-size: 14px;
 }
 section#roster P.hd {

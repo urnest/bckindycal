@@ -178,6 +178,17 @@ class staff_page(webapp2.RequestHandler):
         self.response.set_cookie('kc-session',session.sid)
         pass
     pass
+	
+class fair_admin(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['staff','admin','fair']:
+            log('not logged in as staff or admin')
+            return webapp2.redirect('fair_login.html')
+        self.response.write(file('fair_admin.html').read())
+        self.response.set_cookie('kc-session',session.sid)
+        pass
+    pass
 
 class login_page(webapp2.RequestHandler):
     def get(self):
@@ -497,6 +508,9 @@ def addAdminNavButtonToPage(page,loginLevel):
         pass
     if loginLevel=='staff':
         adminNavButton.find(pq.tagName('a')).attr('href','staff.html')
+        pass
+    if loginLevel=='fair':
+        adminNavButton.find(pq.tagName('a')).attr('href','fair_admin.html')
         pass
     adminNavButton.addBefore(
         page.find(pq.attrEquals('id','navigation')).find(
@@ -2896,6 +2910,7 @@ application = webapp2.WSGIApplication([
     ('/fair_convenor_list.html',FairConvenorListPage),
     ('/stalladmin', fair_stalladmin),
     ('/stalladmin.html', fair_stalladmin),
+	('/fair_admin.html', fair_admin),
     ('/adminsave', fair_adminsave),
     ('/stall', fair_StallPage),
     ('/stall.html', fair_StallPage),

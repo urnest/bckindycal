@@ -116,6 +116,12 @@ TD {
 	border: 1px solid #FFFFFF;
 	text-align:left;
 }
+TD.helpercell {
+	text-align:center;
+}
+TD.helper-th {
+	text-align:center;
+}
 TD.calhdc {
 	font-family: "Montserrat",sans-serif;
     font-weight: 400;
@@ -138,6 +144,9 @@ TD.jobhd {
 	text-align: center;
 	padding: 8px 10px 7px;
 	height: 13px;
+}
+TD.note-col {
+	min-width: 200px;
 }
 TD.calteal {
 	font-family: "Montserrat",sans-serif;
