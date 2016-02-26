@@ -4,6 +4,9 @@ $(document).ready(function(){
   var $groupsOption_t=$('select.grouplst option').remove().first();
   var rendering=kc.rendering($('div#content'));
   var busyCount=0;
+  var $eventHidden=$('input#event-hidden');
+  var $eventVisible=$('input#event-visible');
+
   $('body').removeClass('kc-invisible');//added by kindycal.py
 
   $('input#save-button').click(function(){
@@ -34,6 +37,7 @@ $(document).ready(function(){
 	day:parseInt(d[0])
       });
     });
+    var hidden=$eventHidden.prop('checked');
     var groups=kc.json.decode($('select.grouplst').prop('value'));
     var description=$('.event-description').html();
     ++busyCount;
@@ -45,6 +49,7 @@ $(document).ready(function(){
 	  text:$('input#name').prop('value'),
 	  colour:$('input#name-colour').prop('value')
 	},
+	hidden:hidden,
 	groups:groups,
 	dates:dates,
 	description:{html:description}
@@ -146,6 +151,12 @@ $(document).ready(function(){
       $('select.grouplst').prop('value','['+kc.join(',',event.groups)+']');
       $('input#name').prop('value',event.name.text);
       $('input#name-colour').prop('value',event.name.colour);
+      if (event.hidden){
+	$eventHidden.prop('checked',true);
+      }
+      else{
+	$eventVisible.prop('checked',true);
+      }
       $('img.name-color-picker').css('background-color',event.name.colour);
       $('div.event-description').html(event.description.html);
       tinymce.init({

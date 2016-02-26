@@ -173,7 +173,9 @@ $(document).ready(function(){
 	      $event.find('.event-link').attr('href','event.html?id='+event.id);
 	      $event.find('.event-link').text(event.name.text);
 	      $event.find('.event-link').css('color',event.name.colour);
-	      
+	      if (!event.hidden){
+		$event.find('.hidden-event').remove();
+	      }
 	      dateDays[date.day].append($event);
 	    }
 	  });

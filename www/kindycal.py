@@ -520,6 +520,8 @@ def addAdminNavButtonToPage(page,loginLevel):
 class events_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
+        if session.loginLevel in ['staff','admin']:
+            return webapp2.redirect('edit_events.html')
         if not session.loginLevel:
             log('not logged in')
             return webapp2.redirect('login.html')
@@ -839,10 +841,17 @@ event_schema=jsonschema.Schema({
             'text':StringType,
             'colour':StringType
             },
+        'hidden':BooleanType,
         'description' : {
             'html' : StringType
             }
         })
+
+def fixOldEventData(data):
+    if not 'hidden' in data:
+        data['hidden']=False
+        pass
+    return True
 
 class Event(ndb.Model):
     # data is json encoded event_schema-conformant
@@ -891,6 +900,7 @@ def createEvent(eventId,data):
     'create event from %(data)r'
     scope=Scope(l1(createEvent.__doc__)%vars())
     try:
+        fixOldEventData(data)
         event_schema.validate(data)
         assert data['id']==0
         data['id']=eventId
@@ -954,6 +964,7 @@ class event(webapp2.RequestHandler):
             event=Event.query(Event.id==int(self.request.get('id')),
                               ancestor=root_key).fetch(1)
             result=fromJson(event[0].data)
+            fixOldEventData(result)
             event_schema.validate(result)
             pass
         return self.response.write(toJson({'result':result}))
@@ -964,12 +975,14 @@ class event(webapp2.RequestHandler):
                 result={'error':'You are not logged in.'}
             else:
                 data=fromJson(self.request.get('params'))
+                fixOldEventData(data)
                 event_schema.validate(data)
                 if data['id']==0:
                     result=createEvent(nextEventId(),data)
                 else:
                     result=updateEvent(data)
                     pass
+                fixOldEventData(data)
                 event_schema.validate(result)
                 result={'result':result}
                 pass
@@ -1329,7 +1342,12 @@ class month_events(webapp2.RequestHandler):
                 events=[fromJson(_.data) for _ in
                         Event.query(Event.months==y*100+m,
                                     ancestor=root_key).fetch(10000)]
-                log(events)
+                for event in events:
+                    fixOldEventData(event)
+                    pass
+                if not session.loginLevel in ['staff','admin']:
+                    events=[_ for _ in events if not _['hidden']]
+                    pass
                 month_events_schema.validate(events)
                 self.response.write(toJson({'result':events}))
         except:
@@ -2417,8 +2435,7 @@ class export_data(webapp2.RequestHandler):
                  'id':_.id,
                  'months':_.months} for _ in
                 TWYC.query(ancestor=root_key).fetch(100000)]
-        roster_jobs=[{'data':fromJson(_.data),
-                      'id':_.id} for _ in
+        roster_jobs=[fromJson(_.data) for _ in
                      RosterJob.query(ancestor=root_key).fetch(100000)]
         self.response.headers['Content-Type'] = 'text/json'
         self.response.write(toJson({
@@ -2493,6 +2510,7 @@ class import_data(webapp2.RequestHandler):
             if len(data['events']):
                 for _ in Event.query(ancestor=root_key).fetch(100000): _.key.delete()
                 for _ in data['events']:
+                    fixOldEventData(data)
                     event_schema.validate(_['data'])
                     t=Event(parent=root_key,
                             data=toJson(_['data']),
@@ -2555,10 +2573,12 @@ class import_data(webapp2.RequestHandler):
             if 'roster_jobs' in data:
                 for _ in RosterJob.query(ancestor=root_key).fetch(100000): _.key.delete()
                 for _ in data['roster_jobs']:
+                    #handle old data format
+                    if 'data' in _: _=_['data']
                     roster_job_schema.validate(_)
-                    t=TWYC(parent=root_key,
-                           data=toJson(_),
-                           id=_['id'])
+                    t=RosterJob(parent=root_key,
+                                data=toJson(_),
+                                id=_['id'])
                     t.put()
                     pass
                 self.response.write('%s roster jobs<br>'%len(data['roster_jobs']))
