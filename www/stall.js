@@ -36,7 +36,7 @@ var addPreFairHelper=function($from,stallName){
 	  alert('Sorry, someone else snuck in ahead of you :-(');
 	}
 	$dialog.dialog('close');
-	result.then_(r.names);
+	result.then_(r.names||[],r.details||[]);
       });
   };
   $dialog.dialog({
@@ -89,8 +89,18 @@ $(document).ready(function(){
     $a.click(f);
   }
   $('a.add-prefair-helper').click(function(){
-    addPreFairHelper($a,stallName).then(function(names){
+    addPreFairHelper($a,stallName).then(function(names,details){
+      var $preFairHelperDetails=$('.pre-fair-helper-details');
       $('.pre-fair-helper-names').text(kc.join(', ',names));
+      kc.each(details,function(i,d){
+	var $d=$preFairHelperDetails.find('.pre-fair-helper-detail').first().clone();
+	$d.find('.pre-fair-helper-name').text(d.name);
+	$d.find('.pre-fair-helper-mailto-link')
+	  .attr('href','mailto:'+d.email)
+	  .text(d.email);
+	$d.find('.pre-fair-helper-note').text(d.note);
+	$preFairHelperDetails.append($d);
+      });
     });
     return false;
   });

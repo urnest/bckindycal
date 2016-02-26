@@ -1556,12 +1556,21 @@ class add_prefair_helper(webapp2.RequestHandler):
                     email=params['email'],
                     note=params['note'])
                 entry.put()
-                result={
-                    'result':{
-                        'added':True,
-                        'names':[_['name'] for _ in fair.getStallPreFairHelpers(stall_name)]
-                    }
-                }
+                if session.loginLevel in ['staff','admin']:
+                    result={
+                        'result':{
+                            'added':True,
+                            'names':[_['name'] for _ in fair.getStallPreFairHelpers(stall_name)],
+                            }
+                        }
+                else:
+                    result={
+                        'result':{
+                            'added':True,
+                            'details':fair.getStallPreFairHelpers()
+                            }
+                        }
+                    pass
                 pass
         except:
             result={'error':str(inContext('add_prefair_helper'))}
@@ -2625,6 +2634,8 @@ class FairPage(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
+prefair_helper_t='''<span class="prefair-helper"><input type="hidden" class="name"><li>
+</span>'''
 
 class fair_StallPage(webapp2.RequestHandler):
     def get(self):
@@ -2665,8 +2676,22 @@ class fair_StallPage(webapp2.RequestHandler):
             a.text('VACANT')
             pass
         preFairHelpers=fair.getStallPreFairHelpers(stallname)
+        preFairHelpersElement=page.find(pq.hasClass('pre-fair-helper-names'))
+        sep=pq.parse('')
         page.find(pq.hasClass('pre-fair-helper-names')).text(', '.join(
             [_['name'] for _ in preFairHelpers]))
+        dt=page.find(pq.hasClass('pre-fair-helper-detail')).remove().first()
+        preFairHelpersElement=page.find(pq.hasClass('pre-fair-helper-details'))
+        for h in preFairHelpers:
+            d=dt.clone()
+            d.find(pq.hasClass('pre-fair-helper-name')).text(h['name'])
+            d.find(pq.hasClass('pre-fair-helper-mailto-link'))\
+                .attr('href','mailto:'+h['email'])\
+                .text(h['email'])
+            d.find(pq.hasClass('pre-fair-helper-note')).text(h['note'])
+            d.appendTo(preFairHelpersElement)
+            pass
+        dt.addClass('kc-display-none').appendTo(preFairHelpersElement)
         if not session.loginLevel in ['admin']:
             page.find(pq.hasClass('admin-only')).remove()
             pass
@@ -2675,6 +2700,9 @@ class fair_StallPage(webapp2.RequestHandler):
             pass
         if not session.loginLevel in ['fair','staff','admin']:
             page.find(pq.hasClass('fair-only')).remove()
+            pass
+        if not session.loginLevel in ['parent','fair']:
+            page.find(pq.hasClass('parent-only')).remove()
             pass
         page.find(pq.hasClass('edit-stall-link')).attr('href','stalladmin?stall_name=%(stallname)s'%vars())
         addScriptToPageHead('stall.js',page)

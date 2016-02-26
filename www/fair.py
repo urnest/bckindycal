@@ -222,7 +222,15 @@ Please note that email and phone numbers you enter will not appear on this roste
 <hr class="stallhd">
 <h3 class="section-head">PRE-FAIR HELP</h3>
 <p class="blue" width="90%" style="max-width:600px">Can you help with organising and preparing goods for the stall? &nbsp; <a class="add-prefair-helper helpros" href="add_prefair_helper"> ADD ME</a></p>
-<p class="pre-fair-helper-names" width="90%" style="max-width:600px">Alan, John</p>
+<p class="pre-fair-helper-names parent-only" width="90%" style="max-width:600px">Alan, John</p>
+<p class="staff-only" width="90%" style="max-width:600px">
+  <div class="pre-fair-helper-details kc-text-align-left kc-inline-block">
+    <div class="pre-fair-helper-detail">
+      <div><span class="pre-fair-helper-name">Alan</span> (<a class="pre-fair-helper-mailto-link" href="mailto:">a@b</a>)</div>
+      <div class="pre-fair-helper-note">I'll bring my big spanner set.</div>
+    </div>
+  </div>
+</p>
 <br><br>
 <hr class="stallhd">
 <h3 class="section-head">ROSTER</h3>
