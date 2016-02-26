@@ -187,6 +187,9 @@ h1	{
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
     <script type="text/javascript" src="js/custom-form-elements.js"></script>
+    <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
+    <script src="jquery-ui-1.11/jquery-ui.js"></script>
+    <script type="text/javascript" src="kc.js"></script>
     
     <!-- SMOOTH SCROLL -->
     <script>
@@ -804,9 +807,9 @@ h1	{
     <div class="whitetre-box">
 	  <section id="pre-fair" class="section section-center section-cta">
 	    <h2>PRE-FAIR HELPERS</h2>
-	    <!-- filled in by guestbook.py class admin -->
 	    <table align="center" class="pre-fair-helpers">
-	      <tr>
+	      <tr class="pre-fair-helper-detail">
+		<td><a href="delete-pre-fair-helper"><i class="fa fa-trash-o"></i>&nbsp;<input type="hidden" class="stall-name"></td>
 		<td class="helper-name">Fred Glob</td>
 		<td class="helper-top"><a href="mailto:fred@glob.com" class="helper-email">fred@glob.com</a></td>
 		<td class="helper-note">I have a table you can borrow.</td>

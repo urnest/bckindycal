@@ -520,6 +520,8 @@ def addAdminNavButtonToPage(page,loginLevel):
 class events_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
+        if session.loginLevel in ['staff','admin']:
+            return webapp2.redirect('edit_events.html')
         if not session.loginLevel:
             log('not logged in')
             return webapp2.redirect('login.html')
@@ -839,10 +841,17 @@ event_schema=jsonschema.Schema({
             'text':StringType,
             'colour':StringType
             },
+        'hidden':BooleanType,
         'description' : {
             'html' : StringType
             }
         })
+
+def fixOldEventData(data):
+    if not 'hidden' in data:
+        data['hidden']=False
+        pass
+    return True
 
 class Event(ndb.Model):
     # data is json encoded event_schema-conformant
@@ -891,6 +900,7 @@ def createEvent(eventId,data):
     'create event from %(data)r'
     scope=Scope(l1(createEvent.__doc__)%vars())
     try:
+        fixOldEventData(data)
         event_schema.validate(data)
         assert data['id']==0
         data['id']=eventId
@@ -954,6 +964,7 @@ class event(webapp2.RequestHandler):
             event=Event.query(Event.id==int(self.request.get('id')),
                               ancestor=root_key).fetch(1)
             result=fromJson(event[0].data)
+            fixOldEventData(result)
             event_schema.validate(result)
             pass
         return self.response.write(toJson({'result':result}))
@@ -964,12 +975,14 @@ class event(webapp2.RequestHandler):
                 result={'error':'You are not logged in.'}
             else:
                 data=fromJson(self.request.get('params'))
+                fixOldEventData(data)
                 event_schema.validate(data)
                 if data['id']==0:
                     result=createEvent(nextEventId(),data)
                 else:
                     result=updateEvent(data)
                     pass
+                fixOldEventData(data)
                 event_schema.validate(result)
                 result={'result':result}
                 pass
@@ -1329,7 +1342,12 @@ class month_events(webapp2.RequestHandler):
                 events=[fromJson(_.data) for _ in
                         Event.query(Event.months==y*100+m,
                                     ancestor=root_key).fetch(10000)]
-                log(events)
+                for event in events:
+                    fixOldEventData(event)
+                    pass
+                if not session.loginLevel in ['staff','admin']:
+                    events=[_ for _ in events if not _['hidden']]
+                    pass
                 month_events_schema.validate(events)
                 self.response.write(toJson({'result':events}))
         except:
@@ -1538,12 +1556,21 @@ class add_prefair_helper(webapp2.RequestHandler):
                     email=params['email'],
                     note=params['note'])
                 entry.put()
-                result={
-                    'result':{
-                        'added':True,
-                        'names':[_['name'] for _ in fair.getStallPreFairHelpers(stall_name)]
-                    }
-                }
+                if session.loginLevel in ['staff','admin']:
+                    result={
+                        'result':{
+                            'added':True,
+                            'details':fair.getStallPreFairHelpers(stall_name)
+                            }
+                        }
+                else:
+                    result={
+                        'result':{
+                            'added':True,
+                            'names':[_['name'] for _ in fair.getStallPreFairHelpers(stall_name)],
+                            }
+                        }
+                    pass
                 pass
         except:
             result={'error':str(inContext('add_prefair_helper'))}
@@ -2417,8 +2444,7 @@ class export_data(webapp2.RequestHandler):
                  'id':_.id,
                  'months':_.months} for _ in
                 TWYC.query(ancestor=root_key).fetch(100000)]
-        roster_jobs=[{'data':fromJson(_.data),
-                      'id':_.id} for _ in
+        roster_jobs=[fromJson(_.data) for _ in
                      RosterJob.query(ancestor=root_key).fetch(100000)]
         self.response.headers['Content-Type'] = 'text/json'
         self.response.write(toJson({
@@ -2493,6 +2519,7 @@ class import_data(webapp2.RequestHandler):
             if len(data['events']):
                 for _ in Event.query(ancestor=root_key).fetch(100000): _.key.delete()
                 for _ in data['events']:
+                    fixOldEventData(data)
                     event_schema.validate(_['data'])
                     t=Event(parent=root_key,
                             data=toJson(_['data']),
@@ -2555,10 +2582,12 @@ class import_data(webapp2.RequestHandler):
             if 'roster_jobs' in data:
                 for _ in RosterJob.query(ancestor=root_key).fetch(100000): _.key.delete()
                 for _ in data['roster_jobs']:
+                    #handle old data format
+                    if 'data' in _: _=_['data']
                     roster_job_schema.validate(_)
-                    t=TWYC(parent=root_key,
-                           data=toJson(_),
-                           id=_['id'])
+                    t=RosterJob(parent=root_key,
+                                data=toJson(_),
+                                id=_['id'])
                     t.put()
                     pass
                 self.response.write('%s roster jobs<br>'%len(data['roster_jobs']))
@@ -2605,6 +2634,8 @@ class FairPage(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
+prefair_helper_t='''<span class="prefair-helper"><input type="hidden" class="name"><li>
+</span>'''
 
 class fair_StallPage(webapp2.RequestHandler):
     def get(self):
@@ -2645,11 +2676,35 @@ class fair_StallPage(webapp2.RequestHandler):
             a.text('VACANT')
             pass
         preFairHelpers=fair.getStallPreFairHelpers(stallname)
+        preFairHelpersElement=page.find(pq.hasClass('pre-fair-helper-names'))
+        sep=pq.parse('')
         page.find(pq.hasClass('pre-fair-helper-names')).text(', '.join(
             [_['name'] for _ in preFairHelpers]))
-        #stall page never shows admin stuff
-        page.find(pq.hasClass('admin-only')).remove()
-        page.find(pq.hasClass('staff-only')).remove()
+        dt=page.find(pq.hasClass('pre-fair-helper-detail')).remove().first()
+        preFairHelpersElement=page.find(pq.hasClass('pre-fair-helper-details'))
+        for h in preFairHelpers:
+            d=dt.clone()
+            d.find(pq.hasClass('pre-fair-helper-name')).text(h['name'])
+            d.find(pq.hasClass('pre-fair-helper-mailto-link'))\
+                .attr('href','mailto:'+h['email'])\
+                .text(h['email'])
+            d.find(pq.hasClass('pre-fair-helper-note')).text(h['note'])
+            d.appendTo(preFairHelpersElement)
+            pass
+        dt.addClass('kc-display-none').appendTo(preFairHelpersElement)
+        if not session.loginLevel in ['admin']:
+            page.find(pq.hasClass('admin-only')).remove()
+            pass
+        if not session.loginLevel in ['staff','admin']:
+            page.find(pq.hasClass('staff-only')).remove()
+            pass
+        if not session.loginLevel in ['fair','staff','admin']:
+            page.find(pq.hasClass('fair-only')).remove()
+            pass
+        if not session.loginLevel in ['parent','fair']:
+            page.find(pq.hasClass('parent-only')).remove()
+            pass
+        page.find(pq.hasClass('edit-stall-link')).attr('href','stalladmin?stall_name=%(stallname)s'%vars())
         addScriptToPageHead('stall.js',page)
         self.response.write(unicode(page).encode('utf-8'))
 
@@ -2750,6 +2805,7 @@ class fair_stalladmin(webapp2.RequestHandler):
         rt=preFairHelpersTable.find(pq.tagName('tr')).remove().first()
         for helper in preFairHelpers:
             r=rt.clone()
+            r.find(pq.hasClass('stall-name')).attr('value',stall_name)
             r.find(pq.hasClass('helper-name')).text(helper['name'])
             r.find(pq.hasClass('helper-email')).text(helper['email'])
             r.find(pq.hasClass('helper-email')).attr('href','mailto:'+helper['email'])
@@ -2761,7 +2817,10 @@ class fair_stalladmin(webapp2.RequestHandler):
             pass
         if session.loginLevel in ['admin','staff']:
             addAdminNavButtonToPage(page,session.loginLevel)
+        addScriptToPageHead('stall_admin.js',page)
         self.response.write(unicode(page).encode('utf-8'))
+        pass
+    pass
 
 class FairConvenorListPage(webapp2.RequestHandler):
     def get(self):
@@ -2836,6 +2895,56 @@ class fair_adminsave(webapp2.RequestHandler):
         entry.put()            
         self.redirect('stalladmin')
 
+class delete_stall_helper(webapp2.RequestHandler):
+    def post(self):
+        'delete stall helper'
+        scope=Scope(l1(delete_stall_helper.post.__doc__)%vars())
+        try:
+            schema=jsonschema.Schema({
+                    'helper_number':IntType,
+                    'hour':IntType,
+                    'stall_name':StringType
+                    })
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['fair','staff','admin']:
+                log('not logged in')
+                return webapp2.redirect('fair_login.html')
+            params=schema.validate(fromJson(self.request.get('params')))
+            fair.deleteHelper(**params)
+            result={'result':'OK'}
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext(scope.description))}))
+            pass
+        pass
+    pass
+
+
+class delete_prefair_helper(webapp2.RequestHandler):
+    def post(self):
+        'delete prefair helper'
+        scope=Scope(l1(delete_prefair_helper.post.__doc__)%vars())
+        try:
+            schema=jsonschema.Schema({
+                    'stall_name':StringType,
+                    'helper_name':StringType,
+                    'email':StringType,
+                    })
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['fair','staff','admin']:
+                log('not logged in')
+                return webapp2.redirect('fair_login.html')
+            params=schema.validate(fromJson(self.request.get('params')))
+            fair.deletePreFairHelper(**params)
+            result={'result':'OK'}
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext(scope.description))}))
+            pass
+        pass
+    pass
+
+
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
@@ -2870,7 +2979,6 @@ application = webapp2.WSGIApplication([
     # following are not real pages, they are called by javascript files
     # to get and save data
     ('/add_maintenance_day_volunteer',add_maintenance_day_volunteer),
-    ('/add_prefair_helper',add_prefair_helper),
     ('/add_roster_job_volunteer',add_roster_job_volunteer),
     ('/all_maintenance_days',all_maintenance_days),
     ('/convenor_signup',convenor_signup),
@@ -2916,6 +3024,9 @@ application = webapp2.WSGIApplication([
     ('/stall.html', fair_StallPage),
     ('/add', fair_AddName),
     ('/error', fair.Error),
+    ('/delete_stall_helper', delete_stall_helper),
+    ('/add_prefair_helper',add_prefair_helper),
+    ('/delete_prefair_helper', delete_prefair_helper),
 #fair redirects, so can do /Art and get to stall?stall_name=Art
     ('/Art',fair.ArtRedirect),
     ('/Auction',fair.AuctionRedirect),

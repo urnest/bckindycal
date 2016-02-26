@@ -48,6 +48,12 @@ span.ulhd {
 .kc-transfer-effect {
     border: 2px dotted black;
 }
+.kc-text-align-left {
+    text-align: left;
+}
+.kc-inline-block {
+    display: inline-block;
+}
 .kc-in-front-of-navbar.ui-front,
 .kc-in-front-of-navbar {
     z-index:1000
@@ -59,6 +65,9 @@ input.kc-invalid-input,
 .kc-invalid-input,
 .invalid-input {
     outline: 1px solid red !important
+}
+.pre-fair-helper-note {
+  margin-left: 20px;
 }
 .GroupName {
 	width: 300px;
@@ -115,6 +124,11 @@ TD {
 	background: #FFFFFF;
 	border: 1px solid #FFFFFF;
 	text-align:left;
+}
+
+section#roster table.non-admin.pre-fair-helper-details td{
+    background-color: white;
+    color:black;
 }
 TD.helpercell {
 	text-align:center;

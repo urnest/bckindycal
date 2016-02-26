@@ -36,7 +36,7 @@ var addPreFairHelper=function($from,stallName){
 	  alert('Sorry, someone else snuck in ahead of you :-(');
 	}
 	$dialog.dialog('close');
-	result.then_(r.names);
+	result.then_(r.names||[],r.details||[]);
       });
   };
   $dialog.dialog({
@@ -71,6 +71,20 @@ var addPreFairHelper=function($from,stallName){
   });
   return result;
 };
+var deletePreFairHelper=function(stallName,$row){
+  var name=$row.find('.pre-fair-helper-name').text();
+  var email=$row.find('.pre-fair-helper-mailto-link').text();
+  if (window.confirm('Remove '+name+'?')){
+    kc.postToServer('delete_prefair_helper',{
+      params:kc.json.encode({
+	stall_name:stallName,
+	helper_name:name,
+	email:email})})
+      .then(function(){
+	$row.remove();
+      });
+  }
+};
 $(document).ready(function(){
   var $stall=$('.kindycal-py-stall');
   var stallName=$stall.attr('id');
@@ -89,9 +103,49 @@ $(document).ready(function(){
     $a.click(f);
   }
   $('a.add-prefair-helper').click(function(){
-    addPreFairHelper($a,stallName).then(function(names){
+    addPreFairHelper($a,stallName).then(function(names,details){
+      var $preFairHelperDetails=$('.pre-fair-helper-details');
+      var $dt=$preFairHelperDetails.find('.pre-fair-helper-detail').remove().first();
       $('.pre-fair-helper-names').text(kc.join(', ',names));
+      kc.each(details,function(i,d){
+	var $d=$dt.clone().removeClass('kc-display-none');
+	$d.find('.pre-fair-helper-name').text(d.name);
+	$d.find('.pre-fair-helper-mailto-link')
+	  .attr('href','mailto:'+d.email)
+	  .text(d.email);
+	$d.find('.pre-fair-helper-note').text(d.note);
+	$preFairHelperDetails.append($d);
+	$d.find('a[href="delete-pre-fair-helper"]').click(function(){
+	  deletePreFairHelper(stallName,$d);
+	  return false;
+	});
+      });
+      $preFairHelperDetails.append($dt);
     });
     return false;
+  });
+  $('.helpercell').each(function(){
+    var $td=$(this);
+    $(this).find('a.delete-fair-helper').click(function(){
+      if (window.confirm('Delete helper?')){
+	kc.postToServer('delete_stall_helper',{
+	  params:kc.json.encode({
+	    'helper_number':parseInt($td.find('input.helper-number').prop('value')),
+	    'hour':parseInt($td.find('input.hour').prop('value')),
+	    'stall_name':$td.find('input.stall-name').prop('value')
+	  })})
+	  .then(function(){
+	    window.location.reload(true);
+	  });
+      }
+      return false;
+    });
+  });
+  $('.pre-fair-helper-detail').each(function(){
+    var $d=$(this);
+    $d.find('a[href="delete-pre-fair-helper"]').click(function(){
+      deletePreFairHelper(stallName,$d);
+      return false;
+    });
   });
 });
