@@ -1,16 +1,16 @@
 - edit fair description
 
-- fix up stall v stall admin so it works more naturally
+- add admin password change page
+- hide past twycs
+- no addme on past maintenance days/roster jobs
+- re-add calendar group selector
+- make groups cookie persistent till 2/1 next year
 
-- hide events
-  - add hidden attribute
-    - json schema
-    - data fixer
-    - edit_event.html
-    - parent calendar view
-    - staff calendar view
+x fix up stall v stall admin so it works more naturally
 
-- bin fair volunteer
+x hide events
+
+x bin fair volunteer
 
 - .ics https://tools.ietf.org/html/rfc2445
 
@@ -26,18 +26,13 @@ DESCRIPTION:https://bckindycal-1197.appspot.com/event.html?id=1001
 END:VEVENT
 END:VCALENDAR
 
-- family information report
+x family information report
 x add another name (edit_maintenance_day.html/js colspan=2)
-- re-add calendar group selector
-- make groups cookie persistent till 2/1 next year
 x adjust maintenance_day.js to know maxVolunteers and hide addme button
   once we get there
 x hide addme when past:
   x maintenance_day.js
   x twyc.js
-- add admin password change page
-- hide past twycs
-- no addme on past maintenance days/roster jobs
 
 x hide past maintenance days
 x maint day title does not display
@@ -184,8 +179,8 @@ x grey out next/prev-months days
 
 x time with your child
 x roster jobs
-- fair rosters
-  - bring in rss-carnival/stall:
+x fair rosters
+  x bring in rss-carnival/stall:
     guestbook.py -> fair.py
     StallPage
       x index.html (used as template)
@@ -263,8 +258,12 @@ x fix + button after adding new date (use before rather than append)
 
 - allow remove of stuff added during parent's session  
 
-- make more use of ndb keys? eg instead of storing big json
-  record, store it as ndb objects eg
+- make more use of ndb keys?
+- derive from ndb.Model to provide consistent access
+  - a['x'] gets attribute, a['x']=y sets attribute
+  - arrange so a['x']['y'] gets json encoded attr x's ['y']
+  - but harder to do a['x']['y']='fred' :-(
+    ... perhaps the json data type helps?
 
 -----------------------
 
