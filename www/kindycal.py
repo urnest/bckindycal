@@ -2805,6 +2805,7 @@ class fair_stalladmin(webapp2.RequestHandler):
         rt=preFairHelpersTable.find(pq.tagName('tr')).remove().first()
         for helper in preFairHelpers:
             r=rt.clone()
+            r.find(pq.hasClass('stall-name')).attr('value',stall_name)
             r.find(pq.hasClass('helper-name')).text(helper['name'])
             r.find(pq.hasClass('helper-email')).text(helper['email'])
             r.find(pq.hasClass('helper-email')).attr('href','mailto:'+helper['email'])
@@ -2919,6 +2920,31 @@ class delete_stall_helper(webapp2.RequestHandler):
     pass
 
 
+class delete_prefair_helper(webapp2.RequestHandler):
+    def post(self):
+        'delete prefair helper'
+        scope=Scope(l1(delete_prefair_helper.post.__doc__)%vars())
+        try:
+            schema=jsonschema.Schema({
+                    'stall_name':StringType,
+                    'helper_name':StringType,
+                    'email':StringType,
+                    })
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['fair','staff','admin']:
+                log('not logged in')
+                return webapp2.redirect('fair_login.html')
+            params=schema.validate(fromJson(self.request.get('params')))
+            fair.deletePreFairHelper(**params)
+            result={'result':'OK'}
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext(scope.description))}))
+            pass
+        pass
+    pass
+
+
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
@@ -2953,7 +2979,6 @@ application = webapp2.WSGIApplication([
     # following are not real pages, they are called by javascript files
     # to get and save data
     ('/add_maintenance_day_volunteer',add_maintenance_day_volunteer),
-    ('/add_prefair_helper',add_prefair_helper),
     ('/add_roster_job_volunteer',add_roster_job_volunteer),
     ('/all_maintenance_days',all_maintenance_days),
     ('/convenor_signup',convenor_signup),
@@ -3000,6 +3025,8 @@ application = webapp2.WSGIApplication([
     ('/add', fair_AddName),
     ('/error', fair.Error),
     ('/delete_stall_helper', delete_stall_helper),
+    ('/add_prefair_helper',add_prefair_helper),
+    ('/delete_prefair_helper', delete_prefair_helper),
 #fair redirects, so can do /Art and get to stall?stall_name=Art
     ('/Art',fair.ArtRedirect),
     ('/Auction',fair.AuctionRedirect),

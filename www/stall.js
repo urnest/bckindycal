@@ -71,6 +71,20 @@ var addPreFairHelper=function($from,stallName){
   });
   return result;
 };
+var deletePreFairHelper=function(stallName,$row){
+  var name=$row.find('.pre-fair-helper-name').text();
+  var email=$row.find('.pre-fair-helper-mailto-link').text();
+  if (window.confirm('Remove '+name+'?')){
+    kc.postToServer('delete_prefair_helper',{
+      params:kc.json.encode({
+	stall_name:stallName,
+	helper_name:name,
+	email:email})})
+      .then(function(){
+	$row.remove();
+      });
+  }
+};
 $(document).ready(function(){
   var $stall=$('.kindycal-py-stall');
   var stallName=$stall.attr('id');
@@ -101,6 +115,10 @@ $(document).ready(function(){
 	  .text(d.email);
 	$d.find('.pre-fair-helper-note').text(d.note);
 	$preFairHelperDetails.append($d);
+	$d.find('a[href="delete-pre-fair-helper"]').click(function(){
+	  deletePreFairHelper(stallName,$d);
+	  return false;
+	});
       });
       $preFairHelperDetails.append($dt);
     });
@@ -120,6 +138,13 @@ $(document).ready(function(){
 	    window.location.reload(true);
 	  });
       }
+      return false;
+    });
+  });
+  $('.pre-fair-helper-detail').each(function(){
+    var $d=$(this);
+    $d.find('a[href="delete-pre-fair-helper"]').click(function(){
+      deletePreFairHelper(stallName,$d);
       return false;
     });
   });

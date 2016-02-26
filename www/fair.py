@@ -411,7 +411,7 @@ class StallConvenor(ndb.Model):
     phone=ndb.StringProperty(indexed=False,repeated=False)		
 
 class StallPreFairHelper(ndb.Model):
-    '''Stall convenor'''
+    '''Stall Pre-fair Helper'''
     name=ndb.StringProperty(indexed=False,repeated=False)
     email=ndb.StringProperty(indexed=False,repeated=False)
     note=ndb.StringProperty(indexed=False,repeated=False)		
@@ -577,6 +577,24 @@ def deleteHelper(stall_name,hour,helper_number):
         del entry.phones[helper_number]
         entry.put()
         return scope.result('entry now %(entry)s'%vars())
+    except:
+        raise inContext(scope.description)
+    pass
+
+def deletePreFairHelper(stall_name,helper_name,email):
+    'delete pre-fair helper %(helper_name)s of email %(email)s from stall %(stall_name)s'
+    scope=Scope(l1(deletePreFairHelper.__doc__)%vars())
+    try:
+        entry_query = StallPreFairHelper.query(
+            ancestor=stall_key(stall_name))
+        entries = entry_query.fetch(1000)
+        entries=[_ for _ in entries \
+                     if _.name==helper_name and _.email==email]
+        if len(entries)==0:
+            return scope.result('no such helper')
+        entry=entries[0]
+        entry.key.delete()
+        return scope.result('entry deleted'%vars())
     except:
         raise inContext(scope.description)
     pass
