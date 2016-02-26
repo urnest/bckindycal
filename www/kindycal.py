@@ -1560,14 +1560,14 @@ class add_prefair_helper(webapp2.RequestHandler):
                     result={
                         'result':{
                             'added':True,
-                            'names':[_['name'] for _ in fair.getStallPreFairHelpers(stall_name)],
+                            'details':fair.getStallPreFairHelpers(stall_name)
                             }
                         }
                 else:
                     result={
                         'result':{
                             'added':True,
-                            'details':fair.getStallPreFairHelpers()
+                            'names':[_['name'] for _ in fair.getStallPreFairHelpers(stall_name)],
                             }
                         }
                     pass

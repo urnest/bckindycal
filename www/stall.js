@@ -91,9 +91,10 @@ $(document).ready(function(){
   $('a.add-prefair-helper').click(function(){
     addPreFairHelper($a,stallName).then(function(names,details){
       var $preFairHelperDetails=$('.pre-fair-helper-details');
+      var $dt=$preFairHelperDetails.find('.pre-fair-helper-detail').remove().first();
       $('.pre-fair-helper-names').text(kc.join(', ',names));
       kc.each(details,function(i,d){
-	var $d=$preFairHelperDetails.find('.pre-fair-helper-detail').first().clone();
+	var $d=$dt.clone().removeClass('kc-display-none');
 	$d.find('.pre-fair-helper-name').text(d.name);
 	$d.find('.pre-fair-helper-mailto-link')
 	  .attr('href','mailto:'+d.email)
@@ -101,6 +102,7 @@ $(document).ready(function(){
 	$d.find('.pre-fair-helper-note').text(d.note);
 	$preFairHelperDetails.append($d);
       });
+      $preFairHelperDetails.append($dt);
     });
     return false;
   });

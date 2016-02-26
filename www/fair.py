@@ -224,12 +224,14 @@ Please note that email and phone numbers you enter will not appear on this roste
 <p class="blue" width="90%" style="max-width:600px">Can you help with organising and preparing goods for the stall? &nbsp; <a class="add-prefair-helper helpros" href="add_prefair_helper"> ADD ME</a></p>
 <p class="pre-fair-helper-names parent-only" width="90%" style="max-width:600px">Alan, John</p>
 <p class="staff-only" width="90%" style="max-width:600px">
-  <div class="pre-fair-helper-details kc-text-align-left kc-inline-block">
-    <div class="pre-fair-helper-detail">
-      <div><span class="pre-fair-helper-name">Alan</span> (<a class="pre-fair-helper-mailto-link" href="mailto:">a@b</a>)</div>
-      <div class="pre-fair-helper-note">I'll bring my big spanner set.</div>
-    </div>
-  </div>
+  <table align="center" class="non-admin pre-fair-helper-details pre-fair-helpers">
+    <tr class="pre-fair-helper-detail">
+      <td><a href="delete-pre-fair-helper"><i class="fa fa-trash-o"></i>&nbsp;</td>
+      <td class="pre-fair-helper-name">Fred Glob</td>
+      <td class="helper-top"><a href="mailto:fred@glob.com" class="pre-fair-helper-mailto-link">fred@glob.com</a></td>
+      <td class="pre-fair-helper-note">I have a table you can borrow.</td>
+    </tr>
+  </table>
 </p>
 <br><br>
 <hr class="stallhd">
@@ -481,7 +483,7 @@ def getStallPreFairHelpers(stall_name):
     q=StallPreFairHelper.query(ancestor=stall_key(stall_name))
     helpers=q.fetch(1000)
     result=[{ 'name':_.name,'email':_.email,'note':_.note} for _ in helpers]
-    result.sort()
+    result.sort(lambda a,b: cmp(a['name'],b['name']))
     return result
 	
 def makeRosterContent(stall_name):

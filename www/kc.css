@@ -125,6 +125,11 @@ TD {
 	border: 1px solid #FFFFFF;
 	text-align:left;
 }
+
+section#roster table.non-admin.pre-fair-helper-details td{
+    background-color: white;
+    color:black;
+}
 TD.helpercell {
 	text-align:center;
 }
