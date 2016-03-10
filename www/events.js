@@ -203,6 +203,7 @@ $(document).ready(function(){
 	    var $event=$event_t.clone();
 	    $event.find('.event-link').attr('href','maintenance_day.html?id='+event.id);
 	    $event.find('.event-link').text(event.name);
+		$event.find('.hidden-event').remove();
 	    dateDays[date.day].append($event);
 	  }
 	});

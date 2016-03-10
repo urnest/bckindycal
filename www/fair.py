@@ -226,7 +226,7 @@ Please note that email and phone numbers you enter will not appear on this roste
 <p class="staff-only" width="90%" style="max-width:600px">
   <table align="center" class="non-admin pre-fair-helper-details pre-fair-helpers">
     <tr class="pre-fair-helper-detail">
-      <td><a href="delete-pre-fair-helper"><i class="fa fa-trash-o"></i>&nbsp;</td>
+      <td class="helper-top"><a href="delete-pre-fair-helper"><i class="fa fa-trash-o"></i>&nbsp;</td>
       <td class="pre-fair-helper-name">Fred Glob</td>
       <td class="helper-top"><a href="mailto:fred@glob.com" class="pre-fair-helper-mailto-link">fred@glob.com</a></td>
       <td class="pre-fair-helper-note">I have a table you can borrow.</td>

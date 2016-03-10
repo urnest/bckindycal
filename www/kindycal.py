@@ -2815,7 +2815,7 @@ class fair_stalladmin(webapp2.RequestHandler):
         if len(preFairHelpers)>0:
             page.find(pq.hasClass('no-prefair-helpers-yet')).remove()
             pass
-        if session.loginLevel in ['admin','staff']:
+        if session.loginLevel in ['admin','staff', 'fair']:
             addAdminNavButtonToPage(page,session.loginLevel)
         addScriptToPageHead('stall_admin.js',page)
         self.response.write(unicode(page).encode('utf-8'))

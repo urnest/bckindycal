@@ -982,6 +982,23 @@ kbd {
     background-color: #eeeeee;
     border-radius: 3px;
 }
+.skinny-box {
+    padding: 2px 4px;
+    font-size: 15px;
+    color: #3e3f3d;
+    border-radius: 3px;
+	width: 450px;
+	font-weight: 400;
+}
+.long-box {
+    padding: 2px 4px;
+    font-size: 15px;
+    color: #3e3f3d;
+    background-color: #eeeeee;
+    border-radius: 3px;
+	width: 100%;
+	font-weight: 400;
+}
 .grnlt-box {
     padding: 2px 4px;
     font-size: 90%;
@@ -5774,6 +5791,26 @@ h3.stall	{
 p.stall	{
 	color: #666666;
 	font-size: 12px;
+	margin: 10px 10px 1em;
+	border: 0 none;
+	padding: 0;	
+	text-align: left;
+	line-height: 1.5;
+}
+p.fp, td.fp	{
+	color: #666666;
+	font-size: 14px;
+	font-weight:normal;
+	margin: 10px 10px 1em;
+	border: 0 none;
+	padding: 0;	
+	text-align: centre;
+	line-height: 1.5;
+}
+p.fpli	{
+	color: #3e3f3d;
+	font-size: 14px;
+	font-weight: 400;
 	margin: 10px 10px 1em;
 	border: 0 none;
 	padding: 0;	
