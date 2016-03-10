@@ -1,10 +1,20 @@
 - edit fair description
 
 - add admin password change page
+- hash passwords
+  - change all passwords on web and nicole's to force into database
+  - change default password to default password hashes of 'password'+salt
+    https://exyr.org/2011/hashing-passwords/
+  - when checking password, if no hash in db, put hash in from first
+    valid of db password, default hash
+  - test locally, including password change, before upload
 - hide past twycs
 - no addme on past maintenance days/roster jobs
 - re-add calendar group selector
 - make groups cookie persistent till 2/1 next year
+  
+- export fair stuff
+- edit html on pages
 
 x fix up stall v stall admin so it works more naturally
 
@@ -77,21 +87,21 @@ x groups
     x post
     x polish
 
-- schema:
+x schema:
   x BoolType
   x allow literals (matches that literal)
   x OneOf(a,b,c) - match exactly one of the items
     (so OneOf('a','b','c') is an enum)
-  - set(x) - set of x
   x IntType as dict key
   x StringType as dict key
   x embed Schema
 
 - add HTML type to schema and promote all string things that are really
   html to HTML type, validation accepts String that can be parsed by pq
-
+  (might do this in urnest/pq)
 - then write a getAllHTML(x,schema) that traverses x according to schema
   and returns list of values of all HTML elements
+  (might do this in urnest/pq)
 
 - then use that to make getting uploaded_file refs generic
 
@@ -252,8 +262,6 @@ INFO     2016-01-30 05:36:46,739 kindycal.py:37] {'Content-Type': 'multipart/for
 INFO     2016-01-30 05:33:37,792 kindycal.py:37] '--44de7b2477ba1ea2\r\nContent-Disposition: form-data; name="filename"; filename="xxx.txt"\r\nContent-Type: text/plain\r\n\r\nxxx\n\r\n--44de7b2477ba1ea2--\r\n'
 
 
-- hash passwords
-
 x fix + button after adding new date (use before rather than append)
 
 - allow remove of stuff added during parent's session  
@@ -264,6 +272,8 @@ x fix + button after adding new date (use before rather than append)
   - arrange so a['x']['y'] gets json encoded attr x's ['y']
   - but harder to do a['x']['y']='fred' :-(
     ... perhaps the json data type helps?
+  - json method gets attributes plus expands json attributes?
+  - construct from json with schema validation
 
 -----------------------
 
@@ -276,10 +286,5 @@ x fix + button after adding new date (use before rather than append)
 
 
 -------------------
-to run test-kindycal.py:
+to run test-kindycal.py - see comments in its header:
 
-- start server with empty database, eg:
-/usr/local/google_appengine/dev_appserver.py --host 192.168.0.3  --clear_datastore True www
-
-- then ./test-kindycal.py 192.168.0.3:8080 password
-(password is the staff password, which defaults to just password)
