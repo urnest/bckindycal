@@ -1,4 +1,7 @@
-- edit fair description
+- edit fair details:
+  - fair.updateFairDetails(page)
+  - use from EditFairPage
+  - and all others that have date/email/message
 
 - add admin password change page
 - hash passwords
