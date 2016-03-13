@@ -388,6 +388,7 @@ def stall_key(stall_name):
     return ndb.Key('Stall', stall_name)
 
 nextCodeKey=ndb.Key('nextCode','nextCode')
+fair_key=ndb.Key('fair','fair')
 
 class OneHourOfHelp(ndb.Model):
     """Models an individual Stall 1 hour of help."""
@@ -416,6 +417,41 @@ class StallPreFairHelper(ndb.Model):
     email=ndb.StringProperty(indexed=False,repeated=False)
     note=ndb.StringProperty(indexed=False,repeated=False)		
 
+class Fair(ndb.Model):
+    '''Fair details'''
+    date_and_time=ndb.StringProperty(indexed=False,repeated=False)
+    email=ndb.StringProperty(indexed=False,repeated=False)
+    message=ndb.StringProperty(indexed=False,repeated=False)#html
+    pass
+
+@ndb.transactional
+def getFairDetails():
+    data=Fair.query(ancestor=fair_key).fetch(1)
+    if len(data):
+        data=data[0]
+    else:
+        data=Fair(parent=fair_key,
+                  date_and_time='Sunday 22nd May 10am to 2pm',
+                  email='bardonkindyfair@gmail.com',
+                  message='<p class=fairnote>The Fair is our major fundraiser for the year. Please sign up to assist in any way you can.</p><br/><br/>')
+        data.put()
+        pass
+    return data
+
+@ndb.transactional
+def setFairDateAndTime(newDateAndTime):
+    data=getFairDetails()
+    data.date_and_time=newDateAndTime
+    data.put()
+    pass
+    
+@ndb.transactional
+def setFairEmail(newEmail):
+    data=getFairDetails()
+    data.email=newEmail
+    data.put()
+    pass
+    
 def default_helpers_required(hour):
     if hour < 9:
         return 0

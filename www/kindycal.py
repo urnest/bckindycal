@@ -2634,6 +2634,23 @@ class FairPage(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
+class EditFairPage(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['fair','staff','admin']:
+            log('not fair/staff/admin')
+            return webapp2.redirect('fair_login.html')
+        page=pq.loadFile('edit_fair.html')
+        data=fair.getFairDetails()
+        page.find(pq.tagName('input')).filter(pq.hasClass('fair-date-and-time')).attr('value',str(data.date_and_time))
+        page.find(pq.tagName('input')).filter(pq.hasClass('fair-email')).attr('value',str(data.email))
+        page.find(pq.tagName('div')).filter(pq.hasClass('fair-message')).html(
+            pq.parse(data.message))
+        addAdminNavButtonToPage(page,session.loginLevel)
+        addScriptToPageHead('edit_fair.js',page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
 prefair_helper_t='''<span class="prefair-helper"><input type="hidden" class="name"><li>
 </span>'''
 
@@ -2944,7 +2961,40 @@ class delete_prefair_helper(webapp2.RequestHandler):
         pass
     pass
 
-
+class SetFairDateAndTime(webapp2.RequestHandler):
+    def post(self):
+        'set fair date and time'
+        scope=Scope(l1(SetFairDateAndTime.post.__doc__)%vars())
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['fair','staff','admin']:
+                raise xn.Xn('not logged in')
+            fair.setFairDateAndTime(self.request.get('date-and-time'))
+            result={'result':'OK'}
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext(scope.description))}))
+            pass
+        pass
+    pass
+            
+class SetFairEmail(webapp2.RequestHandler):
+    def post(self):
+        'set fair email'
+        scope=Scope(l1(SetFairEmail.post.__doc__)%vars())
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['fair','staff','admin']:
+                raise xn.Xn('not logged in')
+            fair.setFairEmail(self.request.get('email'))
+            result={'result':'OK'}
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext(scope.description))}))
+            pass
+        pass
+    pass
+            
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
@@ -3015,6 +3065,9 @@ application = webapp2.WSGIApplication([
 #fair stuff:
     ('/fair',FairPage),
     ('/fair.html',FairPage),
+    ('/edit_fair.html',EditFairPage),
+    ('/set-fair-date-and-time',SetFairDateAndTime),
+    ('/set-fair-email',SetFairEmail),
     ('/fair_convenor_list.html',FairConvenorListPage),
     ('/stalladmin', fair_stalladmin),
     ('/stalladmin.html', fair_stalladmin),
