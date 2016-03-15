@@ -72,10 +72,16 @@ class Password(ndb.Model):
     pass
 
 defaultPasswords={
-    'admin':'10greenfrogs',
+    'admin':'10greenfrogs',#guru
     'staff':'password',
     'parent':'password',
     'fair':'fairyfloss',
+}
+loginLevelName={
+    'admin':'GURU',
+    'staff':'STAFF',
+    'parent':'PARENT',
+    'fair':'FAIR'
 }
 
 def getPassword(level):
@@ -163,8 +169,12 @@ class admin_page(webapp2.RequestHandler):
         if session.loginLevel!='admin':
             log('not logged in as admin')
             return webapp2.redirect('admin_login.html')
-        self.response.write(file('admin.html').read())
-        self.response.set_cookie('kc-session',session.sid)
+        page=pq.loadFile('admin.html')
+        page.find(pq.hasClass('login-level-name')).text(
+            loginLevelName[session.loginLevel])
+        page.find(pq.hasClass('edit-fair-details-panel')).addClass('kc-display-none')
+        addScriptToPageHead('admin.js',page)
+        self.response.write(unicode(page).encode('utf-8'))
         pass
     pass
 
@@ -174,19 +184,30 @@ class staff_page(webapp2.RequestHandler):
         if not session.loginLevel in ['staff','admin']:
             log('not logged in as staff or admin')
             return webapp2.redirect('staff_login.html?from=staff.html')
-        self.response.write(file('staff.html').read())
-        self.response.set_cookie('kc-session',session.sid)
+        page=pq.loadFile('admin.html')
+        page.find(pq.hasClass('admin-only')).remove()
+        page.find(pq.hasClass('login-level-name')).text(
+            loginLevelName[session.loginLevel])
+        page.find(pq.hasClass('edit-fair-details-panel')).addClass('kc-display-none')
+        addScriptToPageHead('admin.js',page)
+        self.response.write(unicode(page).encode('utf-8'))
         pass
     pass
 	
-class fair_admin(webapp2.RequestHandler):
+class fair_admin_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['staff','admin','fair']:
             log('not logged in as staff or admin')
             return webapp2.redirect('fair_login.html')
-        self.response.write(file('fair_admin.html').read())
-        self.response.set_cookie('kc-session',session.sid)
+        page=pq.loadFile('admin.html')
+        page.find(pq.hasClass('admin-only')).remove()
+        page.find(pq.hasClass('staff-only')).remove()
+        page.find(pq.hasClass('login-level-name')).text(
+            loginLevelName[session.loginLevel])
+        page.find(pq.hasClass('edit-fair-details-panel')).addClass('kc-display-none')
+        addScriptToPageHead('admin.js',page)
+        self.response.write(unicode(page).encode('utf-8'))
         pass
     pass
 
@@ -2630,6 +2651,7 @@ class FairPage(webapp2.RequestHandler):
                 a.addClass('stallconvac')
                 a.text('VACANT')
         addScriptToPageHead('fair.js',page)
+        page=fair.adjustFairDetails(page)
         #makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
@@ -2641,11 +2663,7 @@ class EditFairPage(webapp2.RequestHandler):
             log('not fair/staff/admin')
             return webapp2.redirect('fair_login.html')
         page=pq.loadFile('edit_fair.html')
-        data=fair.getFairDetails()
-        page.find(pq.tagName('input')).filter(pq.hasClass('fair-date-and-time')).attr('value',str(data.date_and_time))
-        page.find(pq.tagName('input')).filter(pq.hasClass('fair-email')).attr('value',str(data.email))
-        page.find(pq.tagName('div')).filter(pq.hasClass('fair-message')).html(
-            pq.parse(data.message))
+        page=fair.adjustFairDetails(page)
         addAdminNavButtonToPage(page,session.loginLevel)
         addScriptToPageHead('edit_fair.js',page)
         self.response.write(unicode(page).encode('utf-8'))
@@ -2995,10 +3013,27 @@ class SetFairEmail(webapp2.RequestHandler):
         pass
     pass
             
+class SetFairMessage(webapp2.RequestHandler):
+    def post(self):
+        'set fair message'
+        scope=Scope(l1(SetFairMessage.post.__doc__)%vars())
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['fair','staff','admin']:
+                raise xn.Xn('not logged in')
+            fair.setFairMessage(fromJson(self.request.get('message')))
+            result={'result':'OK'}
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext(scope.description))}))
+            pass
+        pass
+    pass
+            
 application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
-	('/guru',admin_page),
+    ('/guru',admin_page),
     ('/admin_login.html',admin_login_page),
     ('/change_parent_password.html',change_parent_password_page),
     ('/change_staff_password.html',change_staff_password_page),
@@ -3068,10 +3103,11 @@ application = webapp2.WSGIApplication([
     ('/edit_fair.html',EditFairPage),
     ('/set-fair-date-and-time',SetFairDateAndTime),
     ('/set-fair-email',SetFairEmail),
+    ('/set-fair-message',SetFairMessage),
     ('/fair_convenor_list.html',FairConvenorListPage),
     ('/stalladmin', fair_stalladmin),
     ('/stalladmin.html', fair_stalladmin),
-	('/fair_admin.html', fair_admin),
+    ('/fair_admin.html', fair_admin_page),
     ('/adminsave', fair_adminsave),
     ('/stall', fair_StallPage),
     ('/stall.html', fair_StallPage),

@@ -452,6 +452,23 @@ def setFairEmail(newEmail):
     data.put()
     pass
     
+@ndb.transactional
+def setFairMessage(newMessage):
+    data=getFairDetails()
+    data.message=newMessage
+    data.put()
+    pass
+    
+def adjustFairDetails(page):
+    data=getFairDetails()
+    page.find(pq.tagName('div')).filter(pq.hasClass('fair-date-and-time')).text(str(data.date_and_time))
+    page.find(pq.tagName('span')).filter(pq.hasClass('fair-date-and-time')).text(str(data.date_and_time))
+    page.find(pq.tagName('div')).filter(pq.hasClass('fair-email')).text(str(data.email))
+    page.find(pq.tagName('a')).filter(pq.hasClass('fair-email')).text(str(data.email)).attr('href','mailto:'+str(data.email))
+    page.find(pq.tagName('div')).filter(pq.hasClass('fair-message')).html(
+        pq.parse(data.message))
+    return page
+
 def default_helpers_required(hour):
     if hour < 9:
         return 0
