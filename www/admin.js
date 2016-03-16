@@ -16,7 +16,8 @@ $(document).ready(function(){
 	    var message=$message.html();
 	    var dateAndTime=$dateAndTime.prop('value');
 	    var email=$email.prop('value');
-	    kc.postToServer('set-fair-details',{
+	    $dialog.addClass('kc-busy-cursor').find('*').addClass('kc-busy-cursor');
+	    kc.postToServer('fair_details',{
 	      params:kc.json.encode({
 		'dateAndTime':dateAndTime,
 		'email':email,
@@ -24,27 +25,42 @@ $(document).ready(function(){
 	      })
 	    })
 	      .then(function(){
-		$d.dialog('close');
+		$dialog.dialog('close');
+	      })
+	      .always(function(){
+		$dialog.removeClass('kc-busy-cursor').find('*')
+		  .removeClass('kc-busy-cursor');
 	      });
 	  }
       }],
       open:function(){
-	if (!mceInitialized){
-	  tinymce.init({
-	    selector: 'div.edit-fair-details-panel div.fair-message',
-	    inline: true,
-	    plugins: [
-	      'advlist autolink lists link image charmap print preview anchor',
-	      'searchreplace visualblocks code fullscreen',
-	      'insertdatetime media table contextmenu paste code upload_doc'
-	    ],
-	    toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
+	kc.getFromServer('fair_details')
+	  .then(function(result){
+	    $message.html(result.message);
+	    $dateAndTime.prop('value',result.dateAndTime);
+	    $email.prop('value',result.email);
+	    $dialog.removeClass('kc-busy-cursor').find('*').removeClass('kc-busy-cursor');
+	    if (!mceInitialized){
+	      tinymce.init({
+		selector: 'div.edit-fair-details-panel div.fair-message',
+		inline: true,
+		plugins: [
+		  'advlist autolink lists link image charmap print preview anchor',
+		  'searchreplace visualblocks code fullscreen',
+		  'insertdatetime media table contextmenu paste code upload_doc'
+		],
+		toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
+	      });
+	      mceInitialized=true;
+	    }
 	  });
-	  mceInitialized=true;
-	}
       }});
   $('a.edit-fair-details-link').click(function(){
     $dialog.dialog('open');
+    $message.text('');
+    $dateAndTime.prop('value','');
+    $email.prop('value','');
+    $dialog.addClass('kc-busy-cursor').find('*').addClass('kc-busy-cursor');
     return false;
   });
 });

@@ -439,23 +439,13 @@ def getFairDetails():
     return data
 
 @ndb.transactional
-def setFairDateAndTime(newDateAndTime):
+def setFairDetails(dateAndTime,
+                   email,
+                   message):
     data=getFairDetails()
-    data.date_and_time=newDateAndTime
-    data.put()
-    pass
-    
-@ndb.transactional
-def setFairEmail(newEmail):
-    data=getFairDetails()
-    data.email=newEmail
-    data.put()
-    pass
-    
-@ndb.transactional
-def setFairMessage(newMessage):
-    data=getFairDetails()
-    data.message=newMessage
+    data.date_and_time=dateAndTime
+    data.email=email
+    data.message=message
     data.put()
     pass
     

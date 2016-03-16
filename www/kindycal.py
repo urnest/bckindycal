@@ -2979,50 +2979,34 @@ class delete_prefair_helper(webapp2.RequestHandler):
         pass
     pass
 
-class SetFairDateAndTime(webapp2.RequestHandler):
+class fair_details(webapp2.RequestHandler):
     def post(self):
-        'set fair date and time'
-        scope=Scope(l1(SetFairDateAndTime.post.__doc__)%vars())
+        'set fair details'
+        scope=Scope(l1(fair_details.post.__doc__)%vars())
         try:
             session=getSession(self.request.cookies.get('kc-session',''))
             if not session.loginLevel in ['fair','staff','admin']:
                 raise xn.Xn('not logged in')
-            fair.setFairDateAndTime(self.request.get('date-and-time'))
+            fair.setFairDetails(**fromJson(self.request.get('params')))
             result={'result':'OK'}
             self.response.write(toJson(result))
         except:
             self.response.write(toJson({'error':str(inContext(scope.description))}))
             pass
         pass
-    pass
-            
-class SetFairEmail(webapp2.RequestHandler):
-    def post(self):
-        'set fair email'
-        scope=Scope(l1(SetFairEmail.post.__doc__)%vars())
+    def get(self):
+        'get fair details'
+        scope=Scope(l1(fair_details.get.__doc__)%vars())
         try:
             session=getSession(self.request.cookies.get('kc-session',''))
-            if not session.loginLevel in ['fair','staff','admin']:
+            if not session.loginLevel:
                 raise xn.Xn('not logged in')
-            fair.setFairEmail(self.request.get('email'))
-            result={'result':'OK'}
-            self.response.write(toJson(result))
-        except:
-            self.response.write(toJson({'error':str(inContext(scope.description))}))
-            pass
-        pass
-    pass
-            
-class SetFairMessage(webapp2.RequestHandler):
-    def post(self):
-        'set fair message'
-        scope=Scope(l1(SetFairMessage.post.__doc__)%vars())
-        try:
-            session=getSession(self.request.cookies.get('kc-session',''))
-            if not session.loginLevel in ['fair','staff','admin']:
-                raise xn.Xn('not logged in')
-            fair.setFairMessage(fromJson(self.request.get('message')))
-            result={'result':'OK'}
+            details=fair.getFairDetails()
+            result={'result':{
+                    'email':details.email,
+                    'dateAndTime':details.date_and_time,
+                    'message':details.message}
+                    }
             self.response.write(toJson(result))
         except:
             self.response.write(toJson({'error':str(inContext(scope.description))}))
@@ -3101,9 +3085,7 @@ application = webapp2.WSGIApplication([
     ('/fair',FairPage),
     ('/fair.html',FairPage),
     ('/edit_fair.html',EditFairPage),
-    ('/set-fair-date-and-time',SetFairDateAndTime),
-    ('/set-fair-email',SetFairEmail),
-    ('/set-fair-message',SetFairMessage),
+    ('/fair_details',fair_details),
     ('/fair_convenor_list.html',FairConvenorListPage),
     ('/stalladmin', fair_stalladmin),
     ('/stalladmin.html', fair_stalladmin),
