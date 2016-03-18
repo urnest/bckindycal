@@ -1,3 +1,6 @@
+- finish image2 mce plugin
+- switch all mces over to it
+
 x merge admin pages (admin,staff,fair)
 - edit fair details:
   x fair.updateFairDetails(page)

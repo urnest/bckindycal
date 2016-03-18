@@ -2265,6 +2265,23 @@ class delete_roster_job_volunteer(webapp2.RequestHandler):
         pass
     pass
 
+class get_edit_image_panel(webapp2.RequestHandler):
+    def get(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel:
+                result={'error':'You are not logged in.'}
+            else:
+                page=pq.loadFile('edit_image.html')
+                result={'result':unicode(page).encode('utf-8')}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('get_edit_image_panel'))}))
+            pass
+        pass
+    pass
+
 all_maintenance_days_schema=jsonschema.Schema([
         maintenance_day_schema])
 
@@ -3060,6 +3077,7 @@ application = webapp2.WSGIApplication([
     ('/convenor_signup',convenor_signup),
     ('/delete_roster_job',delete_roster_job),
     ('/delete_roster_job_volunteer',delete_roster_job_volunteer),
+    ('/get_edit_image_panel',get_edit_image_panel),
     ('/get_month_to_show',get_month_to_show),
     ('/groups',groups),
     ('/groups_to_show',groups_to_show),
