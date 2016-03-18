@@ -456,9 +456,9 @@ def setFairDetails(getUploadedFileRefsFromHTML,
     
 def adjustFairDetails(page):
     data=getFairDetails()
-    page.find(pq.tagName('div')).filter(pq.hasClass('fair-date-and-time')).text(str(data.date_and_time))
+    page.find(pq.tagName('input')).filter(pq.hasClass('fair-date-and-time')).attr('value',str(data.date_and_time))
     page.find(pq.tagName('span')).filter(pq.hasClass('fair-date-and-time')).text(str(data.date_and_time))
-    page.find(pq.tagName('div')).filter(pq.hasClass('fair-email')).text(str(data.email))
+    page.find(pq.tagName('input')).filter(pq.hasClass('fair-email')).attr('value',str(data.email))
     page.find(pq.tagName('a')).filter(pq.hasClass('fair-email')).text(str(data.email)).attr('href','mailto:'+str(data.email))
     page.find(pq.tagName('div')).filter(pq.hasClass('fair-message')).html(
         pq.parse(data.message))

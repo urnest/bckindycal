@@ -2656,16 +2656,17 @@ class FairPage(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
-class EditFairPage(webapp2.RequestHandler):
+class edit_fair_details_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['fair','staff','admin']:
             log('not fair/staff/admin')
             return webapp2.redirect('fair_login.html')
-        page=pq.loadFile('edit_fair.html')
+        page=pq.loadFile('edit_fair_details.html')
         page=fair.adjustFairDetails(page)
         addAdminNavButtonToPage(page,session.loginLevel)
-        addScriptToPageHead('edit_fair.js',page)
+        addScriptToPageHead('edit_fair_details.js',page)
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','referer')).attr('value',self.request.headers.get('Referer','admin.html'))
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
@@ -3090,7 +3091,7 @@ application = webapp2.WSGIApplication([
 #fair stuff:
     ('/fair',FairPage),
     ('/fair.html',FairPage),
-    ('/edit_fair.html',EditFairPage),
+    ('/edit_fair_details.html',edit_fair_details_page),
     ('/fair_details',fair_details),
     ('/fair_convenor_list.html',FairConvenorListPage),
     ('/stalladmin', fair_stalladmin),

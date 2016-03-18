@@ -17,6 +17,7 @@
     <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
     <script src="jquery-ui-1.11/jquery-ui.js"></script>
     <script type="text/javascript" src="kc.js"></script>
+    <script src="ajaxfileupload/ajaxfileupload.js"></script>
     <script src="tinymce/js/tinymce/tinymce.js"></script>
     
     <!-- SMOOTH SCROLL -->
@@ -62,37 +63,39 @@
                 <li><a href="roster.html">ROSTER JOBS</a></li>
                 <li><a href="twyc.html">TWYC</a></li>
                 <li><a href="fair.html">FAIR</a></li>
-                <li><a href="links.html">LINKS</a></li>
+                <li><a href="links.html">LINKS</a></li>                            
               </ul>
             </div>
           </div>
         </nav>
       </header>
       
-      <main id="main" class="site-main">    
-        <div id="content" class="shell">       
-        </div>
-        <section id="stalls" class="section section-portfolio">
-          <div class="container" align="center">
-	    <div class="skinny-box" style="text-align:left">
-	      <table class="edit-fair-details">
-		<tr>
-		  <td class="edit-fair-details-label">Date and time:</td><td><input class="fair-date-and-time display-inline" type="text" value="Sunday 22nd May 10am to 2pm" readonly="readonly"></td>
-		</tr>
-		<tr>
-		  <td class="edit-fair-details-label">Email:</td><td><input class="fair-email display-inline" type="text" value="bardonkindyfair@gmail.com" readonly="readonly"></td>
-		</tr>
-		<tr>
-		  <td class="edit-fair-details-label">Message:</td>
-		</tr>
-	      </table>
-	    </div>
-            <div class="skinny-box fair-message">
-              <p class=fairnote>The Fair is our major fundraiser for the year. Please sign up to assist in any way you can.</p><br/><br/>	   
-	    </div>
+      <main id="main" class="site-main">
+	<div id="content" class="shell">
+	  <div class="skinny-box" style="text-align:left">
+	    <table class="edit-fair-details">
+	      <tr>
+		<td class="edit-fair-details-label">Date and time:</td><td><input class="fair-date-and-time display-inline" type="text" value="Sunday 22nd May 10am to 2pm"></td>
+	      </tr>
+	      <tr>
+		<td class="edit-fair-details-label">Email:</td><td><input class="fair-email display-inline" type="text" value="bardonkindyfair@gmail.com"></td>
+	      </tr>
+	      <tr>
+		<td class="edit-fair-details-label">Message:</td>
+	      </tr>
+	    </table>
 	  </div>
-	</section>
+          <div class="skinny-box fair-message">
+            <p class=fairnote>The Fair is our major fundraiser for the year. Please sign up to assist in any way you can.</p><br/><br/>	   
+	  </div>
+	  <input type="submit" value="SAVE">
+	  <br><br>
+	</div>
       </main>
     </div>
+    <div class="edit-fair-details-panel">
+    </div>
+    <input type="hidden" name="referer">
   </body>
 </html>
+
