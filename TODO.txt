@@ -1,9 +1,9 @@
-- merge admin pages (admin,staff,fair)
+x merge admin pages (admin,staff,fair)
 - edit fair details:
   x fair.updateFairDetails(page)
   x use from EditFairPage
   x and all others that have date/email/message
-  - input box border around fair message on edit_fair.html
+  x input box border around fair message on edit_fair.html
   x test reference count images in Fair.message
   - and info@bardonkindy.com.au?
 
