@@ -4,9 +4,8 @@
   x use from EditFairPage
   x and all others that have date/email/message
   - input box border around fair message on edit_fair.html
-  - reference count images in Fair.message
+  x test reference count images in Fair.message
   - and info@bardonkindy.com.au?
-  - make mce toolbar static on message edit dialog
 
 - add admin password change page
 - hash passwords

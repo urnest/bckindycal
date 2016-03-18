@@ -2987,7 +2987,13 @@ class fair_details(webapp2.RequestHandler):
             session=getSession(self.request.cookies.get('kc-session',''))
             if not session.loginLevel in ['fair','staff','admin']:
                 raise xn.Xn('not logged in')
-            fair.setFairDetails(**fromJson(self.request.get('params')))
+            params=fromJson(self.request.get('params'))
+            fair.setFairDetails(
+                getUploadedFileRefsFromHTML,
+                updateUploadedFiles,
+                params['dateAndTime'],
+                params['email'],
+                params['message'])
             result={'result':'OK'}
             self.response.write(toJson(result))
         except:

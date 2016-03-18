@@ -438,15 +438,20 @@ def getFairDetails():
         pass
     return data
 
-@ndb.transactional
-def setFairDetails(dateAndTime,
+@ndb.transactional(xg=True)
+def setFairDetails(getUploadedFileRefsFromHTML,
+                   updateUploadedFiles,
+                   dateAndTime,
                    email,
                    message):
     data=getFairDetails()
+    uploadedFileRefsBefore=getUploadedFileRefsFromHTML(data.message)
     data.date_and_time=dateAndTime
     data.email=email
     data.message=message
     data.put()
+    uploadedFileRefsNow=getUploadedFileRefsFromHTML(data.message)
+    updateUploadedFiles(uploadedFileRefsBefore,uploadedFileRefsNow)
     pass
     
 def adjustFairDetails(page):
