@@ -1,4 +1,14 @@
 - finish image2 mce plugin
+  - test insert image
+  - check size boxes
+  - adjust width, height follows
+  - adjust heigh, width follows
+  - not-linked
+  - relink
+  - test above with existing image
+  - add Replace Image... button
+    - check keeps size
+
 - switch all mces over to it
 
 x merge admin pages (admin,staff,fair)

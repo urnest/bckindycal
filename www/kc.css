@@ -805,3 +805,6 @@ table.edit-fair-details td.edit-fair-details-label {
 div.edit-fair-message {
     border: 1px solid #EAEAEA !important;
 }
+img#tinymce_image2_preview {
+    width: 150px;
+}

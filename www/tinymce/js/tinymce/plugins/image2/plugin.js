@@ -24,71 +24,115 @@ tinymce.PluginManager.add('image2', function(editor) {
 		   imgElm.getAttribute('data-mce-placeholder'))) {
       imgElm = null;
     }
-    var chooseImage;
-    var editImage;
-    var $dialog;
-    var next;
-    var cancel;
-    chooseImage=function(){
-      $dialog.find('div.choose-image-panel').show();
-      $dialog.find('div.edit-image-panel').hide();
-      $('.edit-image-next-button .ui-button-text').text('Next >>');
-      next=function(){
-	//REVISIT
-      };
-      cancel=function(){
-	//REVISIT
-      };
-      $dialog.dialog('open');
-    };
-    editImage=function(){
-      $dialog.find('div.edit-image-panel').show();
-      $dialog.find('div.choose-image-panel').hide();
-      $('.edit-image-next-button .ui-button-text').text('OK');
-      $('.edit-image-cancel-button .ui-button-text').text('<< Back');
-      next=function(){
-	//REVISIT
-      };
-      cancel=function(){
-	chooseImage();
-      };
-      $dialog.dialog('open');
-    };
-    if (!$dialog){
+    var editImage=function($elm){
+      var $dialog=$('<div>');
+      var apply;
+      $dialog.dialog({
+	'class':'tinymce_image2_dialog',
+	'close':function(){
+	  if (apply){
+	    apply();
+	  }
+	  $dialog.dialog('destroy');
+	}
+      });
+      $('.tinymce_image2_dialog').addClass('kc-busy-cursor');
       kc.getFromServer('get_edit_image_panel')
 	.then(function(result){
-	  $dialog=$(result);
-	  $dialog.dialog({
-	    autoOpen:false,
-	    buttons:[{
-	      text:'Cancel',
-	      click:function(){
-		cancel();
-	      },
-	      'class':'edit-image-cancel-button'
-	    },{
-	      text:'Next',
-	      click:function(){
-		next();
-	      },
-	      'class':'edit-image-next-button'
-	    }]
+	  var $content=$(result);
+	  $dialog.html($content);
+	  $content.find('img#tinymce_image2_preview').attr(
+	    'src',$elm.attr('src'));
+	  $content.find('input[name="width"]').prop('value',
+						    $elm.innerWidth());
+	  $content.find('input[name="height"]').prop('value',
+						     $elm.innerHeight());
+	  $content.find('input[name="title"]').prop('value',
+						    $elm.attr('title')||'');
+	  var proportion=$elm.innerWidth()/$elm.innerHeight();
+	  $content.find('input[name="linked"]').prop('checked',true);
+	  apply=function(){
+	    $elm.css({
+	      width:$content.find('input[name="width"]').prop('value'),
+	      height:$content.find('input[name="height"]').prop('value'),
+	    });
+	    $elm.attr('title',$content.find('input[name="title"]').prop('value'));
+	  };
+	  var applyTimer;
+	  $content.find('input[name="width"]').keyPress(function(){
+	    if ($content.find('input[name="linked"]').prop('checked')){
+	      var w=parseInt($(this).prop('value'));
+	      if (!isnan(w)){
+		$content.find('input[name="height"]').prop(
+		  'value',
+		  w/proportion);
+	      };
+	    };
+	    clearTimeout(applyTimer);
+	    applyTimer=setTimeout(apply,50);
 	  });
-	  if (imgElm){
-	    editImage();
-	  }
-	  else{
-	    chooseImage();
-	  }
+	  $content.find('input[name="height"]').keyPress(function(){
+	    if ($content.find('input[name="linked"]').prop('checked')){
+	      var h=parseInt($(this).prop('value'));
+	      if (!isnan(h)){
+		$content.find('input[name="width"]').prop(
+		  'value',
+		  w*proportion);
+	      };
+	    };
+	    clearTimeout(applyTimer);
+	    applyTimer=setTimeout(apply,50);
+	  });
+	  $content.find('input[name="title"]').keyPress(function(){
+	    clearTimeout(applyTimer);
+	    applyTimer=setTimeout(apply,50);
+	  });
+	  $content.find('input[name="linked"]').change(function(){
+	    if ($(this).prop('checked')){
+	      proportion=
+		parseInt($content.find('input[name="width"]').prop('value'))/
+		parseInt($content.find('input[name="height"]').prop('value'));
+	    }
+	  });
+	})
+	.always(function(result){
+	  $('.tinymce_image2_dialog').removeClass('kc-busy-cursor');
 	});
+    };
+    if (imgElm){
+      $(imgElm).load(function(){
+	editImage($(imgElm));
+      });
     }
     else{
-      if (imgElm){
-	editImage();
-      }
-      else{
-	chooseImage();
-      }
+      kc.uploadFile($,'Choose Image')
+	.then(function(url,originalFileName){
+	  var data={
+	    src: url,
+	    alt: originalFileName,
+	    title: originalFileName,
+	    width: null,
+	    height: null,
+	    style: null
+	  };
+	  editor.undoManager.transact(function() {
+	    var imgElm;
+	    var figureElm;
+	    data.id = '__mcenew';
+	    editor.focus();
+	    editor.selection.setContent(dom.createHTML('img', data));
+	    imgElm = dom.get('__mcenew');
+	    dom.setAttrib(imgElm, 'id', null);
+	    if (dom.is(imgElm.parentNode, 'figure.image')) {
+	      figureElm = imgElm.parentNode;
+	      dom.insertAfter(imgElm, figureElm);
+	      dom.remove(figureElm);
+	    }
+	    $(imgElm).load(function(){
+	      editImage($(imgElm));
+	    });
+	  });
+	});
     }
   };
     
