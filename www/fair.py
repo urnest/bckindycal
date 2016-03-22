@@ -57,13 +57,6 @@ stalls={
             'address':'info@bardonkindy.com.au'
             }
         },
-'Bar':{
-        'name':'Drinks (Bar)',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
-        },
 'Books':{
         'name':'Books',
         'email':{
@@ -92,8 +85,15 @@ stalls={
             'address':'info@bardonkindy.com.au'
             }
         },
+'Craft':{
+        'name':'Craft',
+        'email':{
+            'name':'',
+            'address':'info@bardonkindy.com.au'
+            }
+        },
 'Drinks':{
-        'name':'Drinks (Soft)',
+        'name':'Drinks',
         'email':{
             'name':'',
             'address':'info@bardonkindy.com.au'
@@ -106,13 +106,6 @@ stalls={
             'address':'info@bardonkindy.com.au'
             }
         },
-'Garden':{
-        'name':'Plants and Herbs',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
-        },
 'Gourmet':{
         'name':'Gourmet',
         'email':{
@@ -120,8 +113,8 @@ stalls={
             'address':'info@bardonkindy.com.au'
             }
         },
-'LobaChoc':{
-        'name':'Lob-a-Choc',
+'Info':{
+        'name':'Info',
         'email':{
             'name':'',
             'address':'info@bardonkindy.com.au'
@@ -129,6 +122,13 @@ stalls={
         },
 'Rides':{
         'name':'Rides',
+        'email':{
+            'name':'',
+            'address':'info@bardonkindy.com.au'
+            }
+        },
+'MC':{
+        'name':'MC',
         'email':{
             'name':'',
             'address':'info@bardonkindy.com.au'
@@ -651,6 +651,21 @@ class BurgerBurnersRedirect(webapp2.RequestHandler):
 class CakesRedirect(webapp2.RequestHandler):
     def get(self):
         return self.redirect('stall?stall_name=Cakes')
+    pass
+
+class CraftRedirect(webapp2.RequestHandler):
+    def get(self):
+        return self.redirect('stall?stall_name=Craft')
+    pass
+
+class InfoRedirect(webapp2.RequestHandler):
+    def get(self):
+        return self.redirect('stall?stall_name=Info')
+    pass
+
+class MCRedirect(webapp2.RequestHandler):
+    def get(self):
+        return self.redirect('stall?stall_name=MC')
     pass
 
 class CoffeeRedirect(webapp2.RequestHandler):

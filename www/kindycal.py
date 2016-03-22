@@ -2672,7 +2672,7 @@ class fair_StallPage(webapp2.RequestHandler):
             log(stallname)
 	    a.attr('href','/convenor_signup?stall_name='+stallname)
 	    a.attr('title','Click to volunteer as Convenor')
-            a.addClass('stallconvac')
+            a.addClass('helpros')
             a.text('VACANT')
             pass
         preFairHelpers=fair.getStallPreFairHelpers(stallname)
@@ -3036,17 +3036,20 @@ application = webapp2.WSGIApplication([
     ('/BBQCooks',fair.BurgerBurnersRedirect),
     ('/Cakes',fair.CakesRedirect),
     ('/Coffee',fair.CoffeeRedirect),
+	('/Craft',fair.CraftRedirect),
     ('/Drinks',fair.DrinksRedirect),
     ('/FacePainting',fair.FacePaintingRedirect),
+	('/Floss',fair.FlossRedirect),
     ('/Garden',fair.GardenRedirect),
 	('/Games',fair.GamesRedirect),
-    ('/LobaChoc',fair.LobaChocRedirect),
-    ('/Rides',fair.RidesRedirect),
+	('/Info',fair.InfoRedirect),
+    ('/LobaChoc',fair.LobaChocRedirect),    
     ('/Lucky',fair.LuckyRedirect),
-    ('/PreLoved',fair.PreLovedRedirect),
-    ('/Floss',fair.FlossRedirect),
+	('/MC',fair.MCRedirect),
+    ('/PreLoved',fair.PreLovedRedirect),    
     ('/SweetTreats',fair.SweetTreatsRedirect),
     ('/Raffle',fair.RaffleRedirect),
+	('/Rides',fair.RidesRedirect),
     ('/SetupSat',fair.SetupSatRedirect),
     ('/SetupSun',fair.SetupSunRedirect),
     ('/art',fair.ArtRedirect),
@@ -3057,13 +3060,17 @@ application = webapp2.WSGIApplication([
     ('/bbqcooks',fair.BurgerBurnersRedirect),
     ('/cakes',fair.CakesRedirect),
     ('/coffee',fair.CoffeeRedirect),
+	('/craft',fair.CraftRedirect),
     ('/drinks',fair.DrinksRedirect),
     ('/facepainting',fair.FacePaintingRedirect),
     ('/garden',fair.GardenRedirect),
 	('/games',fair.GamesRedirect),
+	('/info',fair.InfoRedirect),
     ('/lobachoc',fair.LobaChocRedirect),
     ('/rides',fair.RidesRedirect),
     ('/lucky',fair.LuckyRedirect),
+	('/mc',fair.MCRedirect),
+	('/Mc',fair.MCRedirect),
     ('/preloved',fair.PreLovedRedirect),
     ('/floss',fair.FlossRedirect),
     ('/sweettreats',fair.SweetTreatsRedirect),
