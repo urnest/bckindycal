@@ -26,73 +26,102 @@ tinymce.PluginManager.add('image2', function(editor) {
     }
     var editImage=function($elm){
       var $dialog=$('<div>');
-      var apply;
+      var apply=function(){};
       $dialog.dialog({
-	'class':'tinymce_image2_dialog',
+	modal:true,
+	'title':'Edit Image',
+	'dialogClass':'tinymce_image2_dialog',
 	'close':function(){
-	  if (apply){
-	    apply();
-	  }
+	  apply();
+	  apply=function(){};
 	  $dialog.dialog('destroy');
+	},
+	'open':function(){
+	  // bring dialog in front of image resize handles, which are
+	  // at 10000
+	  $('.tinymce_image2_dialog').css('z-index',20000);
 	}
       });
       $('.tinymce_image2_dialog').addClass('kc-busy-cursor');
       kc.getFromServer('get_edit_image_panel')
 	.then(function(result){
 	  var $content=$(result);
+	  var $width=$content.find('input[name="width"]');
+	  var $height=$content.find('input[name="height"]');
+	  var $title=$content.find('input[name="title"]');
+	  var $linked=$content.find('input[name="linked"]');
+	  var $preview=$content.find('img#tinymce_image2_preview');
+	  var $changeImage=$content.find('.change-image-button');
 	  $dialog.html($content);
-	  $content.find('img#tinymce_image2_preview').attr(
-	    'src',$elm.attr('src'));
-	  $content.find('input[name="width"]').prop('value',
-						    $elm.innerWidth());
-	  $content.find('input[name="height"]').prop('value',
-						     $elm.innerHeight());
-	  $content.find('input[name="title"]').prop('value',
-						    $elm.attr('title')||'');
+	  $preview.attr('src',$elm.attr('src'));
+	  $width.prop('value',$elm.innerWidth());
+	  $height.prop('value',$elm.innerHeight());
+	  $title.prop('value',$elm.attr('title')||'');
 	  var proportion=$elm.innerWidth()/$elm.innerHeight();
-	  $content.find('input[name="linked"]').prop('checked',true);
+	  $linked.prop('checked',true);
 	  apply=function(){
-	    $elm.css({
-	      width:$content.find('input[name="width"]').prop('value'),
-	      height:$content.find('input[name="height"]').prop('value'),
-	    });
-	    $elm.attr('title',$content.find('input[name="title"]').prop('value'));
+	    var w=parseInt($width.prop('value'));
+	    if (isNaN(w)){
+	      w='auto';
+	    }
+	    var h=parseInt($height.prop('value'));
+	    if (isNaN(h)){
+	      h='auto';
+	    }
+	    $elm.css({ width:w, height:h });
+	    $elm.attr('title',$title.prop('value'));
 	  };
 	  var applyTimer;
-	  $content.find('input[name="width"]').keyPress(function(){
-	    if ($content.find('input[name="linked"]').prop('checked')){
+	  var delayedApply=function(){
+	    clearTimeout(applyTimer);
+	    applyTimer=setTimeout(apply,50);
+	  }
+	  var widthChanged=function(){
+	    if ($linked.prop('checked')){
 	      var w=parseInt($(this).prop('value'));
-	      if (!isnan(w)){
-		$content.find('input[name="height"]').prop(
-		  'value',
-		  w/proportion);
+	      if (!isNaN(w)){
+		$height.prop('value',w/proportion);
 	      };
 	    };
-	    clearTimeout(applyTimer);
-	    applyTimer=setTimeout(apply,50);
-	  });
-	  $content.find('input[name="height"]').keyPress(function(){
-	    if ($content.find('input[name="linked"]').prop('checked')){
+	    delayedApply();
+	  };
+	  var heightChanged=function(){
+	    if ($linked.prop('checked')){
 	      var h=parseInt($(this).prop('value'));
-	      if (!isnan(h)){
-		$content.find('input[name="width"]').prop(
-		  'value',
-		  w*proportion);
+	      if (!isNaN(h)){
+		$width.prop('value',h*proportion);
 	      };
 	    };
-	    clearTimeout(applyTimer);
-	    applyTimer=setTimeout(apply,50);
-	  });
-	  $content.find('input[name="title"]').keyPress(function(){
-	    clearTimeout(applyTimer);
-	    applyTimer=setTimeout(apply,50);
-	  });
-	  $content.find('input[name="linked"]').change(function(){
+	    delayedApply();
+	  };
+	  $width.keyup(widthChanged);
+	  $height.keyup(heightChanged);
+	  $width.change(widthChanged);
+	  $height.change(heightChanged);
+	  $title.keyup(delayedApply());
+	  $title.change(delayedApply());
+	  $linked.change(function(){
 	    if ($(this).prop('checked')){
 	      proportion=
-		parseInt($content.find('input[name="width"]').prop('value'))/
-		parseInt($content.find('input[name="height"]').prop('value'));
+		parseInt($width.prop('value'))/
+		parseInt($height.prop('value'));
 	    }
+	  });
+	  $changeImage.button().click(function(){
+	    kc.uploadFile($,'Choose Image')
+	      .then(function(url,originalFileName){
+		if (!url){
+		  editor.focus();
+		  return;
+		}
+		$preview.attr('src',url);
+		$elm.attr('src',url);
+		$elm.attr('data-mce-src',url);
+		if (!$elm.get().complete){
+		  $elm.load(delayedApply);
+		}
+	      });
+	    return false;
 	  });
 	})
 	.always(function(result){
@@ -100,13 +129,22 @@ tinymce.PluginManager.add('image2', function(editor) {
 	});
     };
     if (imgElm){
-      $(imgElm).load(function(){
+      if (!imgElm.complete){
+	$(imgElm).load(function(){
+	  editImage($(imgElm));
+	});
+      }
+      else{
 	editImage($(imgElm));
-      });
+      }
     }
     else{
       kc.uploadFile($,'Choose Image')
 	.then(function(url,originalFileName){
+	  if (!url){
+	    editor.focus();
+	    return;
+	  }
 	  var data={
 	    src: url,
 	    alt: originalFileName,
@@ -128,14 +166,19 @@ tinymce.PluginManager.add('image2', function(editor) {
 	      dom.insertAfter(imgElm, figureElm);
 	      dom.remove(figureElm);
 	    }
-	    $(imgElm).load(function(){
+	    if (!imgElm.complete){
+	      $(imgElm).load(function(){
+		editImage($(imgElm));
+	      });
+	    }
+	    else{
 	      editImage($(imgElm));
-	    });
+	    }
 	  });
 	});
     }
   };
-    
+  
   editor.addCommand('mceUploadImage2', uploadImage);
   
   editor.addButton('image2', {

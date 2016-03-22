@@ -862,6 +862,7 @@
     title=title||"Select File";
     var result={
       then_: function(url,originalFileName){},
+      else_: function(){},
       error_:function(e){
 	alert(e);
       },
@@ -903,6 +904,7 @@
 	      else {
                 result.then_('uploaded_file?id='+data.result.id,
 			     data.result.originalFileName);
+		result.then_=function(){};
                 $dialog.dialog('close');
               }
             },
@@ -917,10 +919,10 @@
 	"class": 'kc-cancel-button',
 	click:function(){
 	  $dialog.dialog('close');
-	  result.then_();
 	}
       }],
       close:function(){
+	result.then_();
 	$dialog.dialog('destroy');
       }
     });
