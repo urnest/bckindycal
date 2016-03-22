@@ -797,3 +797,25 @@ p.mid {
 .Mday {
     margin-top: 15px;
 }
+input[type="text"].display-inline {
+    display: inline-block;
+    width: auto;
+}
+
+input[type="text"].display-inline.fair-date-and-time,
+input[type="text"].display-inline.fair-email  {
+    width: 300px;
+}
+table.edit-fair-details td {
+    vert-align: top;
+}
+table.edit-fair-details td.edit-fair-details-label {
+    font-size: 16px;
+    padding-right: 10px;
+}
+div.edit-fair-message {
+    border: 1px solid #EAEAEA !important;
+}
+img#tinymce_image2_preview {
+    width: 150px;
+}

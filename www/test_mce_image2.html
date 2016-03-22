@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="bckfair.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="kc.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="inputs.css" rel="stylesheet" type="text/css" media="all" />
+    <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="js/jquery.form.js"></script>
+    <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
+    <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
+    <script src="jquery-ui-1.11/jquery-ui.js"></script>
+    <script type="text/javascript" src="kc.js"></script>
+    <script src="ajaxfileupload/ajaxfileupload.js"></script>
+    <script src="tinymce/js/tinymce/tinymce.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+  tinymce.init({
+    selector: 'div.edit-me',
+    inline: true,
+    plugins: [
+      'advlist autolink lists link image2 charmap print preview anchor',
+      'searchreplace visualblocks code fullscreen',
+      'insertdatetime media table contextmenu paste code upload_doc'
+    ],
+    toolbar: 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image2'
+  });
+        
+      });
+    </script>
+  </head>
+  <body>
+    <div style="width:50px; height:150px;">X</div>
+    <div class="edit-me">
+      Edit this by clicking
+    </div>
+  </body>
+</html>

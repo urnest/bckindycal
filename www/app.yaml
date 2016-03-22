@@ -66,6 +66,12 @@ handlers:
 - url: /admin.html$
   script: kindycal.application
 
+- url: /edit_fair_details.html$
+  script: kindycal.application
+
+- url: /edit_image.html$
+  script: kindycal.application
+
 - url: /edit_terms.html$
   script: kindycal.application
 

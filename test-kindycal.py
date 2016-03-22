@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+instructions=='''
+- start server with empty database, eg:
+/usr/local/google_appengine/dev_appserver.py --host 192.168.0.3  --clear_datastore True www
+
+- then ./test-kindycal.py 192.168.0.3:8080 password
+(password is the staff password, which defaults to just password)
+'''
+
 import sys
 import os.path
 
@@ -202,7 +210,12 @@ class Staff:
         return 'Staff session %(session)r'%self.__dict__
     pass
 
-server,staff_password=sys.argv[1:]
+try:
+    server,staff_password=sys.argv[1:]
+except:
+    print instructions
+    sys.exit(1)
+    pass
 
 staff=Staff(server,staff_password)
 

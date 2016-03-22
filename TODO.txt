@@ -1,16 +1,46 @@
-- edit fair description
+- finish image2 mce plugin
+  x test insert image
+  x check size boxes
+  x adjust width, height follows
+  x adjust heigh, width follows
+  x not-linked
+  x relink
+  x test above with existing image
+  x add Replace Image... button
+    x check keeps size
 
-- fix up stall v stall admin so it works more naturally
+x switch all mces over to it
 
-- hide events
-  - add hidden attribute
-    - json schema
-    - data fixer
-    - edit_event.html
-    - parent calendar view
-    - staff calendar view
+x merge admin pages (admin,staff,fair)
+- edit fair details:
+  x fair.updateFairDetails(page)
+  x use from EditFairPage
+  x and all others that have date/email/message
+  x input box border around fair message on edit_fair.html
+  x test reference count images in Fair.message
+  - and info@bardonkindy.com.au?
 
-- bin fair volunteer
+- add admin password change page
+- hash passwords
+  - change all passwords on web and nicole's to force into database
+  - change default password to default password hashes of 'password'+salt
+    https://exyr.org/2011/hashing-passwords/
+  - when checking password, if no hash in db, put hash in from first
+    valid of db password, default hash
+  - test locally, including password change, before upload
+- hide past twycs
+- no addme on past maintenance days/roster jobs
+- re-add calendar group selector
+- make groups cookie persistent till 2/1 next year
+  
+- export fair stuff
+- edit html on pages
+
+x fix up stall v stall admin so it works more naturally
+
+x hide events
+
+x bin fair volunteer
 
 - .ics https://tools.ietf.org/html/rfc2445
 
@@ -26,18 +56,13 @@ DESCRIPTION:https://bckindycal-1197.appspot.com/event.html?id=1001
 END:VEVENT
 END:VCALENDAR
 
-- family information report
+x family information report
 x add another name (edit_maintenance_day.html/js colspan=2)
-- re-add calendar group selector
-- make groups cookie persistent till 2/1 next year
 x adjust maintenance_day.js to know maxVolunteers and hide addme button
   once we get there
 x hide addme when past:
   x maintenance_day.js
   x twyc.js
-- add admin password change page
-- hide past twycs
-- no addme on past maintenance days/roster jobs
 
 x hide past maintenance days
 x maint day title does not display
@@ -82,21 +107,21 @@ x groups
     x post
     x polish
 
-- schema:
+x schema:
   x BoolType
   x allow literals (matches that literal)
   x OneOf(a,b,c) - match exactly one of the items
     (so OneOf('a','b','c') is an enum)
-  - set(x) - set of x
   x IntType as dict key
   x StringType as dict key
   x embed Schema
 
 - add HTML type to schema and promote all string things that are really
   html to HTML type, validation accepts String that can be parsed by pq
-
+  (might do this in urnest/pq)
 - then write a getAllHTML(x,schema) that traverses x according to schema
   and returns list of values of all HTML elements
+  (might do this in urnest/pq)
 
 - then use that to make getting uploaded_file refs generic
 
@@ -184,8 +209,8 @@ x grey out next/prev-months days
 
 x time with your child
 x roster jobs
-- fair rosters
-  - bring in rss-carnival/stall:
+x fair rosters
+  x bring in rss-carnival/stall:
     guestbook.py -> fair.py
     StallPage
       x index.html (used as template)
@@ -257,14 +282,18 @@ INFO     2016-01-30 05:36:46,739 kindycal.py:37] {'Content-Type': 'multipart/for
 INFO     2016-01-30 05:33:37,792 kindycal.py:37] '--44de7b2477ba1ea2\r\nContent-Disposition: form-data; name="filename"; filename="xxx.txt"\r\nContent-Type: text/plain\r\n\r\nxxx\n\r\n--44de7b2477ba1ea2--\r\n'
 
 
-- hash passwords
-
 x fix + button after adding new date (use before rather than append)
 
 - allow remove of stuff added during parent's session  
 
-- make more use of ndb keys? eg instead of storing big json
-  record, store it as ndb objects eg
+- make more use of ndb keys?
+- derive from ndb.Model to provide consistent access
+  - a['x'] gets attribute, a['x']=y sets attribute
+  - arrange so a['x']['y'] gets json encoded attr x's ['y']
+  - but harder to do a['x']['y']='fred' :-(
+    ... perhaps the json data type helps?
+  - json method gets attributes plus expands json attributes?
+  - construct from json with schema validation
 
 -----------------------
 
@@ -277,10 +306,5 @@ x fix + button after adding new date (use before rather than append)
 
 
 -------------------
-to run test-kindycal.py:
+to run test-kindycal.py - see comments in its header:
 
-- start server with empty database, eg:
-/usr/local/google_appengine/dev_appserver.py --host 192.168.0.3  --clear_datastore True www
-
-- then ./test-kindycal.py 192.168.0.3:8080 password
-(password is the staff password, which defaults to just password)

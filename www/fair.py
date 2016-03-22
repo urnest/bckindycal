@@ -388,6 +388,7 @@ def stall_key(stall_name):
     return ndb.Key('Stall', stall_name)
 
 nextCodeKey=ndb.Key('nextCode','nextCode')
+fair_key=ndb.Key('fair','fair')
 
 class OneHourOfHelp(ndb.Model):
     """Models an individual Stall 1 hour of help."""
@@ -415,6 +416,53 @@ class StallPreFairHelper(ndb.Model):
     name=ndb.StringProperty(indexed=False,repeated=False)
     email=ndb.StringProperty(indexed=False,repeated=False)
     note=ndb.StringProperty(indexed=False,repeated=False)		
+
+class Fair(ndb.Model):
+    '''Fair details'''
+    date_and_time=ndb.StringProperty(indexed=False,repeated=False)
+    email=ndb.StringProperty(indexed=False,repeated=False)
+    message=ndb.StringProperty(indexed=False,repeated=False)#html
+    pass
+
+@ndb.transactional
+def getFairDetails():
+    data=Fair.query(ancestor=fair_key).fetch(1)
+    if len(data):
+        data=data[0]
+    else:
+        data=Fair(parent=fair_key,
+                  date_and_time='Sunday 22nd May 10am to 2pm',
+                  email='bardonkindyfair@gmail.com',
+                  message='<p class=fairnote>The Fair is our major fundraiser for the year. Please sign up to assist in any way you can.</p><br/><br/>')
+        data.put()
+        pass
+    return data
+
+@ndb.transactional(xg=True)
+def setFairDetails(getUploadedFileRefsFromHTML,
+                   updateUploadedFiles,
+                   dateAndTime,
+                   email,
+                   message):
+    data=getFairDetails()
+    uploadedFileRefsBefore=getUploadedFileRefsFromHTML(data.message)
+    data.date_and_time=dateAndTime
+    data.email=email
+    data.message=message
+    data.put()
+    uploadedFileRefsNow=getUploadedFileRefsFromHTML(data.message)
+    updateUploadedFiles(uploadedFileRefsBefore,uploadedFileRefsNow)
+    pass
+    
+def adjustFairDetails(page):
+    data=getFairDetails()
+    page.find(pq.tagName('input')).filter(pq.hasClass('fair-date-and-time')).attr('value',str(data.date_and_time))
+    page.find(pq.tagName('span')).filter(pq.hasClass('fair-date-and-time')).text(str(data.date_and_time))
+    page.find(pq.tagName('input')).filter(pq.hasClass('fair-email')).attr('value',str(data.email))
+    page.find(pq.tagName('a')).filter(pq.hasClass('fair-email')).text(str(data.email)).attr('href','mailto:'+str(data.email))
+    page.find(pq.tagName('div')).filter(pq.hasClass('fair-message')).html(
+        pq.parse(data.message))
+    return page
 
 def default_helpers_required(hour):
     if hour < 9:

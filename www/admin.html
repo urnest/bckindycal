@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,7 +14,11 @@
     <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
+    <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
+    <script src="jquery-ui-1.11/jquery-ui.js"></script>
     <script type="text/javascript" src="kc.js"></script>
+    <script src="ajaxfileupload/ajaxfileupload.js"></script>
+    <script src="tinymce/js/tinymce/tinymce.js"></script>
     
     <!-- SMOOTH SCROLL -->
     <script>
@@ -31,19 +35,19 @@
           }
         }
       });
-  // Sticky Navbar Affix
-  $('#navbar').affix({
-    offset: {
-      top: $('#topbar').outerHeight(),
-    }
-  });
+      // Sticky Navbar Affix
+      $('#navbar').affix({
+        offset: {
+          top: $('#topbar').outerHeight(),
+        }
+      });
     });
     </script>
-	<!-- End of SMOOTH SCROLL -->
-</head>
-<body>
+    <!-- End of SMOOTH SCROLL -->
+  </head>
+  <body>
     <div id="page">
-	<header id="header" class="site-header">
+      <header id="header" class="site-header">
         <nav id="navbar" class="site-navbar navbar navbar-static-top" role="navigation">
           <div class="container">
             <div class="navbar-header">
@@ -65,40 +69,42 @@
           </div>
         </nav>
       </header>
-
-    <main id="main" class="site-main">
-    
-     <div id="content" class="shell">
-      <h2>ADMIN MENU (GURU)</h2>
-         <div>
- 			<a class="adm" href="edit_terms.html"><i class="fa fa-calendar fa-fw"></i> Calendar - Term Dates</a><br>             
+      
+      <main id="main" class="site-main">
+	
+	<div id="content" class="shell">
+	  <h2 class="staff-only">ADMIN MENU (<span class="login-level-name">STAFF</span>)</h2>
+          <div class="staff-only">
+ 	    <a class="adm" href="edit_terms.html"><i class="fa fa-calendar fa-fw"></i> Calendar - Term Dates</a><br>             
             <a class="adm" href="edit_events.html"><i class="fa fa-calendar fa-fw"></i> Calendar - Events/Public Holidays/Maintenance Jobs</a><br>
             <a class="adm" href="edit_groups.html"><i class="fa fa-users fa-fw"></i> Class Group Names</a><br><br>
             <a class="adm" href="roster_bychild.html"><i class="fa fa-user-plus fa-fw"></i> Roster Jobs - List by Child</a><br><br>          
             <a class="adm" href="edit_twyc.html"><i class="fa fa-child fa-fw"></i> TWYC - Delete Name</a><br><br>
             <a class="adm" href="change_parent_password.html"><i class="fa fa-key fa-fw"></i> Change password - Parent Login</a><br>
+	  </div>
+          <div class="admin-only">
             <a class="adm" href="change_staff_password.html"><i class="fa fa-key fa-fw"></i> Change password - Staff Login</a><br><br>
-	        <a class="adm" href="export_data.txt"><i class="fa fa-file-archive-o  fa-fw"></i> Database - Export to Text File</a><br>
-	        <a class="adm" href="import_data.html"><i class="fa fa-file-excel-o fa-fw"></i> Database - Import from Text File</a><br><br>
-         </div>
-         <br>
-      <h2>FAIR ADMIN</h2>
-      <h1>STALL CONVENORS</h1>
-         <div>
-        	<a class="adm" href="/stalladmin?stall_name=Auction"><i class="fa fa-th fa-fw"></i> Auction</a><br> 
+	    <a class="adm" href="export_data.txt"><i class="fa fa-file-archive-o  fa-fw"></i> Database - Export to Text File</a><br>
+	    <a class="adm" href="import_data.html"><i class="fa fa-file-excel-o fa-fw"></i> Database - Import from Text File</a><br><br>
+          </div>
+          <br>
+	  <h2>FAIR ADMIN</h2>
+	  <h1>STALL CONVENORS</h1>
+          <div>
+            <a class="adm" href="/stalladmin?stall_name=Auction"><i class="fa fa-th fa-fw"></i> Auction</a><br> 
             <a class="adm" href="/stalladmin?stall_name=BBQ"><i class="fa fa-th fa-fw"></i> BBQ</a><br>
             <a class="adm" href="/stalladmin?stall_name=Books"><i class="fa fa-th fa-fw"></i> Books</a><br>
             <a class="adm" href="/stalladmin?stall_name=Cakes"><i class="fa fa-th fa-fw"></i> Cakes</a><br>
             <a class="adm" href="/stalladmin?stall_name=Art"><i class="fa fa-th fa-fw"></i> Children's Art</a><br>
             <a class="adm" href="/stalladmin?stall_name=Coffee"><i class="fa fa-th fa-fw"></i> Coffee Shop</a><br>
-            <a class="adm" href="/stalladmin?stall_name=Bar"><i class="fa fa-th fa-fw"></i> Drinks (Bar)</a><br>
-            <a class="adm" href="/stalladmin?stall_name=Drinks"><i class="fa fa-th fa-fw"></i> Drinks (Soft)</a><br>
+            <a class="adm" href="/stalladmin?stall_name=Craft"><i class="fa fa-th fa-fw"></i> Craft</a><br>
+            <a class="adm" href="/stalladmin?stall_name=Drinks"><i class="fa fa-th fa-fw"></i> Drinks</a><br>
             <a class="adm" href="/stalladmin?stall_name=FacePainting"><i class="fa fa-th fa-fw"></i> Face Painting</a><br>
             <a class="adm" href="/stalladmin?stall_name=Floss"><i class="fa fa-th fa-fw"></i> Fairy Floss</a><br>
             <a class="adm" href="/stalladmin?stall_name=Games"><i class="fa fa-th fa-fw"></i> Games</a><br>
-            <a class="adm" href="/stalladmin?stall_name=LobaChoc"><i class="fa fa-th fa-fw"></i> Lob-a-Choc</a><br>
+            <a class="adm" href="/stalladmin?stall_name=Info"><i class="fa fa-th fa-fw"></i> Info</a><br>
             <a class="adm" href="/stalladmin?stall_name=Lucky"><i class="fa fa-th fa-fw"></i> Lucky Bags</a><br>
-            <a class="adm" href="/stalladmin?stall_name=Garden"><i class="fa fa-th fa-fw"></i> Plants & Herbs</a><br>
+            <a class="adm" href="/stalladmin?stall_name=MC"><i class="fa fa-th fa-fw"></i> MC</a><br>
             <a class="adm" href="/stalladmin?stall_name=PreLoved"><i class="fa fa-th fa-fw"></i> PreLoved</a><br>
             <a class="adm" href="/stalladmin?stall_name=Rides"><i class="fa fa-th fa-fw"></i> Rides</a><br>
             <a class="adm" href="/stalladmin?stall_name=SetupSat"><i class="fa fa-th fa-fw"></i> Saturday - Setup Crew</a><br>
@@ -108,16 +114,14 @@
             <br> 
             
             <h1>FAIR CONVENORS</h1>  
-             <a class="adm" href="/fair_convenor_list.html"><i class="fa fa-list fa-fw"></i> List of Stall Convenors</a><br> 
-            <a class="adm" href=""><i class="fa fa-quote-left fa-fw"></i> Edit message at top of FAIR page (coming soon)</a><br> 
+            <a class="adm" href="/fair_convenor_list.html"><i class="fa fa-list fa-fw"></i> List of Stall Convenors</a><br> 
+            <a class="adm edit-fair-details-link" href="edit_fair_details.html"><i class="fa fa-quote-left fa-fw"></i> Edit message at top of FAIR page</a><br> 
             <a class="adm" href=""><i class="fa fa-fort-awesome fa-fw"></i> Add a new stall (coming soon)</a><br>            
-
-         </div>
-         <br> <br> 
-       </div>
-      </div>
-     </main>
+	    
+          </div><br><br>
+	</div>
+      </main>
     </div>
-</body>
+  </body>
 </html>
 
