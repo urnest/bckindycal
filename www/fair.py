@@ -49,9 +49,6 @@ stalls={
 'Auction':{
         'name':'Auction'
         },
-'Bar':{
-        'name':'Drinks (Bar)'
-        },
 'Books':{
         'name':'Books'
         },
@@ -64,23 +61,26 @@ stalls={
 'Coffee':{
         'name':'Coffee Shop'
         },
+'Craft':{
+        'name':'Craft',
+        },
 'Drinks':{
-        'name':'Drinks (Soft)'
+        'name':'Drinks',
         },
 'FacePainting':{
-        'name':'Face Painting'
-        },
-'Garden':{
-        'name':'Plants and Herbs'
+        'name':'Face Painting',
         },
 'Gourmet':{
         'name':'Gourmet'
         },
-'LobaChoc':{
-        'name':'Lob-a-Choc'
+'Info':{
+        'name':'Info',
         },
 'Rides':{
         'name':'Rides'
+        },
+'MC':{
+        'name':'MC',
         },
 'Lucky':{
         'name':'Lucky Bags'
@@ -131,7 +131,7 @@ def getStalls():
         x=StallPrefs.query().fetch(1000)
         pass
     result=dict([(stallDbNameFromKey(_.key),{'name':str(_.displayName)}) for _ in x])
-    assert result==stalls, (repr(result),repr(stalls))
+    assert result==stalls, repr( (result,stalls) )
     return result
 
 stall_page_head="""
@@ -629,6 +629,21 @@ class BurgerBurnersRedirect(webapp2.RequestHandler):
 class CakesRedirect(webapp2.RequestHandler):
     def get(self):
         return self.redirect('stall?stall_name=Cakes')
+    pass
+
+class CraftRedirect(webapp2.RequestHandler):
+    def get(self):
+        return self.redirect('stall?stall_name=Craft')
+    pass
+
+class InfoRedirect(webapp2.RequestHandler):
+    def get(self):
+        return self.redirect('stall?stall_name=Info')
+    pass
+
+class MCRedirect(webapp2.RequestHandler):
+    def get(self):
+        return self.redirect('stall?stall_name=MC')
     pass
 
 class CoffeeRedirect(webapp2.RequestHandler):
