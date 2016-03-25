@@ -114,8 +114,25 @@ stalls={
         },								
 }
 
+def stallDbNameFromKey(stallPrefsKey):
+    #stallPrefsKey.pairs() looks like eg [('StallPrefs','Books'),(x,y)]
+    return stallPrefsKey.pairs()[-2][1]
+
 def getStalls():
-    return stalls
+    x=StallPrefs.query().fetch(1000)
+    needUpdate=(len(x)!=len(stalls)) or len([True for _ in x if _.displayName is None])
+    if needUpdate:
+        log('moving stall info into database')
+        for stallName,details in stalls.items():
+            prefs=getPrefs(stallName)
+            prefs.displayName=details['name']
+            prefs.put()
+            pass
+        x=StallPrefs.query().fetch(1000)
+        pass
+    result=dict([(stallDbNameFromKey(_.key),{'name':str(_.displayName)}) for _ in x])
+    assert result==stalls, (repr(result),repr(stalls))
+    return result
 
 stall_page_head="""
 <div align="center">
@@ -311,6 +328,7 @@ class OneHourOfHelp(ndb.Model):
 
 class StallPrefs(ndb.Model):
     '''Stall preferences'''
+    displayName=ndb.StringProperty(indexed=False,repeated=False)
     roster_instructions=ndb.StringProperty(indexed=False,repeated=False)
     ask_for_email=ndb.BooleanProperty(indexed=False,repeated=False)
     ask_for_phone=ndb.BooleanProperty(indexed=False,repeated=False)
@@ -415,10 +433,12 @@ def getPrefs(stall_name):
         print 'prefs2: %(prefs)r' %vars()
     else:
         prefs = StallPrefs(parent=stall_key(stall_name))
+        prefs.displayName=''
         prefs.roster_instructions=''
         prefs.ask_for_email=False
         prefs.ask_for_phone=False
         prefs.helpers_required=toJson({})
+        prefs.put()
         pass
     print 'prefs: %(prefs)r' %vars()
     return prefs
