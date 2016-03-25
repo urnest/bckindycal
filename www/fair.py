@@ -113,6 +113,10 @@ stalls={
         'name':'Pulldown Crew - Monday'
         },								
 }
+
+def getStalls():
+    return stalls
+
 stall_page_head="""
 <div align="center">
           <div class="container">
@@ -490,7 +494,7 @@ def makeRosterContent(stall_name):
     else:
         content.find(hasClass('kindycal-py-noroster-el')).addClass('kc-display-none')
         pass
-    content.find(hasClass('stall_name')).text(stalls[stall_name]['name'])
+    content.find(hasClass('stall_name')).text(getStalls()[stall_name]['name'])
     content.find(hasClass('stall_image')).attr('src','fair_images/roster-%(stall_name)s.jpg'%vars())
     content.find(hasClass('roster_instructions')).text(
         prefs.roster_instructions)

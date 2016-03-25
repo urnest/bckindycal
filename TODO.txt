@@ -35,6 +35,7 @@ x merge admin pages (admin,staff,fair)
   - rename StallPrefs to Stall
   - add editing of description
   - add stall creates key from display name (replace space, & with _)
+- individual stall page is missing Admin button
 
 - edit links page links
 - add admin password change page
