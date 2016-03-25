@@ -44,165 +44,73 @@ stalls={
 #Art corresponds to a href="stall?stall_name=Art" in fair_index.html
 'Art':{
         #name is the name for display
-        'name':"Children's Art",
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':"Children's Art"
         },
 'Auction':{
-        'name':'Auction',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Auction'
         },
 'Bar':{
-        'name':'Drinks (Bar)',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Drinks (Bar)'
         },
 'Books':{
-        'name':'Books',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Books'
         },
 'BBQ':{
-        'name':'BBQ',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'BBQ'
         },
 'Cakes':{
-        'name':'Cakes',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Cakes'
         },
 'Coffee':{
-        'name':'Coffee Shop',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Coffee Shop'
         },
 'Drinks':{
-        'name':'Drinks (Soft)',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Drinks (Soft)'
         },
 'FacePainting':{
-        'name':'Face Painting',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Face Painting'
         },
 'Garden':{
-        'name':'Plants and Herbs',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Plants and Herbs'
         },
 'Gourmet':{
-        'name':'Gourmet',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Gourmet'
         },
 'LobaChoc':{
-        'name':'Lob-a-Choc',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Lob-a-Choc'
         },
 'Rides':{
-        'name':'Rides',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Rides'
         },
 'Lucky':{
-        'name':'Lucky Bags',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Lucky Bags'
         },
 'PreLoved':{
-        'name':'Pre-loved Toys and Clothes',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Pre-loved Toys and Clothes'
         },
 'Floss':{
-        'name':'Fairy Floss',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Fairy Floss'
         },
 'Games':{
-        'name':'Games',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Games'
         },
 'SweetTreats':{
-        'name':'Sweets and Preserves',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Sweets and Preserves'
         },
 'Raffle':{
-        'name':'Wheelbarrow Raffle',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Wheelbarrow Raffle'
         },
 'SetupFri':{
-        'name':'Setup Crew - Friday',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Setup Crew - Friday'
         },
 'SetupSat':{
-        'name':'Setup Crew - Saturday',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Setup Crew - Saturday'
         },			
 'SetupSun':{
-        'name':'Pulldown Crew - Sunday',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Pulldown Crew - Sunday'
         },			
 'SetupMon':{
-        'name':'Pulldown Crew - Monday',
-        'email':{
-            'name':'',
-            'address':'info@bardonkindy.com.au'
-            }
+        'name':'Pulldown Crew - Monday'
         },								
 }
 stall_page_head="""
@@ -584,8 +492,6 @@ def makeRosterContent(stall_name):
         pass
     content.find(hasClass('stall_name')).text(stalls[stall_name]['name'])
     content.find(hasClass('stall_image')).attr('src','fair_images/roster-%(stall_name)s.jpg'%vars())
-    content.find(hasClass('stall-convenor-name')).text(
-        stalls[stall_name]['email']['name'])
     content.find(hasClass('roster_instructions')).text(
         prefs.roster_instructions)
     return content
