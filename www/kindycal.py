@@ -2804,7 +2804,7 @@ class fair_stalladmin(webapp2.RequestHandler):
             return webapp2.redirect('fair.html')
         self.response.set_cookie('stall_name',stall_name)
         page=pq.loadFile('stall_admin.html')
-        page.find(pq.hasClass('stall_name')).text(fair.stalls[stall_name]['name'])
+        page.find(pq.hasClass('stall_name')).text(fair.getStalls()[stall_name]['name'])
         page.find(pq.hasClass('stall_specific')).addClass('suppress')
         page.find(pq.hasClass('stall_specific')).find(pq.hasClass(stall_name))\
           .removeClass('suppress')
@@ -2886,11 +2886,11 @@ class FairConvenorListPage(webapp2.RequestHandler):
         vacant=list.find(pq.hasClass('no-convenor-yet')).first()
         rt=list.find(pq.hasClass('stall-row')).remove().first()
         list.children().remove()
-        stalls=fair.stalls.items()
+        stalls=fair.getStalls().items()
         stalls.sort(lambda x,y: cmp(x[1]['name'],y[1]['name']))
         for stall in stalls:
             stall_name=stall[0]
-            display_name=fair.stalls[stall_name]['name']
+            display_name=stall[1]['name']
             conv=fair.getStallConvenor(stall_name)
             log('stall %(stall_name)s convenor %(conv)r'%vars())
             r=rt.clone()

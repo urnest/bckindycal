@@ -19,7 +19,32 @@ x merge admin pages (admin,staff,fair)
   x input box border around fair message on edit_fair.html
   x test reference count images in Fair.message
   - and info@bardonkindy.com.au?
+  - "email the office"? (Bottom of stall page)
+- edit fair convenors
+  - like edit_maintenance_day.html/js
+- delete stall convenor
+- add stall
+  x fair.stalls[x]['email'] is no longer used - delete
+  x replace use of stalls (list) with fair.getListOfStalls()
+    x reimplement as query, with on-the-fly forced update
+      of StallPrefs to add displayName
+  - force update on all 3 sites, then remove fair.stalls altogether
+    - visit fair_convenor_list.html
+      - xjutv
+      - xju
+      - appspot
+  - remove fair.stalls and adjust getStalls()
+  - add editing of display name
+  - move hard-coded descriptions into StallPrefs
+  - replace hard-coded with generic samples to avoid confusion
+  - rename StallPrefs to Stall
+  - add editing of description
+  - add stall creates key from display name (replace space, & with _)
 
+- individual stall page is missing Admin button
+- fair_convenor_list is missing Admin button
+
+- edit links page links
 - add admin password change page
 - hash passwords
   - change all passwords on web and nicole's to force into database
@@ -32,9 +57,11 @@ x merge admin pages (admin,staff,fair)
 - no addme on past maintenance days/roster jobs
 - re-add calendar group selector
 - make groups cookie persistent till 2/1 next year
-  
+- fix login page focus
+- replace window.confirm use with dialog
 - export fair stuff
 - edit html on pages
+- change stall roster comment to html
 
 x fix up stall v stall admin so it works more naturally
 
