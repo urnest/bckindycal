@@ -435,7 +435,7 @@ font-weight:normal;
 color:#000000;
 }
 h3 {
-font-size: 16.5px;
+font-size: 18px;
 font-weight:normal;
 color:#333333;
 }
@@ -5774,8 +5774,23 @@ p.fairnote	{
 	font-weight: 300;
 	line-height: 24px;
 }
+.fair-date-and-time {
+	color: #ee7623;
+	font-size: 26px;
+	font-weight: 300;
+	line-height: 34px;
+	padding-bottom: 15px;
+}
+.edit-fair-details-label {
+	color: #39a7ca;
+	font-size: 14px;
+}
+input[type="submit"].save {
+	font-size: 18px;
+	padding: 5px;
+}
 h3.fairnote	{
-	color: #939;
+	color: #000000;
 }
 h3.stall	{
 	color: #39a7ca;
@@ -5836,7 +5851,7 @@ p.stallconvac	{
 	line-height: 1.5;
 }
 a.stallconvac	{
-	color: #ff0000;
+	color: #ee7623;
 	font-size: 13px;
 	border: 0 none;
 	padding: 0;	
@@ -5860,6 +5875,10 @@ p.stallhead {
     line-height: 1.1;
     margin: 0.3em 10px 0;
     padding-right: 0.5em;
+}
+p.linkdesc {
+	color: #666666;	
+    font-size: 14px;
 }
 h3.auct	{
 	color: #39a7ca;

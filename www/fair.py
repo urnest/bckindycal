@@ -212,14 +212,14 @@ stall_page_head="""
           </div> 
 <div align="center" class="kindycal-py-stall">
 <p><img class="stall_image" src="fair_images/stall-BBQ.jpg"></p>
-<p style="text-align:center" class="stallconv">CONVENOR: <a class="stallconvac" href="/convenor_signup">VACANT</a></p>
+<p style="text-align:center" class="stallconv">CONVENOR: &nbsp;&nbsp;<a class="stallconvac" href="/convenor_signup">VACANT</a></p>
 </div>
 
 <p class="hdsub"><pre width="90%" style="max-width:600px"class="roster_instructions">Please add your name to the roster. The more the merrier!
 The official carnival open times are 10am-2pm, so earlier shifts are for set up and after 2pm time is for pack up.
 Please note that email and phone numbers you enter will not appear on this roster, they are sent to the stall convenor and used for private communication only.
 </pre></p>
-<hr class="stallhd">
+<div class="grey-box"><br><br>
 <h3 class="section-head">PRE-FAIR HELP</h3>
 <p class="blue" width="90%" style="max-width:600px">Can you help with organising and preparing goods for the stall? &nbsp; <a class="add-prefair-helper helpros" href="add_prefair_helper"> ADD ME</a></p>
 <p class="pre-fair-helper-names parent-only" width="90%" style="max-width:600px">Alan, John</p>
@@ -232,9 +232,9 @@ Please note that email and phone numbers you enter will not appear on this roste
       <td class="pre-fair-helper-note">I have a table you can borrow.</td>
     </tr>
   </table>
-</p>
+</p><br><br>
+</div>
 <br><br>
-<hr class="stallhd">
 <h3 class="section-head">ROSTER</h3>
 <p class="kindycal-py-roster-el">NOTE: Your email address is only seen by stall convenors and not published on the roster.</p>
 <p class="kindycal-py-noroster-el">No roster required.</p><br>
