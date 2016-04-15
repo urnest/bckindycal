@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -39,9 +39,9 @@
       });
     });
     </script>
-	<!-- End of SMOOTH SCROLL -->
-</head>
-<body>
+    <!-- End of SMOOTH SCROLL -->
+  </head>
+  <body>
     <div id="page">
       <header id="header" class="site-header">
         <nav id="navbar" class="site-navbar navbar navbar-static-top" role="navigation">
@@ -65,18 +65,39 @@
           </div>
         </nav>
       </header>
-
-    <main id="main" class="site-main">    
-        <div id="content" class="shell">
-        <h2>Useful Links</h2>
-        <span class=ulhd>Kindy Portal</span> </a><br>
-        <a target=_blank class="ulink" href="https://www.kindyportal.com.au">https://www.kindyportal.com.au</a>
-        <p class=linkdesc>Kindy Portal is an online portfolio resource, documenting each child's adventures at kindy. Requires a password - issued via email from class teachers.</p>
-        <br>
-        <span class=ulhd>Bardon Kindy Website </span></a><br>
-        <a target=_blank class="ulink" href="http://bardonkindy.com.au">http://www.bardonkindy.com.au</a>
-        <p class=linkdesc>Bardon Communittee Kindy's public website.</p>
-        </div>
-    </main>
+      
+      <main id="main" class="site-main">    
+	<div id="content" class="shell">
+          <h2>Useful Links</h2>
+	  <div class="kindycal-py-links">
+	    <div class="kindycal-py-sample-link">
+              <span class="ulhd kindycal-py-title">(Sample Link) Kindy Portal</span><br>
+	      <a target="_blank" class="ulink kindycal-py-url" href="https://www.kindyportal.com.au">https://www.kindyportal.com.au</a>
+	      <p class="linkdesc kindycal-py-description">Kindy Portal is an online portfolio resource, documenting each child's adventures at kindy. Requires a password - issued via email from class teachers.</p>
+	      <br>
+	    </div>
+	    <div class="kindycal-py-sample-link">
+              <span class="ulhd">(Sample Link) Bardon Kindy Website </span><br>
+	      <a target=_blank class="ulink" href="http://bardonkindy.com.au">http://www.bardonkindy.com.au</a>
+              <p class=linkdesc>Bardon Communittee Kindy's public website.</p>
+	    </div>
+	  </div>
+	  <div class="staff-only">
+	    <div class="add-link" colspan="2">
+	      <a href="#">
+		<i class="fa fa-plus-square fa-fw"></i>
+		ADD ANOTHER LINK
+	      </a>
+	    </div>
+	    <div class="link-panel">
+	      <input placeholder="Title eg Bardon Kindy Website" type="text" class="link-title"><br>
+	      <input placeholder="URL eg http://www.bardonkindy.com.au" type="text" class="link-url"><br>
+	      <input placeholder="Description (Optional)" type="text" class="link-description"><br>
+	      <input class="job link-panel-ok" type="submit" value="OK">
+	    </div>
+	  </div>
+	</div>
+      </main>
     </div>
-</body>
+  </body>
+</html>

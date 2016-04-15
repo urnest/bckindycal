@@ -240,6 +240,175 @@ class login_page(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
         pass
 
+links_schema=jsonschema.Schema(
+    [
+        {
+            'title':StringType,
+            'url':StringType,
+            'description':StringType
+        }
+    ]
+)
+
+class Links(ndb.Model):
+    data=ndb.StringProperty(indexed=False,repeated=False)
+    pass
+
+def populateLinksDb():
+    scope=Scope('put default links page links into database')
+    links=[
+        {
+            'title':'Kindy Portal',
+            'url':'https://www.kindyportal.com.au',
+            'description':'''Kindy Portal is an online portfolio resource, documenting each child's adventures at kindy. Requires a password - issued via email from class teachers.'''
+            },
+        {
+            'title':'Bardon Kindy Website',
+            'url':'http://www.bardonkindy.com.au',
+            'description':'''Bardon Communittee Kindy's public website.'''
+            }]
+    links_schema.validate(links)
+    x=Links(parent=root_key,data=toJson(links))
+    x.put()
+    return [x]
+
+@ndb.transactional
+def getLinksFromDb():
+    try:
+        x=Links.query(ancestor=root_key).fetch(1)
+        if len(x)==0:
+            x=populateLinksDb()
+            pass
+        result=fromJson(x[0].data)
+        result.sort(lambda a,b: cmp(
+                (a['title'].lower(),a['description'].lower(),a['url'].lower()),
+                (b['title'].lower(),b['description'].lower(),b['url'].lower())))
+        return result
+    except:
+        raise inContext('get links from database')
+    pass
+
+def replaceSampleLinksWithLinksFromDb(links_page):
+    page=links_page
+    links_div=page.find(pq.hasClass('kindycal-py-links'))
+    link_t=links_div.find(pq.hasClass('kindycal-py-sample-link'))\
+        .remove().first()
+    link_t.removeClass('kinyycal-py-sample-link')
+    link_t.addClass('kindycal-py-link')
+    for link in getLinksFromDb():
+        link_div=link_t.clone()
+        link_div.find(pq.hasClass('kindycal-py-title')).text(link['title'])
+        link_div.find(pq.hasClass('kindycal-py-url'))\
+            .text(link['url'])\
+            .attr('href',link['url'])
+        link_div.find(pq.hasClass('kindycal-py-description'))\
+            .text(link['description'])
+        link_div.appendTo(links_div)
+        pass
+    pass
+
+class links_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if session.loginLevel in ['staff','admin']:
+            return webapp2.redirect('edit_links.html')
+        if not session.loginLevel:
+            log('not logged in')
+            return webapp2.redirect('login.html')
+        page=pq.loadFile('links.html')
+        page.find(pq.hasClass('staff-only')).remove()
+        page.find(pq.hasClass('admin-only')).remove()
+        replaceSampleLinksWithLinksFromDb(page)
+        self.response.write(unicode(page).encode('utf-8'))
+        pass
+    pass
+
+class edit_links_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff']:
+            log('not logged in')
+            return webapp2.redirect('staff_login.html')
+        page=pq.loadFile('links.html')
+        page.find(pq.hasClass('parent-only')).remove()
+        if not session.loginLevel in ['staff','admin']:
+            page.find(pq.hasClass('staff-only')).remove()
+            pass
+        if not session.loginLevel in ['admin']:
+            page.find(pq.hasClass('admin-only')).remove()
+            pass
+        replaceSampleLinksWithLinksFromDb(page)
+        page.find(pq.tagName('body')).addClass(session.loginLevel)
+        addAdminNavButtonToPage(page,session.loginLevel)
+        addScriptToPageHead('links.js',page)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+@ndb.transactional
+def deleteLink(title,url,description):
+    'delete links page link %(title)s %(url)s %(description)r'
+    scope=Scope(l1(deleteLink.__doc__)%vars())
+    try:
+        x=Links.query(ancestor=root_key).fetch(1)[0]
+        links=fromJson(x.data)
+        links=[_ for _ in links if not (_['title']==title and
+                                        _['url']==url and
+                                        _['description']==description)]
+        x.data=toJson(links)
+        x.put()
+    except:
+        raise inContext(scope.description)
+    pass
+
+class delete_link(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['admin','staff']:
+                log('not logged in')
+                return webapp2.redirect('staff_login.html')
+            deleteLink(**fromJson(self.request.get('params')))
+            result={'result':'OK'}
+        except:
+            result={'error':str(inContext('delete link'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+@ndb.transactional
+def addLink(title,url,description):
+    'add link %(title)r to %(url)r description %(description)r'
+    scope=Scope(l1(addLink.__doc__)%vars())
+    try:
+        x=Links.query(ancestor=root_key).fetch(1)[0]
+        links=fromJson(x.data)
+        links.append({
+                'title':title,
+                'url':url,
+                'description':description
+                })
+        links_schema.validate(links)
+        x.data=toJson(links)
+        x.put()
+    except:
+        raise inContext(scope.description)
+    pass
+        
+class add_link(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                result={'result':addLink(**fromJson(self.request.get('params')))}
+        except:
+            result={'error':str(inContext('post add_link'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
 class change_parent_password_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
@@ -3042,6 +3211,7 @@ application = webapp2.WSGIApplication([
     ('/', redirect_to_events_page),
     ('/admin.html',admin_page),
     ('/guru',admin_page),
+    ('/admin',admin_page),
     ('/admin_login.html',admin_login_page),
     ('/change_parent_password.html',change_parent_password_page),
     ('/change_staff_password.html',change_staff_password_page),
@@ -3049,6 +3219,7 @@ application = webapp2.WSGIApplication([
     ('/edit_groups.html',edit_groups_page),
     ('/edit_event.html',edit_event_page),
     ('/edit_events.html',edit_events_page),
+    ('/edit_links.html',edit_links_page),
     ('/edit_maintenance_day.html',edit_maintenance_day_page),
     ('/edit_public_holiday.html',edit_public_holiday_page),
     ('/edit_twyc.html',edit_twyc_page),
@@ -3058,6 +3229,7 @@ application = webapp2.WSGIApplication([
     ('/events.html',events_page),
     ('/index.html', redirect_to_events_page),
     ('/login.html',login_page),
+    ('/links.html',links_page),
     ('/parent',login_page),
     ('/maintenance_day.html',maintenance_day_page),
     ('/staff.html',staff_page),
@@ -3082,6 +3254,7 @@ application = webapp2.WSGIApplication([
     ('/groups',groups),
     ('/groups_to_show',groups_to_show),
     ('/terms',terms),
+    ('/add_link',add_link),
     ('/add_twyc',add_twyc),
     ('/delete_twyc',delete_twyc),
     ('/month_calendar',month_calendar),
@@ -3098,6 +3271,7 @@ application = webapp2.WSGIApplication([
     ('/delete_event',delete_event),
     ('/delete_maintenance_day',delete_maintenance_day),
     ('/delete_public_holiday',delete_public_holiday),
+    ('/delete_link',delete_link),
     ('/remember_month',remember_month),
     ('/export_data.txt',export_data),
     ('/import_data',import_data),

@@ -81,6 +81,9 @@ handlers:
 - url: /edit_events.html$
   script: kindycal.application
 
+- url: /edit_links.html$
+  script: kindycal.application
+
 - url: /edit_roster.html$
   script: kindycal.application
 
@@ -88,6 +91,9 @@ handlers:
   script: kindycal.application
 
 - url: /events.html$
+  script: kindycal.application
+
+- url: /links.html$
   script: kindycal.application
 
 - url: /twyc.html$

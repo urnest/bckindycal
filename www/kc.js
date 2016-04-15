@@ -858,6 +858,31 @@
   kc.showError=function(e){
     alert(''+e);
   };
+  // call set(val) whenever input changes
+  // - returns f() that stops tracking input
+  kc.trackTextInput=function($input, set/*f(val:string)*/){
+    var last=$input.val();
+    function set_(){
+      var now=$input.val();
+      if (now != last){
+	last = now;
+	set(now);
+      }
+    }
+    var timer;
+    function delayedSet(){
+      timer&&clearTimeout(timer);
+      timer=setTimeout(set_, 100);
+    }
+    $input.bind('change', delayedSet);
+    // note keypress is no good as IE and webkit don't send eg on backspace
+    $input.bind('keyup', delayedSet);
+    return function(){
+      timer&&clearTimeout(timer);
+      $input.unbind('keyup', delayedSet);
+      $input.unbind('change', delayedSet);
+    }
+  }
   kc.uploadFile=function(jquery_,title){
     title=title||"Select File";
     var result={

@@ -1,4 +1,6 @@
-- finish image2 mce plugin
+x edit links page, staff only:
+
+x finish image2 mce plugin
   x test insert image
   x check size boxes
   x adjust width, height follows
@@ -335,3 +337,13 @@ x fix + button after adding new date (use before rather than append)
 -------------------
 to run test-kindycal.py - see comments in its header:
 
+
+-------------------
+
+What is non-intuitive about appengine+webapp2?
+  - too many levels, app.yaml + webapp2.WSGIApplication
+    (want to just have a single level, best would be to just define
+     module of functions that are called from urls, but how to do
+     "private" functions?)
+  - params should be url or post params (how to handle headers?)
+  - with default being static file
