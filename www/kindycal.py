@@ -288,6 +288,28 @@ def getLinksFromDb():
         raise inContext('get links from database')
     pass
 
+class LinksPage(ndb.Model):
+    data=ndb.StringProperty(indexed=False,repeated=False)#HTML unicode
+    pass
+
+def getLinksPageContent():
+    p=LinksPage.query(ancestor=root_key).fetch(1)
+    if len(p)==0:
+        oldLinks=getLinksFromDb()
+        html=pq.parse('<div></div>')
+        for oldLink in oldLinks:
+            pq.parse('<h3></h3>').text(oldLink['title']).appendTo(html)
+            pq.parse('<a></a>').text(oldLink['url'])\
+                .attr('href',oldLink['url']).appendTo(html)
+            pq.parse('<p></p>').text(oldLink['description']).appendTo(html)
+            pass
+        LinksPage(parent=root_key,data=unicode(html)).put()
+        pass
+    else:
+        html=pq.parse(p[0].data)
+        pass
+    return html
+            
 def replaceSampleLinksWithLinksFromDb(links_page):
     page=links_page
     links_div=page.find(pq.hasClass('kindycal-py-links'))
@@ -318,7 +340,8 @@ class links_page(webapp2.RequestHandler):
         page=pq.loadFile('links.html')
         page.find(pq.hasClass('staff-only')).remove()
         page.find(pq.hasClass('admin-only')).remove()
-        replaceSampleLinksWithLinksFromDb(page)
+        page.find(pq.hasClass('kindycal-py-links')).html(
+            getLinksPageContent())
         self.response.write(unicode(page).encode('utf-8'))
         pass
     pass
@@ -337,7 +360,8 @@ class edit_links_page(webapp2.RequestHandler):
         if not session.loginLevel in ['admin']:
             page.find(pq.hasClass('admin-only')).remove()
             pass
-        replaceSampleLinksWithLinksFromDb(page)
+        page.find(pq.hasClass('kindycal-py-links')).html(
+            getLinksPageContent())
         page.find(pq.tagName('body')).addClass(session.loginLevel)
         addAdminNavButtonToPage(page,session.loginLevel)
         addScriptToPageHead('links.js',page)
@@ -345,6 +369,37 @@ class edit_links_page(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
+@ndb.transactional
+def saveLinksPageContent(newContent):
+    'save new links page content %(newContent)s'
+    scope=Scope(l1(saveLinksPageContent.__doc__)%vars())
+    try:
+        oldContent=unicode(getLinksPageContent())
+        updateUploadedFiles(
+            getUploadedFileRefsFromHTML(oldContent),
+            getUploadedFileRefsFromHTML(newContent))
+        x=LinksPage.query(ancestor=root_key).fetch(1)[0]
+        x.data=newContent
+        x.put()
+    except:
+        raise inContext(scope.description)
+    pass
+
+class save_links_page_content(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if not session.loginLevel in ['admin','staff']:
+                log('not logged in')
+                return webapp2.redirect('staff_login.html')
+            saveLinksPageContent(**fromJson(self.request.get('params')))
+            result={'result':'OK'}
+        except:
+            result={'error':str(inContext('save links page content'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+        
 @ndb.transactional
 def deleteLink(title,url,description):
     'delete links page link %(title)s %(url)s %(description)r'
@@ -3275,6 +3330,7 @@ application = webapp2.WSGIApplication([
     ('/remember_month',remember_month),
     ('/export_data.txt',export_data),
     ('/import_data',import_data),
+    ('/save_links_page_content',save_links_page_content),
     ('/update_roster_job_volunteer_attended',update_roster_job_volunteer_attended),
     ('/update_roster_job_volunteer',update_roster_job_volunteer),
     ('/uploaded_file',uploaded_file),

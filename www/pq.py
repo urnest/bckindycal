@@ -510,8 +510,6 @@ class Selection:
         [_.attr(name, value) for _ in self.nodeList]
         return self
     def removeAttr(self, name):
-        '''attr('src') lists the values of the src attributes of each of our nodes'''
-        """attr('src','fred.html') sets the src attribute of each of our nodes to 'html'"""
         [_.removeAttr(name) for _ in self.nodeList]
         return self
     def __str__(self):

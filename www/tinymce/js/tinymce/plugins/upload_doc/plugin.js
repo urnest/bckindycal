@@ -62,11 +62,13 @@ tinymce.PluginManager.add('upload_doc', function(editor) {
       selection.getContent({format: 'text'});
     kc.uploadFile()
       .then(function(url,originalFileName){
-	insertLink({
-	  href: url,
-	  text: originalFileName,
-	  title: originalFileName
-	});
+	if (url){
+	  insertLink({
+	    href: url,
+	    text: originalFileName,
+	    title: originalFileName
+	  });
+	}
       });
   };
   

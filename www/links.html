@@ -14,7 +14,11 @@
     <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="js/jquery.form.js"></script>
     <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
+    <link class="staff-only" href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
+    <script class="staff-only" src="jquery-ui-1.11/jquery-ui.js"></script>
     <script type="text/javascript" src="kc.js"></script>
+    <script class="staff-only" src="ajaxfileupload/ajaxfileupload.js"></script>
+    <script class="staff-only" src="tinymce/js/tinymce/tinymce.js"></script>
     
     <!-- SMOOTH SCROLL -->
     <script>
@@ -70,32 +74,15 @@
 	<div id="content" class="shell">
           <h2>Useful Links</h2>
 	  <div class="kindycal-py-links">
-	    <div class="kindycal-py-sample-link">
-              <span class="ulhd kindycal-py-title">(Sample Link) Kindy Portal</span><br>
-	      <a target="_blank" class="ulink kindycal-py-url" href="https://www.kindyportal.com.au">https://www.kindyportal.com.au</a>
-	      <p class="linkdesc kindycal-py-description">Kindy Portal is an online portfolio resource, documenting each child's adventures at kindy. Requires a password - issued via email from class teachers.</p>
-	      <br>
-	    </div>
-	    <div class="kindycal-py-sample-link">
-              <span class="ulhd">(Sample Link) Bardon Kindy Website </span><br>
-	      <a target=_blank class="ulink" href="http://bardonkindy.com.au">http://www.bardonkindy.com.au</a>
-              <p class=linkdesc>Bardon Communittee Kindy's public website.</p>
-	    </div>
+	    <h3>Bardon Kindy Website</h3>
+	    <p><a href="https://www.kindyportal.com.au">http://www.bardonkindy.com.au</a></p>
+	    <p>Bardon Communittee Kindy's public website.</p>
+	    <h2>Group</h2>
+	    <h3>Bardon Kindy Website</h3>
+	    <p><a href="https://www.kindyportal.com.au">http://www.bardonkindy.com.au</a></p>
+	    <p>Bardon Communittee Kindy's public website.</p>
 	  </div>
-	  <div class="staff-only">
-	    <div class="add-link" colspan="2">
-	      <a href="#">
-		<i class="fa fa-plus-square fa-fw"></i>
-		ADD ANOTHER LINK
-	      </a>
-	    </div>
-	    <div class="link-panel">
-	      <input placeholder="Title eg Bardon Kindy Website" type="text" class="link-title"><br>
-	      <input placeholder="URL eg http://www.bardonkindy.com.au" type="text" class="link-url"><br>
-	      <input placeholder="Description (Optional)" type="text" class="link-description"><br>
-	      <input class="job link-panel-ok" type="submit" value="OK">
-	    </div>
-	  </div>
+	  <p><br><input id="save-button" name="save" type="submit" value="Save" class="job staff-only"></p>
 	</div>
       </main>
     </div>

@@ -340,10 +340,18 @@ to run test-kindycal.py - see comments in its header:
 
 -------------------
 
-What is non-intuitive about appengine+webapp2?
+What is non-intuitive about appengine+webapp2+ndb?
   - too many levels, app.yaml + webapp2.WSGIApplication
     (want to just have a single level, best would be to just define
      module of functions that are called from urls, but how to do
-     "private" functions?)
-  - params should be url or post params (how to handle headers?)
-  - with default being static file
+     "private" functions? private default with public annotation?)
+  - request handler is convoluted, simpler to have a function
+    whose params are taken from the get/post params
+    (plus optional header param); return response, with optional
+    headers
+  - with default being load file verbatim (if no matching function)
+  - need css selector parsing in pq.py
+  - ndb v json is clumsy, should be able to do better, ideas:
+    - generate ndb classes from json schema?
+    - add __getitem__ to make data access more consistent
+  - ndb root_key v ancestor is error prone

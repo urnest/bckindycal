@@ -819,3 +819,37 @@ div.edit-fair-message {
 img#tinymce_image2_preview {
     width: 150px;
 }
+
+div.kindycal-py-links {
+    text-align: left;
+}
+div.kindycal-py-links h1 {
+    color: #000000;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    margin-top: 20px;
+    font-family: "Montserrat",sans-serif;
+    line-height: 1.2;
+}
+div.kindycal-py-links h2 {
+    color: #000000;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    margin-top: 20px;
+    font-family: "Montserrat",sans-serif;
+    line-height: 1.2;
+}
+div.kindycal-py-links h3 {
+    color: #993399;
+    font-size: 15px;
+    font-weight: 400;
+    margin-bottom:2px;
+    margin-top:10px;
+}
+div.kindycal-py-links p {
+    color: #666666;
+    font-size: 14px;
+    margin-bottom:0px;
+}
