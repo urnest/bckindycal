@@ -131,7 +131,6 @@ def getStalls():
         x=StallPrefs.query().fetch(1000)
         pass
     result=dict([(stallDbNameFromKey(_.key),{'name':str(_.displayName)}) for _ in x])
-    assert result==stalls, repr( (result,stalls) )
     return result
 
 stall_page_head="""
