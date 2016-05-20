@@ -853,3 +853,10 @@ div.kindycal-py-links p {
     font-size: 14px;
     margin-bottom:0px;
 }
+div.month-block {
+    display: inline-block;
+}
+div.month-block {
+    vertical-align: top;
+    padding: 0px 0px 20px 0px;
+}

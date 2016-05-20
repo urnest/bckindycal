@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bardon Community Kindy</title>
+    <link href='//fonts.googleapis.com/css?family=Montserrat|Open+Sans|Lato' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link href="bckfair.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="kc.css" rel="stylesheet" type="text/css" media="all" />
+    <link href="inputs.css" rel="stylesheet" type="text/css" media="all" />
+    <script type="text/javascript" src="jquery-1.11.3.min.js"></script>
+    <link href="jquery-ui-1.11/jquery-ui.css" rel="stylesheet">
+    <script src="jquery-ui-1.11/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/jquery.form.js"></script>
+    <script type="text/javascript" src="js/bootstrap-3.1.1.min.js"></script>
+    <script type="text/javascript" src="kc.js"></script>
+    
+    <!-- SMOOTH SCROLL -->
+    <script>
+    $(function() {
+      $('a[href*=#]:not([href=#])').click(function() {
+        if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+          var target = $(this.hash);
+          target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+          if (target.length) {
+            $('html,body').animate({
+              scrollTop: target.offset().top
+            }, 1000);
+            return false;
+          }
+        }
+      });
+      // Sticky Navbar Affix
+      $('#navbar').affix({
+        offset: {
+          top: $('#topbar').outerHeight(),
+        }
+      });
+    });
+    </script>
+    <!-- End of SMOOTH SCROLL -->
+
+    <!-- note kindycal.py uncomments:
+      <script type="text/javascript" src="multi-month-events.js"></script>
+    -->
+  </head>
+  <body>
+    <div id="page">
+      <main id="main" class="site-main">
+	<div id="content" class="shell">
+	  <div class="month-block">
+	    <table border="0" bordercolor="#ffffff" cellspacing="0" cellpadding="0" align="center" class="month-of-events">
+	    <tr>
+	      <td></td><td class="calopt" colspan=13><span class="hdmth"><span class="month">January</span> <span class="year">2014</span></span></td>
+	    </tr>
+	      <tr class="head1">
+		<td class="mon cal">&nbsp;&nbsp;&nbsp;</td>
+		<td colspan="1" class="sun calhdc">SUN</td>
+		<td class="cal"></td>
+		<td colspan="1" class="weekday calhdc">MON</td>
+		<td class="cal"> </td>
+		<td colspan="1" class="weekday calhdc">TUE</td>
+		<td class="cal"> </td>
+		<td colspan="1" class="weekday calhdc">WED</td>
+		<td class="cal"> </td>
+		<td colspan="1" class="weekday calhdc">THU</td>
+		<td class="cal"> </td>
+		<td colspan="1" class="weekday calhdc">FRI</td>
+		<td class="cal"> </td>
+		<td colspan="1" class="sat calhdc">SAT</td>
+		<td class="cal">&nbsp;&nbsp;&nbsp;</td>
+	      </tr>
+	      <tr class="week"> <td class="cal"> </td>
+		<td class="day"><span class="day">1</span><span class="week-label">Week 2</span><br></td> <td class="cal"> </td>
+		<td class="day mon-wed"><span class="day">2</span><br>
+		</td> <td class="cal"> </td>
+		<td class="day mon-wed public-holiday"><span class="day">3</span><br>
+		  <div class="public-holiday">
+		    <span class="public-holiday-name parent-only">Queen's Birthday</span><a class="public-holiday-link staff-only" href="edit_public_holiday.html"><span class="public-holiday-name">Queen's Birthday</span></a>
+		  </div>
+		</td> <td class="cal"> </td>
+		<td class="day mon-wed"><span class="day">4</span><br>
+		</td> <td class="cal"> </td>
+		<td class="day wed-fri"><span class="day">5</span><br>
+		</td> <td class="cal"> </td>
+		<td class="day wed-fri"><span class="day">6</span><br>
+		</td> <td class="cal"> </td>
+		<td class="day"><span class="day">7</span><br>
+		</td>
+	      </tr>
+	      <tr class="week">
+		<td class="sun cal">&nbsp;</td>
+		<td class="sun calout"><span class="week-label">Week 3</span><br>
+		  <div class="event">
+		    <img class="hidden-event staff-only" src="/images/hidden.png" border="0" title="Event is currently hidden from parents."> <a class="event-link" href="event.html">Maintenance Job</a>
+		  </div>
+		</td> <td class="cal"> </td>
+		<td class="calon"><span class="day">9</span>
+		</td> <td class="cal"> </td>
+		<td class="calon"><span class="day">10</span><br>
+		  <br>
+		  <a class="event-link" href="event.html">Park/Creek Visit</a>
+		</td> <td class="cal"> </td>
+		<td class="calon"><span class="day">11</span>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">12</span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">13</span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">14</span><br>
+		</td>
+	      </tr>
+	      <tr class="week">
+		<td class="sun cal">&nbsp;</td>
+		<td class="sun calout"><span class="week-label">Week 4</span></td> <td class="cal"> </td>
+		<td class="calon"><span class="day">16</span><br>
+		  <br>
+		  <a class="event-link" href="event.html"><span style="color:red">Kid Free</span></a>
+		</td> <td class="cal"> </td>
+		<td class="calon"><span class="day">17</span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">18</span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">19</span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">20</span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">21</span><br>
+		</td>
+	      </tr>
+	      <tr class="week">
+		<td class="sun cal">&nbsp;</td>
+		<td class="sun calout"><span class="week-label">Week 5</span></td> <td class="cal"> </td>
+		<td class="calon"><span class="day">23</span>
+		</td> <td class="cal"> </td>
+		<td class="calon"><span class="day">24</span>
+		</td> <td class="cal"> </td>
+		<td class="calon"><span class="day">25</span>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">26</span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">27</span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day">28</span><br>
+		</td>
+	      </tr>
+	      <tr class="week">
+		<td class="sun cal">&nbsp;</td>
+		<td class="sun calout"><span class="week-label">Week 6</span></td> <td class="cal"> </td>
+		<td class="calon"><span class="day">30</span>
+		</td> <td class="cal"> </td>
+		<td class="calon"><span class="day">31</span>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day"></span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day"></span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day"></span><br>
+		</td> <td class="cal"> </td>
+		<td class="calout"><span class="day"></span><br>
+		</td>
+	      </tr>
+	    </table>
+	  </div>
+	</div>
+      </main>
+    </div>
+</body>

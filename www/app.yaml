@@ -81,6 +81,9 @@ handlers:
 - url: /edit_events.html$
   script: kindycal.application
 
+- url: /multi-month-events.html$
+  script: kindycal.application
+
 - url: /edit_links.html$
   script: kindycal.application
 

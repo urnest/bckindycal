@@ -1,3 +1,5 @@
+- multi-month cal (for printing)
+
 x edit links page, staff only:
 
 x finish image2 mce plugin

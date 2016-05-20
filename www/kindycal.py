@@ -782,6 +782,24 @@ class events_page(webapp2.RequestHandler):
     pass
 
 
+class multi_month_events_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel:
+            log('not logged in')
+            return webapp2.redirect('login.html')
+        page=pq.loadFile('multi-month-events.html')
+        page.find(pq.hasClass('staff-only')).remove()
+        page.find(pq.hasClass('admin-only')).remove()
+        if session.loginLevel in ['admin','staff']:
+            addAdminNavButtonToPage(page,session.loginLevel)
+            pass
+        addScriptToPageHead('multi-month-events.js',page)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
+
 class edit_events_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
@@ -1530,6 +1548,35 @@ def dayName(n):
         return str(n)
     return ''
 
+def monthCalendar(y,m):
+    c=calendar.Calendar(6).monthdayscalendar(y,m)
+    week_names=['' for _ in c]
+    for ti,term in enumerate((fetchTerms() or {
+                'numberOfTerms':0,
+                'terms':[]})['terms']):
+        week_names=[_[0] or _[1] for _ in
+                    zip(week_names,
+                        stuff.weekNames(
+                            (y,m),
+                            ti+1,
+                            datetime.date(
+                                term['start']['year'],
+                                term['start']['month'],
+                                term['start']['day']),
+                            datetime.date(
+                                term['end']['year'],
+                                term['end']['month'],
+                                term['end']['day'])))]
+        result={'y':y,'m':m,
+                'weeks':[
+                    {'term_week':_[0],
+                     'days':[dayName(d) for d in _[1]]
+                    }
+                    for _ in zip(week_names,c)]
+                }
+        month_calendar_schema.validate(result)
+        return result
+
 class month_calendar(webapp2.RequestHandler):
     def get(self):
         'get month calendar'
@@ -1537,33 +1584,7 @@ class month_calendar(webapp2.RequestHandler):
             monthToShow=fromJson(self.request.get('params'))
             m=monthToShow['m']
             y=monthToShow['y']
-            c=calendar.Calendar(6).monthdayscalendar(y,m)
-            week_names=['' for _ in c]
-            for ti,term in enumerate((fetchTerms() or {
-                    'numberOfTerms':0,
-                    'terms':[]})['terms']):
-                week_names=[_[0] or _[1] for _ in
-                            zip(week_names,
-                                stuff.weekNames(
-                                    (y,m),
-                                    ti+1,
-                                    datetime.date(
-                                        term['start']['year'],
-                                        term['start']['month'],
-                                        term['start']['day']),
-                                    datetime.date(
-                                        term['end']['year'],
-                                        term['end']['month'],
-                                        term['end']['day'])))]
-                
-
-            result={'y':y,'m':m,
-                    'weeks':[
-                        {'term_week':_[0],
-                         'days':[dayName(d) for d in _[1]]
-                        }
-                        for _ in zip(week_names,c)]
-                    }
+            result=monthCalendar(y,m)
             month_calendar_schema.validate(result)
             self.response.write(toJson({'result':result}))
         except:
@@ -2874,7 +2895,7 @@ class FairPage(webapp2.RequestHandler):
         stalls=page.find(pq.hasClass('stalls'))
         for stall in stalls.children().filter(pq.tagName('div')):
             stall=pq.Selection(stall)
-            stallname=stall.find(pq.hasClass('jobros')).attr('href')[0]
+            stallname=stall.find(pq.hasClass('jobros')).attrs('href')[0]
 	    if stallname.startswith('/'):
                 stallname=stallname[1:]
             #pass stall name to fair.js via id
@@ -3282,6 +3303,7 @@ application = webapp2.WSGIApplication([
     ('/edit_roster_job.html',edit_roster_job_page),
     ('/event.html',event_page),
     ('/events.html',events_page),
+    ('/multi-month-events.html',multi_month_events_page),
     ('/index.html', redirect_to_events_page),
     ('/login.html',login_page),
     ('/links.html',links_page),
