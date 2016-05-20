@@ -860,3 +860,6 @@ div.month-block {
     vertical-align: top;
     padding: 0px 0px 20px 0px;
 }
+div.month-block table.month-of-events {
+    width:1080px;
+}
