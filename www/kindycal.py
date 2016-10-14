@@ -1108,10 +1108,16 @@ event_schema=jsonschema.Schema({
         })
 
 def fixOldEventData(data):
+    changed=False
     if not 'hidden' in data:
         data['hidden']=False
+        changed=True
         pass
-    return True
+    if not 'groups' in data:
+        data['groups']=[0,1,2,3]
+        changed=True
+        pass
+    return changed
 
 class Event(ndb.Model):
     # data is json encoded event_schema-conformant
@@ -1128,8 +1134,7 @@ def massageEvents():
     try:
         for x in Event.query(ancestor=root_key).fetch(5000):
             xdata=fromJson(x.data)
-            if not 'hidden' in xdata:
-                xdata['hidden']=False
+            if fixOldEventData(xdata):
                 event_schema.validate(xdata)
                 x.data=toJson(xdata)
                 x.put()
@@ -1425,10 +1430,20 @@ class MaintenanceDay(ndb.Model):
 def fixMaintanceDayData(_):
     'fix maintenance day data %(_)r to match maintenance_day_schema'
     try:
+        changed=False
         if not 'groups' in _:
             _['groups']=[0,1,2,3]
-            return True
-        return False
+            changed=True
+            pass
+        if not 'name' in _:
+            _['name']='Maintenance Day 8am'
+            changed=True
+            pass
+        if not 'maxVolunteers' in _:
+            _['maxVolunteers']=25
+            changed=True
+            pass
+        return changed
     except:
         raise inContext(l1(fixMaintanceDayData.__doc__)%vars())
     pass
