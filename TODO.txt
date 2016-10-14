@@ -48,7 +48,6 @@ x merge admin pages (admin,staff,fair)
 - individual stall page is missing Admin button
 - fair_convenor_list is missing Admin button
 
-- edit links page links
 - add admin password change page
 - hash passwords
   - change all passwords on web and nicole's to force into database

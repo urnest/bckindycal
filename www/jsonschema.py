@@ -69,7 +69,7 @@ def validateSchemaElement(x):
             return
         t=type(x)
         if t is ObjectType: t=x.__class__
-        raise Xn('jsonschema element may not be a %(t)s, it must be a list, a dictionary or types.IntType, types.StringType, types.FloatType, types.BooleanType, types.TupleType or None'%vars())
+        raise Xn('jsonschema element may not be a %(t)s, it must be a list, a dictionary or types.IntType, types.StringType, types.UnicodeType, types.FloatType, types.BooleanType, types.TupleType or None'%vars())
     except:
         raise inContext(l1(validateSchemaElement.__doc__)%vars())
     pass
@@ -105,9 +105,7 @@ def validate(schema,x):
             if len(schema)==1 and schema.keys()[0] in (IntType,StringType):
                 for key,y in x.items():
                     try:
-                        if not type(key) is schema.keys()[0]:
-                            n=schema.keys()[0].__name__
-                            raise Xn('%(key)r is not a %(n)r'%vars())
+                        validate(schema.keys()[0],key)
                         validate(schema.values()[0],y)
                     except:
                         raise inContext('validate dictionary item %(key)r'%vars())
@@ -121,6 +119,10 @@ def validate(schema,x):
                     validate(schema[name],y)
                 except:
                     raise inContext('validate dictionary item %(name)r'%vars())
+                pass
+            for name in schema:
+                if not name in x:
+                    raise Xn('%(name)r is missing'%vars())
                 pass
             pass
         if type(schema) is ListType:
@@ -184,6 +186,7 @@ def test():
     Schema((IntType,StringType)).validate([8,'fred'])
     Schema({IntType:StringType}).validate({1:'fred',2:'jock'})
     Schema({StringType:IntType}).validate({'fred':1,'jock':2})
+    Schema({StringType:IntType}).validate({u'fred':1,'jock':2})
     Schema(OneOf(IntType,StringType)).validate(1)
     Schema(OneOf(IntType,StringType)).validate('fred')
     Schema([Schema(IntType)]).validate([1,2,3])
@@ -222,7 +225,7 @@ def test():
         Schema({IntType:StringType}).validate({'sal':'fred',2:'jock'})
         assert None
     except Exception,e:
-        assert str(e)=="Failed to verify {2: 'jock', 'sal': 'fred'} conforms to json schema {<type 'int'>: <type 'str'>} because\nfailed to validate dictionary item 'sal' because\n'sal' is not a 'int'.",repr(str(e))
+        assert str(e)=="Failed to verify {2: 'jock', 'sal': 'fred'} conforms to json schema {<type 'int'>: <type 'str'>} because\nfailed to validate dictionary item 'sal' because\nfailed to verify 'sal' conforms to json schema <type 'int'> because\n'sal' is not an Int.",repr(str(e))
         pass
     try:
         Schema(OneOf(IntType,StringType)).validate(None)
@@ -260,6 +263,13 @@ def test():
         assert None
     except Exception,e:
         assert str(e)=='''Failed to verify 'jock' conforms to json schema 'fred' because\n'jock' is not 'fred'.''',repr(str(e))
+        pass
+    try:
+        Schema({'a':IntType,'c':IntType}).validate({'a':1})
+    except Exception,e:
+        assert str(e)=='''Failed to verify {'a': 1} conforms to json schema {'a': <type 'int'>, 'c': <type 'int'>} because\n'c' is missing.''',repr(str(e))
+    else:
+        assert None
         pass
 
 if __name__=='__main__':

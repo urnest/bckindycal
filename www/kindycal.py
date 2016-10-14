@@ -1387,7 +1387,8 @@ maintenance_day_schema=jsonschema.Schema({
         'id': IntType, #0 for new MaintenanceDay
         'name': StringType,
         'date' : {'year':IntType,'month':IntType,'day':IntType},
-        'groups': [ IntType ],
+        'groups': [ IntType ], # eg [0,1] for unit 1 "per-unit" task
+                               #    [0,1,2,3] for "kindy-wide" task
         'description' : {
             'html' : StringType
             },
@@ -1469,6 +1470,7 @@ def updateMaintenanceDay(data):
     try:
         if not 'name' in data: data['name']='Maintenance Day 8am'
         if not 'maxVolunteers' in data: data['maxVolunteers']=25
+        if not 'groups' in data: data['groups']=[0,1,2,3]
         maintenance_day_schema.validate(data)
         maintenance_day=MaintenanceDay(parent=root_key,
                                        id=data['id'],
@@ -1506,6 +1508,7 @@ class maintenance_day(webapp2.RequestHandler):
             result=fromJson(maintenance_day[0].data)
             if not 'name' in result: result['name']='Maintenance Day 8am'
             if not 'maxVolunteers' in result: result['maxVolunteers']=25
+            if not 'groups' in result: result['groups']=[0,1,2,3]
             maintenance_day_schema.validate(result)
             pass
         return self.response.write(toJson({'result':result}))
@@ -1666,6 +1669,7 @@ class month_maintenance_days(webapp2.RequestHandler):
                 for data in maintenance_days:
                     if not 'name' in data: data['name']='Maintenance Day 8am'
                     if not 'maxVolunteers' in data: data['maxVolunteers']=25
+                    if not 'groups' in data: data['groups']=[0,1,2,3]
                     pass
                 log(maintenance_days)
                 month_maintenance_days_schema.validate(maintenance_days)
@@ -1716,6 +1720,7 @@ class maintenance_day_page(webapp2.RequestHandler):
         maintenance_day=fromJson(maintenance_day[0].data)
         if not 'name' in maintenance_day: maintenance_day['name']='Maintenance Day 8am'
         if not 'maxVolunteers' in maintenance_day: maintenance_day['maxVolunteers']=25
+        if not 'groups' in maintenance_day: maintenance_day['groups']=[0,1,2,3]
         maintenance_day_schema.validate(maintenance_day)
         page=pq.loadFile('maintenance_day.html')
         page.find(pq.attrEquals('id','id')).attr('value',str(id))
@@ -1783,6 +1788,7 @@ class add_maintenance_day_volunteer(webapp2.RequestHandler):
                 data=fromJson(maintenance_day.data)
                 if not 'name' in data: data['name']='Maintenance Day 8am'
                 if not 'maxVolunteers' in data: data['maxVolunteers']=25
+                if not 'groups' in data: data['groups']=[0,1,2,3]
                 data['volunteers'].append({
                     'childs_name':childs_name,
                     'parents_name':parents_name,
@@ -2543,6 +2549,7 @@ class all_maintenance_days(webapp2.RequestHandler):
                 for data in result:
                     if not 'name' in data: data['name']='Maintenance Day 8am'
                     if not 'maxVolunteers' in data: data['maxVolunteers']=25
+                    if not 'groups' in data: data['groups']=[0,1,2,3]
                     pass
                 result.sort(lambda x,y: cmpDate(x['date'],y['date']))
                 all_maintenance_days_schema.validate(result)
@@ -2624,6 +2631,7 @@ class roster_bychild(webapp2.RequestHandler):
         for maintenance_day in x:
             if not 'name' in maintenance_day: maintenance_day['name']='Maintenance Day 8am'
             if not 'maxVolunteers' in maintenance_day: maintenance_day['maxVolunteers']=25
+            if not 'groups' in maintenance_day: maintenance_day['groups']=[0,1,2,3]
             for v in maintenance_day['volunteers']:
                 data.setdefault(normaliseChildsName(v['childs_name']),[]).append(
                     (maintenance_day['name']+' '+formatDate(maintenance_day['date']),
