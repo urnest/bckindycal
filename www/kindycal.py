@@ -791,9 +791,6 @@ class multi_month_events_page(webapp2.RequestHandler):
         page=pq.loadFile('multi-month-events.html')
         page.find(pq.hasClass('staff-only')).remove()
         page.find(pq.hasClass('admin-only')).remove()
-        if session.loginLevel in ['admin','staff']:
-            addAdminNavButtonToPage(page,session.loginLevel)
-            pass
         addScriptToPageHead('multi-month-events.js',page)
         makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
@@ -1552,11 +1549,14 @@ def dayName(n):
     return ''
 
 def monthCalendar(y,m):
+    log('monthCalendar {m:02} {y}'.format(**vars()))
     c=calendar.Calendar(6).monthdayscalendar(y,m)
+    log('c={c!r}'.format(**vars()))
     week_names=['' for _ in c]
     for ti,term in enumerate((fetchTerms() or {
                 'numberOfTerms':0,
                 'terms':[]})['terms']):
+        log('ti={ti}, term={term!r}'.format(**vars()))
         week_names=[_[0] or _[1] for _ in
                     zip(week_names,
                         stuff.weekNames(
@@ -1570,15 +1570,16 @@ def monthCalendar(y,m):
                                 term['end']['year'],
                                 term['end']['month'],
                                 term['end']['day'])))]
-        result={'y':y,'m':m,
-                'weeks':[
-                    {'term_week':_[0],
-                     'days':[dayName(d) for d in _[1]]
-                    }
-                    for _ in zip(week_names,c)]
+        pass
+    result={'y':y,'m':m,
+            'weeks':[
+                {'term_week':_[0],
+                 'days':[dayName(d) for d in _[1]]
                 }
-        month_calendar_schema.validate(result)
-        return result
+                for _ in zip(week_names,c)]
+    }
+    month_calendar_schema.validate(result)
+    return result
 
 class month_calendar(webapp2.RequestHandler):
     def get(self):
