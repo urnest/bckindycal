@@ -1122,6 +1122,26 @@ class Event(ndb.Model):
     months=ndb.IntegerProperty(indexed=True,repeated=True)
     pass
 
+def massageEvents():
+    'massage old events to match new schema'
+    scope=Scope(l1(massageEvents.__doc__)%vars())
+    try:
+        for x in Event.query(ancestor=root_key).fetch(5000):
+            xdata=fromJson(x.data)
+            if not 'hidden' in xdata:
+                xdata['hidden']=False
+                event_schema.validate(xdata)
+                x.data=toJson(xdata)
+                x.put()
+                pass
+            pass
+        pass
+    except:
+        raise inContext(scope.description)
+    pass
+
+massageEvents()
+
 @ndb.transactional
 def deleteEvent(id):
     'delete event with id %(id)s'
@@ -1401,6 +1421,26 @@ class MaintenanceDay(ndb.Model):
     # month of data['date'], as yyyymm
     months=ndb.IntegerProperty(indexed=True,repeated=True)
     pass
+
+def fixMaintanceDayData(_):
+    'fix maintenance day data %(_)r to match maintenance_day_schema'
+    try:
+        if not 'groups' in _:
+            _['groups']=[0,1,2,3]
+            return True
+        return False
+    except:
+        raise inContext(l1(fixMaintanceDayData.__doc__)%vars())
+    pass
+
+def massageMaintenanceDays():
+    for x in MaintenanceDay.query(ancestor=root_key).fetch(10000):
+        xdata=fromJson(x.data)
+        if fixMaintanceDayData(xdata):
+            x.data=toJson(xdata)
+            x.put()
+            pass
+        pass
 
 @ndb.transactional
 def deleteMaintenanceDay(id):
@@ -2811,7 +2851,7 @@ class import_data(webapp2.RequestHandler):
             if len(data['events']):
                 for _ in Event.query(ancestor=root_key).fetch(100000): _.key.delete()
                 for _ in data['events']:
-                    fixOldEventData(data)
+                    fixOldEventData(_['data'])
                     event_schema.validate(_['data'])
                     t=Event(parent=root_key,
                             data=toJson(_['data']),
@@ -2850,6 +2890,7 @@ class import_data(webapp2.RequestHandler):
             if len(data['maintenanceDays']):
                 for _ in MaintenanceDay.query(ancestor=root_key).fetch(100000): _.key.delete()
                 for _ in data['maintenanceDays']:
+                    fixMaintanceDayData(_['data'])
                     maintenance_day_schema.validate(_['data'])
                     t=MaintenanceDay(parent=root_key,
                             data=toJson(_['data']),

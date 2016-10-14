@@ -1,4 +1,33 @@
+https:://bckindycal-1197.appspot.com
+
 - multi-month cal (for printing)
+
+- make ready for next year:
+  - add year to roster job:
+    x export data
+    x check exported data has roster jobs
+    x import data
+    - export existing data:
+      x xjutv
+      - nicole
+      - live
+    / schema
+    - updateRosterJob callers
+    - roster_job callers
+    - test:
+      add roster job volunteer
+      update volunteer attended
+      update volunteer
+      delete volunteer
+    - massage data
+      x xjutv
+      - nicole
+      - live
+    - display year in list
+    - sort by year
+    - only display this year and next year
+    - allow edit year
+
 
 x edit links page, staff only:
 
