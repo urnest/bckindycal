@@ -7,10 +7,10 @@ https:://bckindycal-1197.appspot.com
     x export data
     x check exported data has roster jobs
     x import data
-    - export existing data:
+    x export existing data:
       x xjutv
-      - nicole
-      - live
+      x nicole
+      x live
     / schema
     - updateRosterJob callers
     - roster_job callers
