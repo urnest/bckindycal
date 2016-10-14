@@ -161,3 +161,4 @@ skip_files:
 - ^(.*/)?tinymce[^/]*/tests/.*$
 - ^(.*/)?jquery-ui[^/]*/tests/.*$
 - ^(.*/)?jquery-ui[^/]*/demos/.*$
+- ^(.*/)?.*Thumbs.db$
