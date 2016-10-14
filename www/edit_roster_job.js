@@ -6,6 +6,7 @@ $(document).ready(function(){
   $('input#save-button').click(function(){
     var data={
       id:parseInt($('input[name="id"]').prop('value')),
+      year:2016, //REVISIT
       name:$('input[name="name"]').prop('value'),
       per:$('select[name="per"]').prop('value'),
       description:$('div.job-description').html(),

@@ -11,18 +11,18 @@ https:://bckindycal-1197.appspot.com
       x xjutv
       x nicole
       x live
-    / schema
-    - updateRosterJob callers
-    - roster_job callers
+    x schema
+    x updateRosterJob callers
+    x roster_job callers
     - test:
       add roster job volunteer
       update volunteer attended
       update volunteer
       delete volunteer
-    - massage data
+    x massage data
       x xjutv
-      - nicole
-      - live
+      x nicole
+      x live
     - display year in list
     - sort by year
     - only display this year and next year

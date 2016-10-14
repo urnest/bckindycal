@@ -2128,6 +2128,7 @@ roster_job_instance_schema=jsonschema.Schema({
 
 roster_job_schema=jsonschema.Schema({
         'id': IntType,
+        'year':IntType, #eg 2016
         'name': StringType,
         'per': jsonschema.OneOf('group','unit','kindy-wide'),
         'description': StringType,#html
@@ -2215,8 +2216,41 @@ class RosterJob(ndb.Model):
     data=ndb.StringProperty(indexed=False,repeated=False)
     # id from data['id']
     id=ndb.IntegerProperty(indexed=True,repeated=False)
+    # year from data['year']
+    year=ndb.IntegerProperty(indexed=True,repeated=False)
     pass
 
+def fixRosterJobData(data):
+    'adjust %(data)r to match roster_job_schema'
+    try:
+        changed=False
+        if not 'year' in data:
+            data['year']=2016
+            changed=True
+            pass
+        return changed
+    except:
+        raise inContext(l1(fixRosterJobData.__doc__)%vars())
+    pass
+
+def massageRosterJobs():
+    'massage old roster jobs data to match schema updates'
+    scope=Scope(l1(massageRosterJobs.__doc__)%vars())
+    try:
+        for x in RosterJob.query(ancestor=root_key).fetch(5000):
+            data=fromJson(x.data)
+            if fixRosterJobData(data):
+                x.data=toJson(data)
+                x.year=data['year']
+                x.put()
+                pass
+            pass
+    except:
+        raise inContext(scope.description)
+    pass
+
+massageRosterJobs()
+        
 def deleteRosterJob(id):
     'delete roster job with id %(id)r'
     scope=Scope(l1(deleteRosterJob.__doc__)%vars())
@@ -2277,6 +2311,7 @@ def updateRosterJob(json_data):
         roster_job_schema.validate(new_data)
         newUploadedFileRefs=getRosterJobUploadedFileRefs(new_data)
         job.data=toJson(new_data)
+        job.year=new_data['year']
         job.put()
         updateUploadedFiles(oldUploadedFileRefs,newUploadedFileRefs)
         return new_data['id']
@@ -2932,10 +2967,12 @@ class import_data(webapp2.RequestHandler):
                 for _ in data['roster_jobs']:
                     #handle old data format
                     if 'data' in _: _=_['data']
+                    fixRosterJobData(_)
                     roster_job_schema.validate(_)
                     t=RosterJob(parent=root_key,
                                 data=toJson(_),
-                                id=_['id'])
+                                id=_['id'],
+                                year=_['year'])
                     t.put()
                     pass
                 self.response.write('%s roster jobs<br>'%len(data['roster_jobs']))
