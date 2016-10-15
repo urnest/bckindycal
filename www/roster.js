@@ -357,6 +357,12 @@ $(document).ready(function(){
     .then(function(result){
       rosterJobs=result;
       rosterJobs.sort(function(a,b){
+	if (a.year<b.year){
+	  return -1;
+	}
+	if (a.year>b.year){
+	  return 1;
+	}
 	if (a.name<b.name){
 	  return -1;
 	}
@@ -414,8 +420,27 @@ $(document).ready(function(){
   };
   var refresh=function(){
     var groupSet={};
+    var now=new Date;
+    var thisYear=now.getFullYear();
+    var nextYear=thisYear+1;
+    var showYears={};
     kc.each(groupsToShow,function(i,g){
       groupSet[g]=true;
+    });
+    kc.each(rosterJobs,function(i,job){
+      if (staff ||
+	  job.year==thisYear||
+	  job.year==nextYear){
+	showYears[''+job.year]=true;
+      }
+    });
+    showYears=kc.map(showYears,function(year,unused){
+      return parseInt(year);
+    });
+    showYears.sort(function(x,y){
+      if (x<y){	return -1; }
+      if (x>y){	return 1; }
+      return 0;
     });
     var i=kc.find(groupsToShowOptions,function(x){
       return kc.json.encode(x.groups)==kc.json.encode(groupsToShow);
@@ -424,51 +449,26 @@ $(document).ready(function(){
     $('a.select-your-group').text(groupsToShowOptions[i[0]].text);
 
     $rosterJobsTable.find('tr.jobs').remove();
-    kc.each([1,2],function(i,unit){
-      var groups=groupsOfUnit[unit];
-      if (!groupSet[groups[0]]&&!groupSet[groups[1]]){
-	return;
-      }
-      kc.each(rosterJobs,function(i,job){
-	var $r;
-	var c=0;
-	if (job.per=='unit'){
-	  $r=$job_t.clone();
-	  $r.find('.unit').text('U'+unit);
-	  $r.find('.group').text('G1/G2');
-	  kc.each(job.instances,function(i,instance){
-	    if (kc.json.encode(groups)==kc.json.encode(instance.groups)){
-	      kc.each(instance.volunteers,function(i,v){
-		var $rr=$r.clone();
-		$rosterJobsTable.append($rr);
-		jobRow($rr,staff,job,c,groups,v,function(){
-		  refresh();
-		});
-		$r.find('.unit').text('');
-		$r.find('.group').text('');
-		++c;
-	      });
-	    }
-	  });
-	  if (c<job.volunteers_required){
-	    $rosterJobsTable.append($r);
-	    addMeRow($r,$addMe_t.clone(),staff,job,c,groups,
-		     function(){refresh();});
-	  }
-	}
-      });
-      kc.each([1,2],function(i,group){
-	var groups=[ groupsOfUnit[unit][group-1] ];
-	if (!groupSet[(unit-1)*2+group-1]){
+    kc.each(showYears,function(i,year){
+      kc.each([1,2],function(i,unit){
+	var groups=groupsOfUnit[unit];
+	if (!groupSet[groups[0]]&&!groupSet[groups[1]]){
 	  return;
 	}
 	kc.each(rosterJobs,function(i,job){
 	  var $r;
 	  var c=0;
-	  if (job.per=='group'){
+	  if (job.per=='unit' && job.year==year){
 	    $r=$job_t.clone();
+	    if (job.year==thisYear){
+	      $r.removeClass('notthisyear');
+	    }
+	    else{
+	      $r.addClass('notthisyear');
+	    }
+	    $r.find('.year').text(''+job.year);
 	    $r.find('.unit').text('U'+unit);
-	    $r.find('.group').text('G'+group);
+	    $r.find('.group').text('G1/G2');
 	    kc.each(job.instances,function(i,instance){
 	      if (kc.json.encode(groups)==kc.json.encode(instance.groups)){
 		kc.each(instance.volunteers,function(i,v){
@@ -487,36 +487,86 @@ $(document).ready(function(){
 	      $rosterJobsTable.append($r);
 	      addMeRow($r,$addMe_t.clone(),staff,job,c,groups,
 		       function(){refresh();});
-	    };
+	    }
 	  }
+	});
+	kc.each([1,2],function(i,group){
+	  var groups=[ groupsOfUnit[unit][group-1] ];
+	  if (!groupSet[(unit-1)*2+group-1]){
+	    return;
+	  }
+	  kc.each(rosterJobs,function(i,job){
+	    var $r;
+	    var c=0;
+	    if (job.per=='group' && job.year==year){
+	      $r=$job_t.clone();
+	      if (job.year==thisYear){
+		$r.removeClass('notthisyear');
+	      }
+	      else{
+		$r.addClass('notthisyear');
+	      }
+	      $r.find('.year').text(''+job.year);
+	      $r.find('.unit').text('U'+unit);
+	      $r.find('.group').text('G'+group);
+	      kc.each(job.instances,function(i,instance){
+		if (kc.json.encode(groups)==kc.json.encode(instance.groups)){
+		  kc.each(instance.volunteers,function(i,v){
+		    var $rr=$r.clone();
+		    $rosterJobsTable.append($rr);
+		    jobRow($rr,staff,job,c,groups,v,function(){
+		      refresh();
+		    });
+		    $r.find('.unit').text('');
+		    $r.find('.group').text('');
+		    ++c;
+		  });
+		}
+	      });
+	      if (c<job.volunteers_required){
+		$rosterJobsTable.append($r);
+		addMeRow($r,$addMe_t.clone(),staff,job,c,groups,
+			 function(){refresh();});
+	      };
+	    }
+	  });
 	});
       });
     });
     $kindyWideRosterJobsTable.find('tr.jobs').remove();
-    kc.each(rosterJobs,function(i,job){
-      var groups=[0,1,2,3];
-      var $r;
-      var c=0;
-      if (job.per=='kindy-wide'){
-	$r=$kindyWideJob_t.clone();
-	kc.each(job.instances,function(i,instance){
-	  if (kc.json.encode(groups)==kc.json.encode(instance.groups)){
-	    kc.each(instance.volunteers,function(i,v){
-	      var $rr=$r.clone();
-	      $kindyWideRosterJobsTable.append($rr);
-	      jobRow($rr,staff,job,c,groups,v,function(){
-		refresh();
-	      });
-	      ++c;
-	    });
+    kc.each(showYears,function(i,year){
+      kc.each(rosterJobs,function(i,job){
+	var groups=[0,1,2,3];
+	var $r;
+	var c=0;
+	if (job.per=='kindy-wide' && job.year==year){
+	  $r=$kindyWideJob_t.clone();
+	  if (job.year==thisYear){
+	    $r.removeClass('notthisyear');
 	  }
-	});
-	if (c<job.volunteers_required){
-	  $kindyWideRosterJobsTable.append($r);
-	  addMeRow($r,$addMe_t.clone(),staff,job,c,groups,
-		   function(){refresh();});
+	  else{
+	    $r.addClass('notthisyear');
+	  }
+	  $r.find('.year').text(''+job.year);
+	  kc.each(job.instances,function(i,instance){
+	    if (kc.json.encode(groups)==kc.json.encode(instance.groups)){
+	      kc.each(instance.volunteers,function(i,v){
+		var $rr=$r.clone();
+		$kindyWideRosterJobsTable.append($rr);
+		jobRow($rr,staff,job,c,groups,v,function(){
+		  refresh();
+		});
+		++c;
+	      });
+	    }
+	  });
+	  if (c<job.volunteers_required){
+	    $kindyWideRosterJobsTable.append($r);
+	    addMeRow($r,$addMe_t.clone(),staff,job,c,groups,
+		     function(){refresh();});
+	  }
 	}
-      }
+      });
     });
     $('div.maintenance-days').find('.Mday').remove();
     kc.each(maintenanceDays,function(i,m){

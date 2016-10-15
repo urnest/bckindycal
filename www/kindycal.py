@@ -9,6 +9,7 @@ import uuid
 import stuff
 import logging
 import zlib
+import time
 
 from pq import hasClass, tagName, attrEquals
 
@@ -2717,8 +2718,10 @@ class roster_bychild(webapp2.RequestHandler):
         if not session.loginLevel in ['admin','staff']:
             log('not logged in')
             return webapp2.redirect('staff.html?from=events.html')
+        year=time.gmtime().tm_year
         data={}
         x=[fromJson(_.data) for _ in MaintenanceDay.query(ancestor=root_key).fetch(1000)]
+        x=[_ for _ in x if _['date']['year']==year]
         for maintenance_day in x:
             if not 'name' in maintenance_day: maintenance_day['name']='Maintenance Day 8am'
             if not 'maxVolunteers' in maintenance_day: maintenance_day['maxVolunteers']=25
@@ -2733,6 +2736,7 @@ class roster_bychild(webapp2.RequestHandler):
                 pass
             pass
         x=[fromJson(_.data) for _ in RosterJob.query(ancestor=root_key).fetch(10000)]
+        x=[_ for _ in x if _['year']==year]
         for roster_job in x:
             for instance in roster_job['instances']:
                 for v in instance['volunteers']:
@@ -2748,6 +2752,7 @@ class roster_bychild(webapp2.RequestHandler):
         data=data.items()
         data.sort()
         page=pq.loadFile('roster_bychild.html')
+        page.find(pq.hasClass('year')).text(str(year))
         table=page.find(pq.hasClass('roster-jobs-table'))
         rowt=table.find(pq.tagName('tr')).filter(pq.hasClass('jobs')).remove().first()
         for childs_name,jobs in data:

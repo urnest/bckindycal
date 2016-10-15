@@ -2,11 +2,20 @@ $(document).ready(function(){
   var roster_job;
   var rendering=kc.rendering($('div#content'));
   var busyCount=0;
+  var $year=$('select[name="year"]');
+  var $yearOption=$year.find('option').remove().first();
+  var now=new Date;
+  var thisYear=now.getFullYear();
+  var nextYear=thisYear+1;
+  $year.append($yearOption.clone().prop('name','').text(''));
+  $year.append($yearOption.clone().prop('name',''+thisYear).text(''+thisYear));
+  $year.append($yearOption.clone().prop('name',''+nextYear).text(''+nextYear));
+  
   $('body').removeClass('kc-invisible');//added by kindycal.py
   $('input#save-button').click(function(){
     var data={
       id:parseInt($('input[name="id"]').prop('value')),
-      year:2016, //REVISIT
+      year:parseInt(kc.getSelectedOption($year).prop('name')),
       name:$('input[name="name"]').prop('value'),
       per:$('select[name="per"]').prop('value'),
       description:$('div.job-description').html(),
@@ -18,6 +27,10 @@ $(document).ready(function(){
       return false;
     }
     $('input').add($('select')).removeClass('invalid-input');
+    if (data.year==''){
+      $year.addClass('invalid-input');
+      return false;
+    }
     if (data.name==''){
       $('input[name="name"]').first().addClass('invalid-input');
       return false;
@@ -71,6 +84,7 @@ $(document).ready(function(){
     //new roster_job
     roster_job={
       id:0,
+      year:(new Date).getFullYear(),
       name:'',
       per:'kindy-wide',
       description:'<p></p>',
@@ -90,6 +104,11 @@ $(document).ready(function(){
   var proceed=function(){
     if (roster_job){
       $('input[name="name"]').prop('value',roster_job.name);
+      kc.selectOptionByName($year,'');
+      if (roster_job.year==thisYear ||
+	  roster_job.year==nextYear){
+	kc.selectOptionByName($year,''+roster_job.year);
+      }
       $('select[name="per"]').prop('value',roster_job.per);
       $('div.job-description').html(roster_job.description);
       $('select[name="frequency"]').prop('value',roster_job.frequency);

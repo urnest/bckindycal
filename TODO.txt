@@ -14,11 +14,18 @@ https:://bckindycal-1197.appspot.com
     x schema
     x updateRosterJob callers
     x roster_job callers
-    - test:
+    x test:
       add roster job volunteer
       update volunteer attended
       update volunteer
       delete volunteer
+    x massage data
+      x xjutv
+      x nicole
+      x live
+    x add year to schema and default to 2016
+    x push to github
+    x pull from github nicole
     x massage data
       x xjutv
       x nicole

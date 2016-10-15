@@ -863,3 +863,9 @@ div.month-block {
 div.month-block table.month-of-events {
     width:1080px;
 }
+tr.jobs.notthisyear, 
+tr.jobs.notthisyear td.jobc, 
+tr.jobs.notthisyear td.job {
+    font-style: italic;
+    color: #888888;
+}

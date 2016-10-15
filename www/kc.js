@@ -241,7 +241,16 @@
     ];
     return result;
   })();
-
+  kc.getSelectedOption=function($select){
+    var $result;
+    $select.find('option').each(function(){
+      var $option=$(this);
+      if ($option.prop('selected')){
+	$result=$option;
+      }
+    });
+    return $result;
+  };
   kc.inContext=function(e, context){
     var em;
     if (typeof(e)=='object' && 
@@ -806,6 +815,17 @@
 	$x.removeClass('kc-rendering');
       }
     };
+  };
+  kc.selectOptionByName=function($select,name){
+    $select.find('option').each(function(){
+      var $option=$(this);
+      if ($option.prop('name')==name){
+	$option.prop('selected',true);
+      }
+      else{
+	$option.prop('selected',false);
+      }
+    });
   };
   kc.selectYourGroup=function(title,options,$from){
     var animDuration=200;
