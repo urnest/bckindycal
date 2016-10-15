@@ -341,8 +341,41 @@ $(document).ready(function(){
     }
     return 1+groups[0]%2;
   };
+  var now=new Date;
+  var thisYear=now.getFullYear();
+  var nextYear=thisYear+1;
+  var rosterJobsSort=function(a,b){
+    if (a.year<b.year){
+      return -1;
+    }
+    if (a.year>b.year){
+      return 1;
+    }
+    if (a.name<b.name){
+      return -1;
+    }
+    if (a.name>b.name){
+      return 1;
+    }
+    return 0;
+  };
+  $('span.year').text(''+thisYear);
+  $('span.nextyear').text(''+nextYear);
+  $('a.copy-roster-jobs').click(function(){
+    kc.postToServer('copy_roster_jobs',{
+      params:kc.json.encode({fromYear:thisYear,toYear:nextYear})
+    })
+      .then(function(result){
+	kc.each(result,function(i,job){
+	  rosterJobs.push(job);
+	});
+	rosterJobs.sort(rosterJobsSort);
+	refresh();
+      });
+    return false;
+  });
   $('body').removeClass('kc-invisible');//added by kindycal.py
-
+  
   kc.getFromServer('groups')
     .then(function(result){
       groups=result;
@@ -356,21 +389,7 @@ $(document).ready(function(){
   kc.getFromServer('roster_jobs')
     .then(function(result){
       rosterJobs=result;
-      rosterJobs.sort(function(a,b){
-	if (a.year<b.year){
-	  return -1;
-	}
-	if (a.year>b.year){
-	  return 1;
-	}
-	if (a.name<b.name){
-	  return -1;
-	}
-	if (a.name>b.name){
-	  return 1;
-	}
-	return 0;
-      });
+      rosterJobs.sort(rosterJobsSort);
       proceed();
     })
   kc.getFromServer('all_maintenance_days')

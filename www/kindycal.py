@@ -2502,6 +2502,53 @@ class update_roster_job_volunteer_attended(webapp2.RequestHandler):
     pass
 
 @ndb.transactional
+def copyRosterJobs(fromYear,toYear):
+    'copy roster jobs from %(fromYear)s to %(toYear)s'
+    scope=Scope(l1(copyRosterJobs.__doc__)%vars())
+    try:
+        jobs=RosterJob.query(
+            RosterJob.year==fromYear,
+            ancestor=root_key).fetch(1000)
+        result=[]
+        for job in jobs:
+            data=fromJson(job.data)
+            data['id']=nextRosterJobId()
+            data['year']=toYear
+            for instance in data['instances']:
+                instance['volunteers']=[]
+                pass
+            roster_job_schema.validate(data)
+            newUploadedFileRefs=getRosterJobUploadedFileRefs(data)
+            job=RosterJob(parent=root_key,id=data['id'],year=data['year'])
+            job.data=toJson(data)
+            job.put()
+            updateUploadedFiles([],newUploadedFileRefs)
+            result.append(data)
+            pass
+        return result
+    except:
+        raise inContext(scope.description)
+    pass
+
+class copy_roster_jobs(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                params=fromJson(self.request.get('params'))
+                result=copyRosterJobs(**params)
+                result={'result':result}
+                pass
+            self.response.write(toJson(result))
+        except:
+            self.response.write(toJson({'error':str(inContext('update_volunteer_attended'))}))
+            pass
+        pass
+    pass
+
+@ndb.transactional
 def updateVolunteer(id,groups,volunteer,new_volunteer):
     'update %(volunteer)s as a groups %(groups)r volunteer for job %(id)s to %(new_volunteer)s'
     scope=Scope(l1(updateVolunteer.__doc__)%vars())
@@ -3462,6 +3509,7 @@ application = webapp2.WSGIApplication([
     ('/save_links_page_content',save_links_page_content),
     ('/update_roster_job_volunteer_attended',update_roster_job_volunteer_attended),
     ('/update_roster_job_volunteer',update_roster_job_volunteer),
+    ('/copy_roster_jobs',copy_roster_jobs),
     ('/uploaded_file',uploaded_file),
     ('/uploaded_file_refcount',uploaded_file_refcount),
     ('/logout',logout),
