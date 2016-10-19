@@ -2188,6 +2188,7 @@ class edit_roster_job_page(webapp2.RequestHandler):
         page.find(pq.attrEquals('id','id')).attr('value',self.request.get('id','0'))
         addScriptToPageHead('edit_roster_job.js',page)
         addAdminNavButtonToPage(page,session.loginLevel)
+        page.find(pq.tagName('input')).filter(pq.attrEquals('name','referer')).attr('value',self.request.headers.get('Referer','edit_roster_jobs.html'))
         makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
@@ -2276,6 +2277,26 @@ class delete_roster_job(webapp2.RequestHandler):
                 assert not data is None
                 assert 'id' in data,repr(data)
                 deleteRosterJob(data['id'])
+                self.response.write(toJson({'result':'OK'}))
+                return
+        except:
+            result={'error':str(inContext('delete roster_job'))}
+            pass
+        return self.response.write(toJson(result).encode('utf-8'))
+    pass
+
+class delete_roster_jobs(webapp2.RequestHandler):
+    def post(self):
+        try:
+            session=getSession(self.request.cookies.get('kc-session',''))
+            if session.loginLevel not in ['staff','admin']:
+                result={'error':'You are not logged in.'}
+            else:
+                data=fromJson(self.request.get('params'))
+                assert not data is None
+                for id in data:
+                    deleteRosterJob(id)
+                    pass
                 self.response.write(toJson({'result':'OK'}))
                 return
         except:
@@ -2391,6 +2412,33 @@ class edit_roster_page(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
+class copy_roster_jobs_page(webapp2.RequestHandler):
+    def get(self):
+        session=getSession(self.request.cookies.get('kc-session',''))
+        if not session.loginLevel in ['admin','staff']:
+            log('not logged in')
+            return webapp2.redirect('staff.html?from=events.html')
+        if fetchTerms() is None:
+            log('terms not defined')
+            return webapp2.redirect('edit_terms.html')
+        if fetchGroups() is None:
+            log('groups not defined')
+            return webapp2.redirect('edit_groups.html')
+        page=pq.loadFile('copy_roster_jobs.html')
+        page.find(pq.hasClass('parent-only')).remove()
+        if not session.loginLevel in ['staff','admin']:
+            page.find(pq.hasClass('staff-only')).remove()
+            pass
+        if not session.loginLevel in ['admin']:
+            page.find(pq.hasClass('admin-only')).remove()
+            pass
+        page.find(pq.tagName('body')).addClass(session.loginLevel)
+        addAdminNavButtonToPage(page,session.loginLevel)
+        addScriptToPageHead('copy_roster_jobs.js',page)
+        makePageBodyInvisible(page)
+        self.response.write(unicode(page).encode('utf-8'))
+    pass
+
 @ndb.transactional
 def addRosterJobVolunteer(id,groups,parents_name,childs_name):
     'add %(parents_name)r (parent of %(childs_name)r as groups %(groups)r volunteer for job %(id)s'
@@ -2502,28 +2550,31 @@ class update_roster_job_volunteer_attended(webapp2.RequestHandler):
     pass
 
 @ndb.transactional
-def copyRosterJobs(fromYear,toYear):
-    'copy roster jobs from %(fromYear)s to %(toYear)s'
+def copyRosterJobs(jobs,toYear):
+    'copy roster jobs %(jobs)s to year %(toYear)s'
     scope=Scope(l1(copyRosterJobs.__doc__)%vars())
     try:
-        jobs=RosterJob.query(
-            RosterJob.year==fromYear,
-            ancestor=root_key).fetch(1000)
         result=[]
-        for job in jobs:
-            data=fromJson(job.data)
-            data['id']=nextRosterJobId()
-            data['year']=toYear
-            for instance in data['instances']:
-                instance['volunteers']=[]
+        for id in jobs:
+            jobs=RosterJob.query(
+                RosterJob.id==id,
+                ancestor=root_key).fetch(1)
+            if len(jobs):
+                job=jobs[0]
+                data=fromJson(job.data)
+                data['id']=nextRosterJobId()
+                data['year']=toYear
+                for instance in data['instances']:
+                    instance['volunteers']=[]
+                    pass
+                roster_job_schema.validate(data)
+                newUploadedFileRefs=getRosterJobUploadedFileRefs(data)
+                job=RosterJob(parent=root_key,id=data['id'],year=data['year'])
+                job.data=toJson(data)
+                job.put()
+                updateUploadedFiles([],newUploadedFileRefs)
+                result.append(data)
                 pass
-            roster_job_schema.validate(data)
-            newUploadedFileRefs=getRosterJobUploadedFileRefs(data)
-            job=RosterJob(parent=root_key,id=data['id'],year=data['year'])
-            job.data=toJson(data)
-            job.put()
-            updateUploadedFiles([],newUploadedFileRefs)
-            result.append(data)
             pass
         return result
     except:
@@ -2543,7 +2594,7 @@ class copy_roster_jobs(webapp2.RequestHandler):
                 pass
             self.response.write(toJson(result))
         except:
-            self.response.write(toJson({'error':str(inContext('update_volunteer_attended'))}))
+            self.response.write(toJson({'error':str(inContext('copy_roster_jobs'))}))
             pass
         pass
     pass
@@ -3445,6 +3496,7 @@ application = webapp2.WSGIApplication([
     ('/admin_login.html',admin_login_page),
     ('/change_parent_password.html',change_parent_password_page),
     ('/change_staff_password.html',change_staff_password_page),
+    ('/copy_roster_jobs.html',copy_roster_jobs_page),
     ('/edit_terms.html',edit_terms_page),
     ('/edit_groups.html',edit_groups_page),
     ('/edit_event.html',edit_event_page),
@@ -3479,6 +3531,7 @@ application = webapp2.WSGIApplication([
     ('/all_maintenance_days',all_maintenance_days),
     ('/convenor_signup',convenor_signup),
     ('/delete_roster_job',delete_roster_job),
+    ('/delete_roster_jobs',delete_roster_jobs),
     ('/delete_roster_job_volunteer',delete_roster_job_volunteer),
     ('/get_edit_image_panel',get_edit_image_panel),
     ('/get_month_to_show',get_month_to_show),

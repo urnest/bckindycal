@@ -45,7 +45,8 @@ $(document).ready(function(){
       params:kc.json.encode(data)
     })
       .then(function(){
-	window.location='edit_roster.html';
+	var referer=$('input[name="referer"]').prop('value');
+	window.location=referer;
       })
       .always(function(){
 	--busyCount;

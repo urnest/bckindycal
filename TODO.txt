@@ -30,11 +30,15 @@ https:://bckindycal-1197.appspot.com
       x xjutv
       x nicole
       x live
-    - display year in list
-    - sort by year
-    - only display this year and next year
-    - allow edit year
-
+    x display year in list
+    x sort by year
+    x only display this year and next year
+    x allow edit year
+  x copy jobs page:
+    x moc-up from roster_jobs.html
+    x add check boxes, copy button
+    - make select all trigger update handler
+    - rename to edit_roster_jobs.{html,js}
 
 x edit links page, staff only:
 
