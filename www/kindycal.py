@@ -2412,7 +2412,7 @@ class edit_roster_page(webapp2.RequestHandler):
         self.response.write(unicode(page).encode('utf-8'))
     pass
 
-class copy_roster_jobs_page(webapp2.RequestHandler):
+class edit_roster_jobs_page(webapp2.RequestHandler):
     def get(self):
         session=getSession(self.request.cookies.get('kc-session',''))
         if not session.loginLevel in ['admin','staff']:
@@ -2424,7 +2424,7 @@ class copy_roster_jobs_page(webapp2.RequestHandler):
         if fetchGroups() is None:
             log('groups not defined')
             return webapp2.redirect('edit_groups.html')
-        page=pq.loadFile('copy_roster_jobs.html')
+        page=pq.loadFile('edit_roster_jobs.html')
         page.find(pq.hasClass('parent-only')).remove()
         if not session.loginLevel in ['staff','admin']:
             page.find(pq.hasClass('staff-only')).remove()
@@ -2434,7 +2434,7 @@ class copy_roster_jobs_page(webapp2.RequestHandler):
             pass
         page.find(pq.tagName('body')).addClass(session.loginLevel)
         addAdminNavButtonToPage(page,session.loginLevel)
-        addScriptToPageHead('copy_roster_jobs.js',page)
+        addScriptToPageHead('edit_roster_jobs.js',page)
         makePageBodyInvisible(page)
         self.response.write(unicode(page).encode('utf-8'))
     pass
@@ -3496,7 +3496,7 @@ application = webapp2.WSGIApplication([
     ('/admin_login.html',admin_login_page),
     ('/change_parent_password.html',change_parent_password_page),
     ('/change_staff_password.html',change_staff_password_page),
-    ('/copy_roster_jobs.html',copy_roster_jobs_page),
+    ('/edit_roster_jobs.html',edit_roster_jobs_page),
     ('/edit_terms.html',edit_terms_page),
     ('/edit_groups.html',edit_groups_page),
     ('/edit_event.html',edit_event_page),

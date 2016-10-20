@@ -66,7 +66,7 @@ handlers:
 - url: /admin.html$
   script: kindycal.application
 
-- url: /copy_roster_jobs.html$
+- url: /edit_roster_jobs.html$
   script: kindycal.application
 
 - url: /delete_roster_jobs$
