@@ -50,6 +50,7 @@ $(document).ready(function(){
 	else{
 	  $('.selected input[type="checkbox"]').prop('checked',false);
 	}
+	$('.selected input[type="checkbox"]').change();
       });
       $('.delete-roster-jobs').click(function(){
 	var s=kc.map(kc.keys(selectedJobs),function(i,id){
@@ -72,6 +73,7 @@ $(document).ready(function(){
 	      });
 	      selectedJobs={}
 	      rosterJobs.sort(rosterJobsSort);
+	      $('.select-all').prop('checked',false);
 	      refresh();
 	    });
 	}
@@ -95,6 +97,7 @@ $(document).ready(function(){
 		rosterJobs.push(job);
 	      });
 	      rosterJobs.sort(rosterJobsSort);
+	      $('.select-all').prop('checked',false);
 	      refresh();
 	    });
 	}
@@ -113,7 +116,9 @@ $(document).ready(function(){
     }
     $r.find('.year').text(''+job.year);
     $r.find('.per').text(job.per);
-    $r.find('.name').text(job.name);
+    $r.find('.name a')
+      .text(job.name)
+      .attr('href','edit_roster_job.html?id='+job.id);
     $r.find('.frequency').text(job.frequency);
     $r.find('.volunteers-required').text(job.volunteers_required);
     $rosterJobsTable.append($r);
@@ -127,7 +132,7 @@ $(document).ready(function(){
       }
     });
     if (selectedJobs[''+job.id]){
-      $r.find('selected checkbox').prop('checked',true);
+      $r.find('.selected input[type="checkbox"]').prop('checked',true);
     }
   };
   var refresh=function(){
