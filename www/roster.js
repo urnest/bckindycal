@@ -361,19 +361,6 @@ $(document).ready(function(){
   };
   $('span.year').text(''+thisYear);
   $('span.nextyear').text(''+nextYear);
-  $('a.copy-roster-jobs').click(function(){
-    kc.postToServer('copy_roster_jobs',{
-      params:kc.json.encode({fromYear:thisYear,toYear:nextYear})
-    })
-      .then(function(result){
-	kc.each(result,function(i,job){
-	  rosterJobs.push(job);
-	});
-	rosterJobs.sort(rosterJobsSort);
-	refresh();
-      });
-    return false;
-  });
   $('body').removeClass('kc-invisible');//added by kindycal.py
   
   kc.getFromServer('groups')
