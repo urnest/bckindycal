@@ -869,3 +869,7 @@ tr.jobs.notthisyear td.job {
     font-style: italic;
     color: #888888;
 }
+.edit-roster-jobs-toolbar
+{
+    margin-bottom: 8px;
+}

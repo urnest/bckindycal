@@ -313,6 +313,55 @@ var addMeRow=function($r,$addMe,staff,job,c,groups,refresh){
     return false;
   });
 };
+var selectYearToShow=function(title,options,$from){
+  var animDuration=200;
+  var $dialogContent=$('<div>');
+  var $dialog;
+  var $option_t=$from.clone();
+  var result={
+    then_:function(selectedYear){
+    }
+  };
+  result.then=function(f){
+    result.then_=f;
+  };
+  kc.each(options,function(i,option){
+    var $o=$option_t.clone();
+    $o.text(''+option);
+    $dialogContent.append($('<div class="select-your-group-button">').html($o));
+    $o.click(function(){
+      $dialog.addClass('kc-invisible');
+      $dialog.effect('transfer',{
+	to:$from,
+	className:'kc-transfer-effect'
+      },animDuration);
+      setTimeout(function(){
+	$dialog.removeClass('kc-invisible');
+	$dialogContent.dialog('close');
+	$dialog.remove();
+	result.then_(option);
+      },animDuration);
+      return false;
+    });
+  });
+  $dialogContent.dialog({
+    autoOpen:false,
+    title: title,
+    closeOnEscape:false,
+    dialogClass:'kc-no-close-dialog'
+  });
+  $dialog=$dialogContent.parent('.ui-dialog');
+  $dialog.addClass('kc-invisible');
+  $dialog.addClass('kc-in-front-of-navbar');
+  $dialogContent.dialog('open');
+  $from.effect('transfer',{
+    to:$dialog,
+    className:'kc-transfer-effect'
+  },animDuration);
+  setTimeout(function(){ $dialog.removeClass('kc-invisible');},animDuration);
+  return result;
+};
+
 $(document).ready(function(){
   var groups;
   var rosterJobs;
@@ -321,6 +370,7 @@ $(document).ready(function(){
   var groupsToShowOptions;
   var $groupsToShowOption_t=$('a.select-your-group').first().clone();
   var $selectYourGroup=$('a.select-your-group');
+  var $yearToShow=$('a.year-to-show');
   var rendering=kc.rendering($('div#content'));
   var staff=$('body').hasClass('staff')||$('body').hasClass('admin');
   var $rosterJobsTable=$('table.roster-jobs-table');
@@ -344,6 +394,7 @@ $(document).ready(function(){
   var now=new Date;
   var thisYear=now.getFullYear();
   var nextYear=thisYear+1;
+  var yearToShow=thisYear;
   var rosterJobsSort=function(a,b){
     if (a.year<b.year){
       return -1;
@@ -412,6 +463,17 @@ $(document).ready(function(){
 			   groupsToShowOptions,
 			   $selectYourGroup)
 	  .then(showGroups);
+	return false;
+      });
+      $yearToShow.click(function(){
+	selectYearToShow('Select Year to Show',
+			 [thisYear,nextYear],
+			 $yearToShow)
+	  .then(function(selectedYear){
+	    yearToShow=selectedYear;
+	    refresh();
+	  });
+	return false;
       });
       if (!staff && groupsToShow.length!=1){
 	kc.selectYourGroup('Roster Jobs - Choose Your Class',
@@ -427,35 +489,20 @@ $(document).ready(function(){
   var refresh=function(){
     var groupSet={};
     var now=new Date;
-    var thisYear=now.getFullYear();
-    var nextYear=thisYear+1;
-    var showYears={};
-    kc.each(groupsToShow,function(i,g){
-      groupSet[g]=true;
-    });
-    kc.each(rosterJobs,function(i,job){
-      if (staff ||
-	  job.year==thisYear||
-	  job.year==nextYear){
-	showYears[''+job.year]=true;
-      }
-    });
-    showYears=kc.map(showYears,function(year,unused){
-      return parseInt(year);
-    });
-    showYears.sort(function(x,y){
-      if (x<y){	return -1; }
-      if (x>y){	return 1; }
-      return 0;
-    });
     var i=kc.find(groupsToShowOptions,function(x){
       return kc.json.encode(x.groups)==kc.json.encode(groupsToShow);
     });
     i.push(0); //default
     $('a.select-your-group').text(groupsToShowOptions[i[0]].text);
 
+    kc.each(groupsToShow,function(i,g){
+      groupSet[g]=true;
+    });
+
+    $yearToShow.text(''+yearToShow);
+
     $rosterJobsTable.find('tr.jobs').remove();
-    kc.each(showYears,function(i,year){
+    kc.each([yearToShow],function(i,year){
       kc.each([1,2],function(i,unit){
 	var groups=groupsOfUnit[unit];
 	if (!groupSet[groups[0]]&&!groupSet[groups[1]]){
@@ -540,7 +587,7 @@ $(document).ready(function(){
       });
     });
     $kindyWideRosterJobsTable.find('tr.jobs').remove();
-    kc.each(showYears,function(i,year){
+    kc.each([yearToShow],function(i,year){
       kc.each(rosterJobs,function(i,job){
 	var groups=[0,1,2,3];
 	var $r;
