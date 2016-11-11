@@ -29,6 +29,7 @@ var cssSlidy = function(newOptions) {
     CS.domPrefixes = 'Webkit Moz O Khtml'.split(' ');
     CS.pfx = '';
     CS.element = document.getElementById(options.slidySelector.replace('#', ''));
+    if (!CS.element){ return; }
     CS.init = (function() {
     // browser supports keyframe animation w/o prefixes
       if (CS.element.style.animationName !== undefined) CS.hasAnimation = true;

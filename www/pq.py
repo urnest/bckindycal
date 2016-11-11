@@ -436,6 +436,9 @@ class Selection:
             return u''.join([_.text() for _ in self.nodeList])
         if type(s) is types.StringType:
             s=unicode(s,'utf-8','strict')
+        else:
+            s=unicode(s)
+            pass
         for n in self.nodeList:
             Selection([n]).html(parse(encodeEntities(s)))
         return self
@@ -493,6 +496,9 @@ class Selection:
     def first(self):
         '''return Selection containing first of our nodes'''
         return Selection(self.nodeList[0:1])
+    def last(self):
+        '''return Selection containing first of our nodes'''
+        return Selection(self.nodeList[-1:])
     def children(self):
         '''return Selection containing children of our nodes'''
         return Selection(sum([_.children for _ in self.nodeList],[]))
